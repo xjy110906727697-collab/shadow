@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(USER)
+  expireAt     DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Category {
+  id        String          @id @default(cuid())
+  name      String
+  nameZh    String
+  type      CategoryType
+  slug      String          @unique
+  sortOrder Int             @default(0)
+  videos    VideoCategory[]
+}
+
+enum CategoryType {
+  LEVEL
+  TOPIC
+}
+
+model Video {
+  id              String          @id @default(cuid())
+  title           String
+  titleZh         String
+  description     String?
+  descriptionZh   String?
+  coverUrl        String
+  videoUrl        String
+  audioUrl        String?
+  duration        Int
+  published       Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  categories      VideoCategory[]
+  subtitleTracks  SubtitleTrack[]
+}
+
+model VideoCategory {
+  videoId    String
+  categoryId String
+  video      Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([videoId, categoryId])
+}
+
+model SubtitleTrack {
+  id      String          @id @default(cuid())
+  videoId String
+  lang    SubtitleLang
+  video   Video           @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  entries SubtitleEntry[]
+
+  @@unique([videoId, lang])
+}
+
+enum SubtitleLang {
+  KO
+  ZH
+}
+
+model SubtitleEntry {
+  id        String        @id @default(cuid())
+  trackId   String
+  index     Int
+  startTime Float
+  endTime   Float
+  text      String
+  track     SubtitleTrack @relation(fields: [trackId], references: [id], onDelete: Cascade)
+}
+
+model SiteSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
