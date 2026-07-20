@@ -1,153 +1,173 @@
 #!/usr/bin/env ts-node
+/**
+ * YouTube 视频下载导入脚本
+ *
+ * 使用方法：
+ *   npx tsx src/scripts/youtube-download.ts <youtube-url> [--title-zh "中文标题"] [--publish]
+ *
+ * 示例：
+ *   npx tsx src/scripts/youtube-download.ts https://youtu.be/xxxxx
+ *   npx tsx src/scripts/youtube-download.ts https://youtu.be/xxxxx --title-zh "韩语基础" --publish
+ *
+ * 前置要求：
+ *   pip install yt-dlp
+ */
+
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import OSS from 'ali-oss';
-import sharp from 'sharp';
 import { prisma } from '../lib/prisma';
 
-const client = new OSS({
-  region: process.env.OSS_REGION!,
-  accessKeyId: process.env.OSS_ACCESS_KEY_ID!,
-  accessKeySecret: process.env.OSS_ACCESS_KEY_SECRET!,
-  bucket: process.env.OSS_BUCKET!,
-});
-
-async function downloadVideo(url: string, outputPath: string) {
-  console.log('Downloading video...');
-  execSync(`yt-dlp -f "bestvideo[height<=1080]+bestaudio/best" -o "${outputPath}" "${url}"`);
-  console.log('Video downloaded');
-}
-
-async function extractAudio(videoPath: string, audioPath: string) {
-  console.log('Extracting audio...');
-  execSync(`ffmpeg -i "${videoPath}" -vn -acodec libmp3lame -q:a 2 "${audioPath}"`);
-  console.log('Audio extracted');
-}
-
-async function extractSubtitles(url: string, outputPath: string) {
-  console.log('Extracting subtitles...');
-  execSync(`yt-dlp --write-auto-sub --sub-lang ko --skip-download -o "${outputPath}" "${url}"`);
-  console.log('Subtitles extracted');
-}
-
-async function generateThumbnail(videoPath: string, thumbnailPath: string) {
-  console.log('Generating thumbnail...');
-  execSync(`ffmpeg -i "${videoPath}" -ss 00:00:05 -vframes 1 -vf "scale=640:360" "${thumbnailPath}"`);
-  console.log('Thumbnail generated');
-}
-
-async function getVideoDuration(videoPath: string): Promise<number> {
-  const result = execSync(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${videoPath}"`);
-  return Math.floor(parseFloat(result.toString()));
-}
-
-async function uploadToOSS(filePath: string, key: string): Promise<string> {
-  console.log(`Uploading ${key} to OSS...`);
-  const result = await client.put(key, filePath);
-  return result.url;
-}
-
-async function parseSubtitles(subtitlePath: string) {
-  if (!fs.existsSync(subtitlePath)) {
-    console.log('No subtitles found');
-    return [];
+function extractVideoId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /^([a-zA-Z0-9_-]{11})$/,
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
   }
+  return null;
+}
 
-  const content = fs.readFileSync(subtitlePath, 'utf-8');
-  const entries: Array<{ startTime: number; endTime: number; text: string }> = [];
-  
-  const blocks = content.split('\n\n');
-  for (const block of blocks) {
-    const lines = block.trim().split('\n');
-    if (lines.length >= 3) {
-      const timeMatch = lines[1].match(/(\d{2}):(\d{2}):(\d{2})\.(\d{3}) --> (\d{2}):(\d{2}):(\d{2})\.(\d{3})/);
-      if (timeMatch) {
-        const startTime = parseInt(timeMatch[1]) * 3600 + parseInt(timeMatch[2]) * 60 + parseInt(timeMatch[3]) + parseInt(timeMatch[4]) / 1000;
-        const endTime = parseInt(timeMatch[5]) * 3600 + parseInt(timeMatch[6]) * 60 + parseInt(timeMatch[7]) + parseInt(timeMatch[8]) / 1000;
-        const text = lines.slice(2).join(' ');
-        entries.push({ startTime, endTime, text });
-      }
-    }
-  }
+function downloadFile(url: string, dest: string): Promise<void> {
+  return fetch(url).then(async res => {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const buffer = Buffer.from(await res.arrayBuffer());
+    fs.writeFileSync(dest, buffer);
+  });
+}
 
-  return entries;
+async function getVideoInfo(url: string) {
+  console.log('获取视频信息...');
+  const result = execSync(
+    `yt-dlp --print "%(title)s|||%(duration)s" "${url}"`,
+    { encoding: 'utf-8' }
+  );
+  const parts = result.trim().split('|||');
+  return {
+    title: parts[0] || 'Unknown',
+    duration: parseInt(parts[1] || '0'),
+  };
 }
 
 async function main() {
   const url = process.argv[2];
   if (!url) {
-    console.error('Usage: ts-node youtube-download.ts <youtube-url>');
+    console.error('\n使用方法:');
+    console.error('  npx tsx src/scripts/youtube-download.ts <youtube-url> [--title-zh "中文标题"] [--publish]\n');
+    console.error('示例:');
+    console.error('  npx tsx src/scripts/youtube-download.ts https://youtu.be/xxxxx\n');
     process.exit(1);
   }
 
-  const tempDir = path.join(process.cwd(), 'temp');
-  if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir);
+  const args = process.argv.slice(3);
+  const titleZhIndex = args.indexOf('--title-zh');
+  const customTitleZh = titleZhIndex >= 0 ? args[titleZhIndex + 1] : null;
+  const shouldPublish = args.includes('--publish');
+
+  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+  for (const dir of ['videos', 'covers']) {
+    const fullDir = path.join(uploadsDir, dir);
+    if (!fs.existsSync(fullDir)) fs.mkdirSync(fullDir, { recursive: true });
   }
 
-  const videoPath = path.join(tempDir, 'video.mp4');
-  const audioPath = path.join(tempDir, 'audio.mp3');
-  const subtitlePath = path.join(tempDir, 'subtitles.ko.vtt');
-  const thumbnailPath = path.join(tempDir, 'thumbnail.jpg');
+  const fileId = Date.now().toString();
+  const tempDir = path.join(process.cwd(), 'temp');
+  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
 
   try {
-    await downloadVideo(url, videoPath);
-    await extractAudio(videoPath, audioPath);
-    await extractSubtitles(url, subtitlePath);
-    await generateThumbnail(videoPath, thumbnailPath);
+    const info = await getVideoInfo(url);
+    console.log(`标题: ${info.title}`);
+    console.log(`时长: ${info.duration}秒`);
 
-    const duration = await getVideoDuration(videoPath);
-    const videoId = Date.now().toString();
+    // Step 1: Download video (prefer mp4 with audio)
+    console.log('下载视频中...');
+    const cookiesArg = args.includes('--cookies') ? ' --cookies-from-browser chrome' : '';
+    execSync(
+      `yt-dlp -f "best[ext=mp4]/best"${cookiesArg} -o "${path.join(tempDir, `${fileId}.%(ext)s`)}" "${url}"`,
+      { stdio: 'inherit' }
+    );
 
-    const videoUrl = await uploadToOSS(videoPath, `videos/${videoId}.mp4`);
-    const audioUrl = await uploadToOSS(audioPath, `audio/${videoId}.mp3`);
-    const coverUrl = await uploadToOSS(thumbnailPath, `covers/${videoId}.jpg`);
+    // Find the actual downloaded file (yt-dlp may append extra info)
+    const findDownloadedFile = (): string | null => {
+      if (!fs.existsSync(tempDir)) return null;
+      const files = fs.readdirSync(tempDir);
+      const match = files.find(f => f.startsWith(fileId));
+      return match ? path.join(tempDir, match) : null;
+    };
 
+    const actualVideo = findDownloadedFile();
+    if (!actualVideo || !fs.existsSync(actualVideo)) {
+      throw new Error('下载的视频文件未找到');
+    }
+    const videoExt = path.extname(actualVideo);
+    console.log(`视频下载完成: ${path.basename(actualVideo)}`);
+
+    // Step 2: Download thumbnail from YouTube's CDN (always jpg, no ffmpeg needed)
+    const tempThumb = path.join(tempDir, `${fileId}.jpg`);
+    console.log('下载封面...');
+    const videoId = extractVideoId(url);
+    if (videoId) {
+      try {
+        await downloadFile(
+          `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+          tempThumb
+        );
+        console.log('封面下载完成');
+      } catch {
+        try {
+          await downloadFile(
+            `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+            tempThumb
+          );
+          console.log('封面下载完成（低分辨率）');
+        } catch {
+          console.log('封面下载失败');
+        }
+      }
+    }
+
+    // Step 3: Copy to uploads
+    const videoDest = path.join(uploadsDir, 'videos', `${fileId}${videoExt}`);
+    fs.copyFileSync(actualVideo, videoDest);
+
+    let coverUrl = '';
+    if (fs.existsSync(tempThumb)) {
+      const coverDest = path.join(uploadsDir, 'covers', `${fileId}.jpg`);
+      fs.copyFileSync(tempThumb, coverDest);
+      coverUrl = `/uploads/covers/${fileId}.jpg`;
+    }
+
+    const videoUrl = `/uploads/videos/${fileId}${videoExt}`;
+
+    // Step 4: Create DB record
     const video = await prisma.video.create({
       data: {
-        title: 'Imported Video',
-        titleZh: '导入的视频',
-        description: '',
-        descriptionZh: '',
-        coverUrl,
+        title: info.title,
+        titleZh: customTitleZh || info.title,
+        coverUrl: coverUrl || '',
         videoUrl,
-        audioUrl,
-        duration,
-        published: false,
+        duration: info.duration,
+        published: shouldPublish,
       },
     });
 
-    const subtitleEntries = await parseSubtitles(subtitlePath);
-    if (subtitleEntries.length > 0) {
-      const koTrack = await prisma.subtitleTrack.create({
-        data: {
-          videoId: video.id,
-          lang: 'KO',
-        },
-      });
-
-      await prisma.subtitleEntry.createMany({
-        data: subtitleEntries.map((entry, index) => ({
-          trackId: koTrack.id,
-          index,
-          startTime: entry.startTime,
-          endTime: entry.endTime,
-          text: entry.text,
-        })),
-      });
-    }
-
-    console.log(`\nVideo imported successfully!`);
-    console.log(`Video ID: ${video.id}`);
-    console.log(`Edit subtitles at: /admin/videos/${video.id}/subtitles`);
+    console.log(`\n✅ 视频已创建! ID: ${video.id}`);
+    console.log(`   视频: ${videoUrl}`);
+    if (coverUrl) console.log(`   封面: ${coverUrl}`);
+    console.log(`   编辑: /admin/videos/${video.id}/edit`);
+    console.log('\n🎉 导入完成!');
   } catch (error) {
-    console.error('Error:', error);
+    console.error('错误:', error);
+    process.exit(1);
   } finally {
-    if (fs.existsSync(videoPath)) fs.unlinkSync(videoPath);
-    if (fs.existsSync(audioPath)) fs.unlinkSync(audioPath);
-    if (fs.existsSync(subtitlePath)) fs.unlinkSync(subtitlePath);
-    if (fs.existsSync(thumbnailPath)) fs.unlinkSync(thumbnailPath);
+    if (fs.existsSync(tempDir)) {
+      const files = fs.readdirSync(tempDir);
+      for (const f of files) {
+        if (f.startsWith(fileId)) fs.unlinkSync(path.join(tempDir, f));
+      }
+    }
   }
 }
 

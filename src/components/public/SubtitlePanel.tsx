@@ -38,14 +38,20 @@ export function SubtitlePanel({
       const containerRect = container.getBoundingClientRect()
       const elementRect = element.getBoundingClientRect()
 
-      if (elementRect.top < containerRect.top || elementRect.bottom > containerRect.bottom) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }
+      // Scroll active subtitle to upper area (25% from top)
+      const targetTop = container.scrollTop + elementRect.top - containerRect.top - containerRect.height * 0.25
+      container.scrollTo({ top: targetTop, behavior: 'smooth' })
     }
   }, [activeIndex])
 
   const handleEntryClick = (entry: SubtitleEntry) => {
     onSeek?.(entry.startTime)
+  }
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60)
+    const s = Math.floor(seconds % 60)
+    return `${m}:${s.toString().padStart(2, '0')}`
   }
 
   return (
@@ -76,33 +82,34 @@ export function SubtitlePanel({
                     : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
                 }`}
               >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[11px] text-gray-400 font-mono">{formatTime(entry.startTime)}</span>
+                  {isActive && (
+                    <span className="text-[11px] text-blue-600 font-medium flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" />
+                      正在播放
+                    </span>
+                  )}
+                </div>
                 {mode === '盲听' ? (
                   <>
                     <div className="h-5 bg-gray-200 rounded w-full mb-2" />
                     <div className="h-4 bg-gray-200 rounded w-3/4" />
                   </>
                 ) : mode === '中文' ? (
-                  <div className={`text-base ${
-                    isActive ? 'text-blue-700' : 'text-gray-600'
-                  }`}>
+                  <div className={`text-base ${isActive ? 'text-blue-700' : 'text-gray-600'}`}>
                     {entry.zh}
                   </div>
                 ) : mode === '韩文' ? (
-                  <div className={`text-lg font-medium ${
-                    isActive ? 'text-blue-900' : 'text-gray-900'
-                  }`}>
+                  <div className={`text-lg font-medium ${isActive ? 'text-blue-900' : 'text-gray-900'}`}>
                     {entry.ko}
                   </div>
                 ) : (
                   <>
-                    <div className={`text-lg font-medium mb-1 ${
-                      isActive ? 'text-blue-900' : 'text-gray-900'
-                    }`}>
+                    <div className={`text-lg font-medium mb-1 ${isActive ? 'text-blue-900' : 'text-gray-900'}`}>
                       {entry.ko}
                     </div>
-                    <div className={`text-base ${
-                      isActive ? 'text-blue-700' : 'text-gray-600'
-                    }`}>
+                    <div className={`text-base ${isActive ? 'text-blue-700' : 'text-gray-600'}`}>
                       {entry.zh}
                     </div>
                   </>

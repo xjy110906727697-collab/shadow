@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { Table, Button, Space, Input, Tabs, Modal, Form, message, Popconfirm } from 'antd'
+import { Table, Button, Space, Input, Modal, Form, message, Popconfirm } from 'antd'
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 
@@ -11,13 +11,11 @@ interface Category {
   nameZh: string
   slug: string
   sortOrder: number
-  type: 'LEVEL' | 'TOPIC'
 }
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'LEVEL' | 'TOPIC'>('LEVEL')
   const [search, setSearch] = useState('')
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
   const [sortField, setSortField] = useState('sortOrder')
@@ -32,7 +30,7 @@ export default function AdminCategoriesPage() {
       const params = new URLSearchParams()
       params.set('page', pagination.current.toString())
       params.set('pageSize', pagination.pageSize.toString())
-      params.set('type', activeTab)
+      params.set('type', 'TOPIC')
       params.set('sortField', sortField)
       params.set('sortOrder', sortOrder)
       if (search) params.set('search', search)
@@ -46,7 +44,7 @@ export default function AdminCategoriesPage() {
     } finally {
       setLoading(false)
     }
-  }, [pagination.current, pagination.pageSize, activeTab, sortField, sortOrder, search])
+  }, [pagination.current, pagination.pageSize, sortField, sortOrder, search])
 
   useEffect(() => {
     fetchCategories()
@@ -92,10 +90,7 @@ export default function AdminCategoriesPage() {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...values,
-          type: activeTab
-        })
+        body: JSON.stringify(values)
       })
 
       if (!res.ok) throw new Error('保存失败')
@@ -122,11 +117,6 @@ export default function AdminCategoriesPage() {
       setSortField(sorter.field)
       setSortOrder(sorter.order || 'asc')
     }
-  }
-
-  const handleTabChange = (key: string) => {
-    setActiveTab(key as 'LEVEL' | 'TOPIC')
-    setPagination(prev => ({ ...prev, current: 1 }))
   }
 
   const columns: ColumnsType<Category> = [
@@ -174,7 +164,7 @@ export default function AdminCategoriesPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">分类管理</h1>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-          添加{activeTab === 'LEVEL' ? '等级' : '主题'}
+          添加主题
         </Button>
       </div>
 
@@ -194,16 +184,6 @@ export default function AdminCategoriesPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow">
-        <Tabs
-          activeKey={activeTab}
-          onChange={handleTabChange}
-          items={[
-            { key: 'LEVEL', label: '等级' },
-            { key: 'TOPIC', label: '主题' }
-          ]}
-          style={{ padding: '0 16px' }}
-        />
-
         <Table<Category>
           columns={columns}
           dataSource={categories}
@@ -222,7 +202,7 @@ export default function AdminCategoriesPage() {
       </div>
 
       <Modal
-        title={`${editingCategory ? '编辑' : '添加'}${activeTab === 'LEVEL' ? '等级' : '主题'}`}
+        title={`${editingCategory ? '编辑' : '添加'}主题`}
         open={showForm}
         onOk={handleSubmit}
         onCancel={() => setShowForm(false)}

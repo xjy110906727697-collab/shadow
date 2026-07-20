@@ -1,5 +1,9 @@
 import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
+import fs from 'fs'
+import path from 'path'
+
+const uploadsDir = path.join(process.cwd(), 'public')
 
 export async function GET(
   request: Request,
@@ -91,9 +95,29 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
+
+    // Get file URLs before deleting the record
+    const video = await prisma.video.findUnique({
+      where: { id },
+      select: { videoUrl: true, coverUrl: true, audioUrl: true }
+    })
+
+    // Delete from database
     await prisma.video.delete({
       where: { id }
     })
+
+    // Delete physical files from uploads
+    if (video) {
+      for (const url of [video.videoUrl, video.coverUrl, video.audioUrl]) {
+        if (url && url.startsWith('/uploads/')) {
+          const filePath = path.join(uploadsDir, url)
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath)
+          }
+        }
+      }
+    }
 
     return NextResponse.json({ message: 'Video deleted successfully' })
   } catch (error) {

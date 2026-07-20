@@ -11,7 +11,12 @@ interface Video {
   id: string
   title: string
   titleZh: string
+  coverUrl: string
+  videoUrl: string
   duration: number
+  episodeNumber?: number | null
+  difficulty?: number | null
+  instructor?: string | null
   published: boolean
   visitorAccessible: boolean
   createdAt: string
@@ -116,6 +121,45 @@ export default function AdminVideosPage() {
           <div className="text-sm text-gray-500">{record.title}</div>
         </div>
       ),
+    },
+    {
+      title: '封面',
+      width: 80,
+      render: (_: any, record: Video) =>
+        record.coverUrl ? (
+          <img src={record.coverUrl} alt="封面" className="w-12 h-8 rounded object-cover" />
+        ) : (
+          <span className="text-xs text-gray-400">无</span>
+        ),
+    },
+    {
+      title: '视频',
+      width: 60,
+      render: (_: any, record: Video) =>
+        record.videoUrl ? (
+          <video src={record.videoUrl} className="w-12 h-8 rounded object-cover" controls preload="none" />
+        ) : (
+          <span className="text-xs text-gray-400">无</span>
+        ),
+    },
+    {
+      title: '期数',
+      dataIndex: 'episodeNumber',
+      width: 60,
+      render: (val: number | null) => val ? <span>第{val}期</span> : '-',
+    },
+    {
+      title: '难度',
+      dataIndex: 'difficulty',
+      width: 80,
+      render: (val: number | null) =>
+        val ? <span className="text-yellow-500">{'★'.repeat(val)}{'☆'.repeat(5 - val)}</span> : '-',
+    },
+    {
+      title: '博主',
+      dataIndex: 'instructor',
+      width: 100,
+      render: (val: string | null) => val || '-',
     },
     {
       title: '时长',

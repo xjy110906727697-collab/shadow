@@ -14,9 +14,10 @@ interface SubtitleEntry {
 interface EntryEditorProps {
   entry: SubtitleEntry
   onUpdate: (entry: SubtitleEntry) => void
+  onClose?: () => void
 }
 
-export function EntryEditor({ entry, onUpdate }: EntryEditorProps) {
+export function EntryEditor({ entry, onUpdate, onClose }: EntryEditorProps) {
   const [formData, setFormData] = useState(entry)
 
   const handleChange = (field: keyof SubtitleEntry, value: string | number) => {
@@ -25,6 +26,7 @@ export function EntryEditor({ entry, onUpdate }: EntryEditorProps) {
 
   const handleSave = () => {
     onUpdate(formData)
+    onClose?.()
   }
 
   return (
@@ -83,12 +85,20 @@ export function EntryEditor({ entry, onUpdate }: EntryEditorProps) {
         </div>
       </div>
 
-      <button
-        onClick={handleSave}
-        className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-      >
-        Save Changes
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={handleSave}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+        >
+          Save Changes
+        </button>
+        <button
+          onClick={onClose}
+          className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200"
+        >
+          Cancel
+        </button>
+      </div>
     </div>
   )
 }

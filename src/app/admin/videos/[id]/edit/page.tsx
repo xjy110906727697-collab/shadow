@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
+import { FileUpload } from '@/components/admin/FileUpload'
 
 interface Category {
   id: string
@@ -15,8 +16,6 @@ interface Category {
 interface VideoFormData {
   title: string
   titleZh: string
-  description: string
-  descriptionZh: string
   coverUrl: string
   videoUrl: string
   duration: number
@@ -25,7 +24,6 @@ interface VideoFormData {
   instructor: string
   published: boolean
   visitorAccessible: boolean
-  levelId: string
   topicIds: string[]
 }
 
@@ -38,8 +36,6 @@ export default function VideoEditPage() {
   const [formData, setFormData] = useState<VideoFormData>({
     title: '',
     titleZh: '',
-    description: '',
-    descriptionZh: '',
     coverUrl: '',
     videoUrl: '',
     duration: 0,
@@ -48,7 +44,6 @@ export default function VideoEditPage() {
     instructor: '',
     published: false,
     visitorAccessible: false,
-    levelId: '',
     topicIds: []
   })
 
@@ -61,14 +56,11 @@ export default function VideoEditPage() {
     fetch(`/api/admin/videos/${params.id}`)
       .then(res => res.json())
       .then(data => {
-        const levelCategory = data.categories?.find((c: any) => c.category.type === 'LEVEL')
         const topicCategories = data.categories?.filter((c: any) => c.category.type === 'TOPIC')
 
         setFormData({
           title: data.title,
           titleZh: data.titleZh,
-          description: data.description || '',
-          descriptionZh: data.descriptionZh || '',
           coverUrl: data.coverUrl,
           videoUrl: data.videoUrl,
           duration: data.duration,
@@ -77,7 +69,6 @@ export default function VideoEditPage() {
           instructor: data.instructor || '',
           published: data.published,
           visitorAccessible: data.visitorAccessible || false,
-          levelId: levelCategory?.category.id || '',
           topicIds: topicCategories?.map((c: any) => c.category.id) || []
         })
       })
@@ -101,7 +92,7 @@ export default function VideoEditPage() {
           episodeNumber: formData.episodeNumber || null,
           difficulty: formData.difficulty || null,
           instructor: formData.instructor || null,
-          categoryIds: [formData.levelId, ...formData.topicIds].filter(Boolean)
+          categoryIds: formData.topicIds
         })
       })
 
@@ -173,57 +164,24 @@ export default function VideoEditPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                韩语描述
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={e => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                中文描述
-              </label>
-              <textarea
-                value={formData.descriptionZh}
-                onChange={e => setFormData({ ...formData, descriptionZh: e.target.value })}
-                rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                封面图片 URL *
-              </label>
-              <input
-                type="url"
-                value={formData.coverUrl}
-                onChange={e => setFormData({ ...formData, coverUrl: e.target.value })}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                视频 URL *
-              </label>
-              <input
-                type="url"
-                value={formData.videoUrl}
-                onChange={e => setFormData({ ...formData, videoUrl: e.target.value })}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+            <FileUpload
+              label="封面图片"
+              accept="image/*"
+              type="covers"
+              value={formData.coverUrl}
+              onChange={url => setFormData({ ...formData, coverUrl: url })}
+              required
+              placeholder="支持 JPG、PNG 等格式"
+            />
+            <FileUpload
+              label="视频文件"
+              accept="video/*"
+              type="videos"
+              value={formData.videoUrl}
+              onChange={url => setFormData({ ...formData, videoUrl: url })}
+              required
+              placeholder="支持 MP4、WebM 等格式"
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -280,25 +238,6 @@ export default function VideoEditPage() {
               placeholder="讲师/博主名称"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              等级 *
-            </label>
-            <select
-              value={formData.levelId}
-              onChange={e => setFormData({ ...formData, levelId: e.target.value })}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">选择等级</option>
-              {levels.map(level => (
-                <option key={level.id} value={level.id}>
-                  {level.nameZh}
-                </option>
-              ))}
-            </select>
           </div>
 
           <div>

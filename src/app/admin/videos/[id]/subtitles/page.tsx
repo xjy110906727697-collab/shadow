@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { WaveformView } from '@/components/admin/WaveformView'
 import { EntryEditor } from '@/components/admin/EntryEditor'
@@ -104,15 +104,20 @@ export default function SubtitleEditorPage() {
     }
   }
 
-  const handleImportYouTube = async (youtubeUrl: string) => {
+  const handleImportSRT = async (file: File) => {
     try {
+      const formData = new FormData()
+      formData.append('file', file)
+
       const res = await fetch(`/api/admin/videos/${params.id}/import-subs`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ youtubeUrl })
+        body: formData,
       })
 
-      if (!res.ok) throw new Error('导入字幕失败')
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || '导入字幕失败')
+      }
 
       const data = await res.json()
       if (data.entries) {
@@ -123,9 +128,11 @@ export default function SubtitleEditorPage() {
       }
     } catch (error) {
       console.error('Failed to import subtitles:', error)
-      alert('导入字幕失败')
+      alert(error instanceof Error ? error.message : '导入字幕失败')
     }
   }
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   if (loading) {
     return <p className="text-gray-500">加载中...</p>
@@ -168,6 +175,7 @@ export default function SubtitleEditorPage() {
           <EntryEditor
             entry={selectedEntry}
             onUpdate={handleUpdateEntry}
+            onClose={() => setSelectedEntryId(null)}
           />
         </div>
       )}
@@ -182,14 +190,18 @@ export default function SubtitleEditorPage() {
             >
               添加条目
             </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".srt,.vtt,.txt"
+              onChange={e => e.target.files?.[0] && handleImportSRT(e.target.files[0])}
+              className="hidden"
+            />
             <button
-              onClick={() => {
-                const url = prompt('请输入 YouTube URL：')
-                if (url) handleImportYouTube(url)
-              }}
+              onClick={() => fileInputRef.current?.click()}
               className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200"
             >
-              从 YouTube 导入
+              导入 SRT 字幕
             </button>
           </div>
         </div>
