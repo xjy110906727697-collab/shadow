@@ -115,8 +115,12 @@ export default function SubtitleEditorPage() {
       if (!res.ok) throw new Error('导入字幕失败')
 
       const data = await res.json()
-      setEntries(data.entries)
-      alert('成功导入 ' + data.entries.length + ' 条字幕')
+      if (data.entries) {
+        setEntries(data.entries)
+        alert('成功导入 ' + data.entries.length + ' 条字幕')
+      } else {
+        alert(data.message || '导入字幕失败')
+      }
     } catch (error) {
       console.error('Failed to import subtitles:', error)
       alert('导入字幕失败')

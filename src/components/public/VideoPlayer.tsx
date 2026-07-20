@@ -92,7 +92,7 @@ export function VideoPlayer({ videoUrl, onTimeUpdate }: VideoPlayerProps) {
       <video
         ref={videoRef}
         src={videoUrl}
-        className="w-full aspect-video"
+        className="w-full aspect-[4/3]"
         onClick={togglePlay}
         autoPlay
       />

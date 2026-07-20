@@ -34,6 +34,7 @@ export default function VideoDetailPage() {
   const [loading, setLoading] = useState(true)
   const [currentTime, setCurrentTime] = useState(0)
   const [isLocked, setIsLocked] = useState(false)
+  const [subtitleMode, setSubtitleMode] = useState<'双语' | '韩文' | '中文' | '盲听'>('双语')
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -60,6 +61,12 @@ export default function VideoDetailPage() {
     }
   }, [params.id])
 
+  useEffect(() => {
+    const handler = (e: CustomEvent) => setSubtitleMode(e.detail as typeof subtitleMode)
+    window.addEventListener('subtitle-mode', handler as EventListener)
+    return () => window.removeEventListener('subtitle-mode', handler as EventListener)
+  }, [])
+
   const handleSeek = (time: number) => {
     setCurrentTime(time)
     const videoElement = document.querySelector('video')
@@ -70,7 +77,7 @@ export default function VideoDetailPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="w-full px-4 md:px-8 py-8">
         <p className="text-center text-gray-500">加载视频中...</p>
       </div>
     )
@@ -78,7 +85,7 @@ export default function VideoDetailPage() {
 
   if (isLocked) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="w-full px-4 md:px-8 py-8">
         <div className="max-w-md mx-auto bg-white rounded-lg shadow p-8 text-center">
           <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -100,37 +107,42 @@ export default function VideoDetailPage() {
 
   if (!video) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="w-full px-4 md:px-8 py-8">
         <p className="text-center text-gray-500">视频未找到</p>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-[1400px]">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">{video.titleZh}</h1>
-        <p className="text-gray-600 mb-2">{video.title}</p>
+    <div className="w-full px-4 md:px-8 py-4">
+      {/* Player + Subtitles */}
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="lg:w-[70%]">
+            <div className="h-full">
+              <VideoPlayer
+                videoUrl={video.videoUrl}
+                onTimeUpdate={setCurrentTime}
+              />
+            </div>
+          </div>
+
+          <div className="lg:w-[30%] flex flex-col h-full">
+            <SubtitlePanel
+              subtitles={video.subtitles}
+              currentTime={currentTime}
+              onSeek={handleSeek}
+              mode={subtitleMode}
+            />
+          </div>
+        </div>
+
+        {/* Description below */}
         {(video.descriptionZh || video.description) && (
-          <p className="text-gray-700">{video.descriptionZh || video.description}</p>
+          <div className="mt-6 text-sm text-gray-600 leading-relaxed">
+            <p>{video.descriptionZh || video.description}</p>
+          </div>
         )}
-      </div>
-
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="lg:w-[65%]">
-          <VideoPlayer
-            videoUrl={video.videoUrl}
-            onTimeUpdate={setCurrentTime}
-          />
-        </div>
-
-        <div className="lg:w-[35%] flex flex-col">
-          <SubtitlePanel
-            subtitles={video.subtitles}
-            currentTime={currentTime}
-            onSeek={handleSeek}
-          />
-        </div>
       </div>
     </div>
   )

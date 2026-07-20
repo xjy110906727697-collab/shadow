@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Invalid password')
         }
 
-        return { id: user.id, email: user.email, role: user.role, expireAt: user.expireAt }
+        return { id: user.id, email: user.email, role: user.role, expireAt: user.expireAt?.toISOString() ?? null } as any
       }
     })
   ],

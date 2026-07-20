@@ -3,11 +3,12 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const video = await prisma.video.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         subtitleTracks: {
           include: {
@@ -51,20 +52,21 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await request.json()
     const { entries } = body
+    const { id } = await params
 
     let koTrack = await prisma.subtitleTrack.findFirst({
-      where: { videoId: params.id, lang: 'KO' }
+      where: { videoId: id, lang: 'KO' }
     })
 
     if (!koTrack) {
       koTrack = await prisma.subtitleTrack.create({
         data: {
-          videoId: params.id,
+          videoId: id,
           lang: 'KO'
         }
       })
@@ -87,13 +89,13 @@ export async function PUT(
     }
 
     let zhTrack = await prisma.subtitleTrack.findFirst({
-      where: { videoId: params.id, lang: 'ZH' }
+      where: { videoId: id, lang: 'ZH' }
     })
 
     if (!zhTrack) {
       zhTrack = await prisma.subtitleTrack.create({
         data: {
-          videoId: params.id,
+          videoId: id,
           lang: 'ZH'
         }
       })

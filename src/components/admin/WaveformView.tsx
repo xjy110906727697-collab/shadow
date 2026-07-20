@@ -76,8 +76,10 @@ export function WaveformView({
 
     regionsRef.current.clearRegions()
 
+    if (!regionsRef.current) return
+
     entries.forEach(entry => {
-      const region = regionsRef.current.addRegion({
+      const region = regionsRef.current!.addRegion({
         start: entry.startTime,
         end: entry.endTime,
         color: entry.id === selectedEntryId ? 'rgba(59, 130, 246, 0.3)' : 'rgba(200, 200, 200, 0.3)',

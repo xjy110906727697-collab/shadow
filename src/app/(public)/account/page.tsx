@@ -3,9 +3,11 @@
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { signOut } from 'next-auth/react'
+import Link from 'next/link'
 
 export default function AccountPage() {
-  const { data: session, update } = useSession()
+  const { data: session, status } = useSession()
   const router = useRouter()
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -68,7 +70,22 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="max-w-lg mx-auto px-4 py-8">
+      {status === 'unauthenticated' && (
+        <div className="text-center py-16">
+          <div className="text-4xl mb-4">🔑</div>
+          <h1 className="text-2xl font-bold mb-3">需要登录</h1>
+          <p className="text-gray-600 mb-6">请登录后查看个人中心</p>
+          <Link
+            href="/login"
+            className="inline-block bg-blue-600 text-white px-8 py-2.5 rounded-lg hover:bg-blue-700 font-medium"
+          >
+            立即登录
+          </Link>
+        </div>
+      )}
+      {status === 'authenticated' && (
+      <>
       <h1 className="text-3xl font-bold mb-8">我的账号</h1>
 
       {isExpired && (
@@ -164,6 +181,17 @@ export default function AccountPage() {
           </button>
         </form>
       </div>
+
+      <div className="mt-6 text-center">
+        <button
+          onClick={() => signOut({ callbackUrl: '/' })}
+          className="text-sm text-gray-400 hover:text-red-500 transition-colors"
+        >
+          退出登录
+        </button>
+      </div>
+        </>
+      )}
     </div>
   )
 }

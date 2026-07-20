@@ -222,7 +222,7 @@ export default function AdminCategoriesPage() {
       </div>
 
       <Modal
-        title={editingCategory ? '编辑' : '添加'}{activeTab === 'LEVEL' ? '等级' : '主题'}
+        title={`${editingCategory ? '编辑' : '添加'}${activeTab === 'LEVEL' ? '等级' : '主题'}`}
         open={showForm}
         onOk={handleSubmit}
         onCancel={() => setShowForm(false)}

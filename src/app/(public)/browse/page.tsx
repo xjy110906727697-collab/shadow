@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -15,6 +15,12 @@ interface Category {
   type: 'LEVEL' | 'TOPIC'
 }
 
+interface TopicInfo {
+  id: string
+  name: string
+  slug: string
+}
+
 interface Video {
   id: string
   title: string
@@ -23,12 +29,27 @@ interface Video {
   descriptionZh?: string | null
   coverUrl: string
   duration: number
+  episodeNumber?: number | null
+  difficulty?: number | null
+  instructor?: string | null
   level?: string | null
+  topics?: TopicInfo[]
   visitorAccessible?: boolean
+  createdAt?: string
 }
 
-export default function BrowsePage() {
+interface ProgressStats {
+  totalVideos: number
+  learnedVideos: number
+  unlearnedVideos: number
+}
+
+type DurationFilter = '' | 'lt3' | '3to5' | 'gt5'
+
+function BrowsePageContent() {
   const searchParams = useSearchParams()
+  const searchQuery = searchParams.get('search') || ''
+  const showFavorites = searchParams.get('show') === 'favorites'
   const { data: session } = useSession()
   const [categories, setCategories] = useState<Category[]>([])
   const [videos, setVideos] = useState<Video[]>([])
@@ -36,11 +57,24 @@ export default function BrowsePage() {
   const [loadingMore, setLoadingMore] = useState(false)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const [selectedLevel, setSelectedLevel] = useState(searchParams.get('level') || '')
   const [selectedTopic, setSelectedTopic] = useState(searchParams.get('topic') || '')
+  // Draft state — changes as user interacts with filters
+  const [durationDraft, setDurationDraft] = useState<DurationFilter>('')
+  const [difficultyDraft, setDifficultyDraft] = useState(0)
+  const [instructorDraft, setInstructorDraft] = useState('')
+  const [topicDraft, setTopicDraft] = useState(searchParams.get('topic') || '')
+  // Applied state — only updated when "视频筛选" button is clicked
+  const [appliedDuration, setAppliedDuration] = useState<DurationFilter>('')
+  const [appliedDifficulty, setAppliedDifficulty] = useState(0)
+  const [appliedInstructor, setAppliedInstructor] = useState('')
+  const [appliedTopic, setAppliedTopic] = useState(searchParams.get('topic') || '')
+  const [instructors, setInstructors] = useState<string[]>([])
+  const [progressStats, setProgressStats] = useState<ProgressStats>({ totalVideos: 0, learnedVideos: 0, unlearnedVideos: 0 })
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+  const [activeStat, setActiveStat] = useState<'all' | 'learned' | 'unlearned'>('all')
   const observerRef = useRef<HTMLDivElement>(null)
   const isVisitor = !session
-  const [showSubscribeModal, setShowSubscribeModal] = useState(false)
 
   useEffect(() => {
     fetch('/api/categories')
@@ -50,9 +84,25 @@ export default function BrowsePage() {
   }, [])
 
   useEffect(() => {
+    fetch('/api/user/progress/stats')
+      .then(res => res.json())
+      .then(data => {
+        if (data.totalVideos !== undefined) {
+          setProgressStats(data)
+        }
+      })
+      .catch(console.error)
+  }, [])
+
+  useEffect(() => {
     const handleVideoLocked = () => setShowSubscribeModal(true)
+    const handleFavoriteLogin = () => setShowLoginPrompt(true)
     window.addEventListener('video-locked', handleVideoLocked)
-    return () => window.removeEventListener('video-locked', handleVideoLocked)
+    window.addEventListener('favorite-login', handleFavoriteLogin)
+    return () => {
+      window.removeEventListener('video-locked', handleVideoLocked)
+      window.removeEventListener('favorite-login', handleFavoriteLogin)
+    }
   }, [])
 
   useEffect(() => {
@@ -60,11 +110,33 @@ export default function BrowsePage() {
       setLoading(true)
       setPage(1)
       try {
-        const params = new URLSearchParams(searchParams)
+        const params = new URLSearchParams()
+        if (searchQuery) params.set('search', searchQuery)
+        if (appliedTopic) params.set('topic', appliedTopic)
+        if (appliedDuration) params.set('duration', appliedDuration)
+        if (appliedDifficulty > 0) params.set('difficulty', appliedDifficulty.toString())
+        if (appliedInstructor) params.set('instructor', appliedInstructor)
+        if (activeStat !== 'all') params.set('progress', activeStat)
         params.set('page', '1')
         const res = await fetch(`/api/videos?${params.toString()}`)
         const data = await res.json()
-        setVideos(data.videos)
+        let fetchedVideos = data.videos
+
+        // Filter by favorites if in favorites mode
+        if (showFavorites) {
+          const stored = localStorage.getItem('favorites')
+          const favIds: string[] = stored ? JSON.parse(stored) : []
+          fetchedVideos = fetchedVideos.filter((v: Video) => favIds.includes(v.id))
+        }
+
+        setVideos(fetchedVideos)
+
+        // Collect unique instructors from all videos
+        const uniqueInstructors = [...new Set<string>(
+          (data.videos as Video[]).map((v: Video) => v.instructor).filter(Boolean) as string[]
+        )].sort()
+        setInstructors(uniqueInstructors)
+
         setTotalPages(data.pagination.totalPages)
       } catch (error) {
         console.error('Failed to fetch videos:', error)
@@ -74,7 +146,7 @@ export default function BrowsePage() {
     }
 
     fetchVideos()
-  }, [searchParams])
+  }, [searchQuery, appliedTopic, appliedDuration, appliedDifficulty, appliedInstructor, activeStat, showFavorites])
 
   const loadMore = async () => {
     if (loadingMore || page >= totalPages) return
@@ -83,7 +155,13 @@ export default function BrowsePage() {
     const nextPage = page + 1
     
     try {
-      const params = new URLSearchParams(searchParams)
+      const params = new URLSearchParams()
+      if (searchQuery) params.set('search', searchQuery)
+      if (appliedTopic) params.set('topic', appliedTopic)
+      if (appliedDuration) params.set('duration', appliedDuration)
+      if (appliedDifficulty > 0) params.set('difficulty', appliedDifficulty.toString())
+      if (appliedInstructor) params.set('instructor', appliedInstructor)
+      if (activeStat !== 'all') params.set('progress', activeStat)
       params.set('page', nextPage.toString())
       const res = await fetch(`/api/videos?${params.toString()}`)
       const data = await res.json()
@@ -113,120 +191,227 @@ export default function BrowsePage() {
     return () => observer.disconnect()
   }, [loading, loadingMore, page, totalPages])
 
-  const levels = categories.filter(c => c.type === 'LEVEL')
   const topics = categories.filter(c => c.type === 'TOPIC')
 
-  const handleFilterChange = (level: string, topic: string) => {
-    setSelectedLevel(level)
-    setSelectedTopic(topic)
-    const params = new URLSearchParams()
-    if (level) params.set('level', level)
-    if (topic) params.set('topic', topic)
-    window.history.pushState(null, '', `?${params.toString()}`)
+  const toggleTopic = (slug: string) => {
+    setTopicDraft(prev => prev === slug ? '' : slug)
+  }
+
+  const handleApplyFilters = () => {
+    setAppliedDuration(durationDraft)
+    setAppliedDifficulty(difficultyDraft)
+    setAppliedInstructor(instructorDraft)
+    setAppliedTopic(topicDraft)
+    setSelectedTopic(topicDraft)
+  }
+
+  const statsCards = [
+    { label: '总期数', value: progressStats.totalVideos, color: 'bg-blue-50 text-blue-600', key: 'all' as const },
+    { label: '已学习', value: progressStats.learnedVideos, color: 'bg-green-50 text-green-600', key: 'learned' as const },
+    { label: '未学习', value: progressStats.unlearnedVideos, color: 'bg-orange-50 text-orange-600', key: 'unlearned' as const },
+  ]
+
+  const handleStatClick = (key: 'all' | 'learned' | 'unlearned') => {
+    if (activeStat === key) return
+    // If not logged in and clicking learned/unlearned, show login prompt
+    if (isVisitor && key !== 'all') {
+      setShowLoginPrompt(true)
+      return
+    }
+    setActiveStat(key)
   }
 
   return (
-    <div className="container mx-auto px-4 py-4">
-      {isVisitor && (
-        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">您正在以访客身份浏览</p>
-              <p className="text-sm mt-1">登录后可观看全部视频内容</p>
-            </div>
-            <Link href="/login" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm whitespace-nowrap">
-              登录 / 注册
+    <div className="w-full px-4 md:px-6 py-3 min-w-[500px] overflow-x-auto">
+      {showLoginPrompt && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowLoginPrompt(false)}>
+          <div className="bg-white rounded-lg p-8 max-w-md text-center" onClick={e => e.stopPropagation()}>
+            <div className="text-4xl mb-4">🔑</div>
+            <h3 className="text-xl font-bold mb-3">需要登录</h3>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              登录后即可查看学习进度和筛选内容
+            </p>
+            <Link
+              href="/login"
+              className="block w-full bg-blue-600 text-white text-center py-2.5 rounded-lg hover:bg-blue-700 font-medium mb-2"
+            >
+              立即登录
+            </Link>
+            <Link
+              href="/register"
+              className="block w-full text-gray-500 text-sm text-center py-2 rounded-lg hover:text-gray-700 hover:bg-gray-50"
+            >
+              注册账号
             </Link>
           </div>
         </div>
       )}
-
       {showSubscribeModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowSubscribeModal(false)}>
-          <div className="bg-white rounded-lg p-6 max-w-md" onClick={e => e.stopPropagation()}>
-            <h3 className="text-xl font-bold mb-4">开通订阅</h3>
-            <p className="text-gray-600 mb-6">此视频需要订阅后才能观看，请登录或注册以获取完整访问权限。</p>
-            <div className="flex gap-3">
-              <Link href="/login" className="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700">
-                登录 / 注册
-              </Link>
-              <Link href="/pricing" className="flex-1 bg-gray-100 text-gray-700 text-center py-2 rounded-lg hover:bg-gray-200">
-                查看订阅
-              </Link>
-            </div>
+          <div className="bg-white rounded-lg p-8 max-w-md text-center" onClick={e => e.stopPropagation()}>
+            <div className="text-4xl mb-4">🔒</div>
+            <h3 className="text-xl font-bold mb-3">此内容需要登录</h3>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              游客模式仅可观看第1、2、3期视频<br />
+              注册账号后即可解锁全部内容
+            </p>
+            <Link
+              href="/register"
+              className="block w-full bg-blue-600 text-white text-center py-2.5 rounded-lg hover:bg-blue-700 font-medium mb-2"
+            >
+              立即注册
+            </Link>
+            <Link
+              href="/login"
+              className="block w-full text-gray-500 text-sm text-center py-2 rounded-lg hover:text-gray-700 hover:bg-gray-50"
+            >
+              已有账号？去登录
+            </Link>
           </div>
         </div>
       )}
-
-      <SearchBar />
       
-      <h1 className="text-3xl font-bold mb-6">浏览视频</h1>
+      <div className="flex flex-row gap-4 overflow-x-auto">
+        <aside className="w-56 md:w-80 shrink-0 space-y-3">
+          <SearchBar />
 
-      <div className="flex flex-col md:flex-row gap-8">
-        <aside className="md:w-64 space-y-6">
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">等级</h3>
-            <div className="space-y-1">
-              <button
-                onClick={() => handleFilterChange('', selectedTopic)}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
-                  !selectedLevel ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100'
-                }`}
-              >
-                全部等级
-              </button>
-              {levels.map(level => (
+          {/* Combined Stats Card - clickable rows */}
+          <div className="border border-gray-200 rounded-lg bg-white overflow-hidden divide-y divide-gray-200">
+            {statsCards.map(card => {
+              const isActive = activeStat === card.key
+              return (
                 <button
-                  key={level.id}
-                  onClick={() => handleFilterChange(level.slug, selectedTopic)}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
-                    selectedLevel === level.slug ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100'
+                  key={card.key}
+                  onClick={() => handleStatClick(card.key)}
+                  className={`w-full flex items-center justify-between px-4 py-3 transition-all cursor-pointer ${
+                    isActive
+                      ? `${card.color} ring-2 ring-inset ring-blue-400 scale-[1.02] shadow-sm`
+                      : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
-                  {level.nameZh}
+                  <div className="flex items-center gap-2.5">
+                    {card.key === 'all' && (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                    )}
+                    {card.key === 'learned' && (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    )}
+                    {card.key === 'unlearned' && (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    )}
+                    <span className={`text-sm font-medium ${isActive ? 'opacity-100' : 'opacity-80'}`}>
+                      {card.label}
+                    </span>
+                  </div>
+                  <span className={`text-lg font-bold ${!isActive ? card.color.split(' ').slice(0,2).join(' ') : ''}`}>
+                    {card.value}
+                  </span>
                 </button>
-              ))}
-            </div>
+              )
+            })}
           </div>
 
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">主题</h3>
-            <div className="space-y-1">
-              <button
-                onClick={() => handleFilterChange(selectedLevel, '')}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
-                  !selectedTopic ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100'
-                }`}
-              >
-                全部主题
-              </button>
-              {topics.map(topic => (
-                <button
-                  key={topic.id}
-                  onClick={() => handleFilterChange(selectedLevel, topic.slug)}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
-                    selectedTopic === topic.slug ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100'
-                  }`}
+          {/* Combined Filters Card - bigger */}
+          <div className="border border-gray-200 rounded-lg bg-white p-4 space-y-4">
+            <h3 className="text-sm font-semibold text-gray-700 border-b border-gray-100 pb-2">筛选条件</h3>
+
+            {/* 时长 + 难度 on one row — aligned */}
+            <div className="flex gap-3 items-start">
+              <div className="flex-1">
+                <h4 className="text-xs font-medium text-gray-500 mb-1.5">时长</h4>
+                <select
+                  value={durationDraft}
+                  onChange={e => setDurationDraft(e.target.value as DurationFilter)}
+                  className="w-full text-sm border border-gray-200 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  {topic.nameZh}
-                </button>
-              ))}
+                  <option value="">全部</option>
+                  <option value="lt3">&lt; 3分钟</option>
+                  <option value="3to5">3-5分钟</option>
+                  <option value="gt5">&gt; 5分钟</option>
+                </select>
+              </div>
+              <div className="flex-1">
+                <h4 className="text-xs font-medium text-gray-500 mb-1.5">难度</h4>
+                <div className="flex items-center h-[38px] gap-0.5">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <button
+                      key={star}
+                      onClick={() => setDifficultyDraft(difficultyDraft === star ? 0 : star)}
+                      className={`text-lg px-0.5 leading-none transition-colors cursor-pointer ${
+                        star <= difficultyDraft ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-300'
+                      }`}
+                      title={`${star}星`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
+
+            {/* 博主单独一行 — 一半宽度 */}
+            <div className="w-1/2">
+              <h4 className="text-xs font-medium text-gray-500 mb-1.5">博主</h4>
+              <select
+                value={instructorDraft}
+                onChange={e => setInstructorDraft(e.target.value)}
+                className="w-full text-sm border border-gray-200 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">全部</option>
+                {instructors.map(name => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* 主题标签 as toggle chips */}
+            <div>
+              <h4 className="text-xs font-medium text-gray-500 mb-1.5">主题标签</h4>
+              <div className="grid grid-cols-3 gap-1.5">
+                {topics.map(topic => (
+                  <button
+                    key={topic.id}
+                    onClick={() => toggleTopic(topic.slug)}
+                    className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer ${
+                      topicDraft === topic.slug
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
+                    }`}
+                  >
+                    {topic.nameZh}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 视频筛选 button */}
+            <button
+              onClick={handleApplyFilters}
+              className="w-full bg-blue-600 text-white text-sm font-medium py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              视频筛选
+            </button>
           </div>
         </aside>
 
-        <main className="flex-1">
+        <main className="flex-1 min-w-0">
           {loading ? (
-            <div className="text-center py-16">
-              <p className="text-gray-500">加载视频中...</p>
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-sm">加载视频中...</p>
             </div>
           ) : videos.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-500">暂无视频</p>
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-sm">{showFavorites ? '暂无收藏的视频' : '暂无视频'}</p>
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
                 {videos.map(video => (
                   <VideoCard
                     key={video.id}
@@ -236,12 +421,12 @@ export default function BrowsePage() {
                 ))}
               </div>
               
-              <div ref={observerRef} className="py-8 text-center">
+              <div ref={observerRef} className="py-6 text-center">
                 {loadingMore && (
-                  <p className="text-gray-500">加载更多...</p>
+                  <p className="text-gray-500 text-sm">加载更多...</p>
                 )}
                 {!loadingMore && page < totalPages && (
-                  <p className="text-gray-400">向下滚动加载更多</p>
+                  <p className="text-gray-400 text-xs">向下滚动加载更多</p>
                 )}
               </div>
             </>
@@ -249,5 +434,13 @@ export default function BrowsePage() {
         </main>
       </div>
     </div>
+  )
+}
+
+export default function BrowsePageWrapper() {
+  return (
+    <Suspense fallback={<div className="w-full px-4 md:px-6 py-3"><p className="text-gray-500 text-sm">加载中...</p></div>}>
+      <BrowsePageContent />
+    </Suspense>
   )
 }

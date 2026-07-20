@@ -20,6 +20,9 @@ interface VideoFormData {
   coverUrl: string
   videoUrl: string
   duration: number
+  episodeNumber: number
+  difficulty: number
+  instructor: string
   published: boolean
   visitorAccessible: boolean
   levelId: string
@@ -39,6 +42,9 @@ export default function VideoFormPage() {
     coverUrl: '',
     videoUrl: '',
     duration: 0,
+    episodeNumber: 0,
+    difficulty: 0,
+    instructor: '',
     published: false,
     visitorAccessible: false,
     levelId: '',
@@ -66,6 +72,9 @@ export default function VideoFormPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          episodeNumber: formData.episodeNumber || null,
+          difficulty: formData.difficulty || null,
+          instructor: formData.instructor || null,
           categoryIds: [formData.levelId, ...formData.topicIds].filter(Boolean)
         })
       })
@@ -193,16 +202,58 @@ export default function VideoFormPage() {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                时长（秒） *
+              </label>
+              <input
+                type="number"
+                value={formData.duration}
+                onChange={e => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
+                required
+                min={0}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                期数
+              </label>
+              <input
+                type="number"
+                value={formData.episodeNumber}
+                onChange={e => setFormData({ ...formData, episodeNumber: parseInt(e.target.value) || 0 })}
+                min={0}
+                placeholder="如 11"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                难度（1-5星）
+              </label>
+              <input
+                type="number"
+                value={formData.difficulty}
+                onChange={e => setFormData({ ...formData, difficulty: parseInt(e.target.value) || 0 })}
+                min={0}
+                max={5}
+                placeholder="1-5"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              时长（秒） *
+              博主
             </label>
             <input
-              type="number"
-              value={formData.duration}
-              onChange={e => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
-              required
-              min={0}
+              type="text"
+              value={formData.instructor}
+              onChange={e => setFormData({ ...formData, instructor: e.target.value })}
+              placeholder="讲师/博主名称"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>

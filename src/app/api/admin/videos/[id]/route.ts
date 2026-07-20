@@ -3,11 +3,12 @@ import { NextResponse } from 'next/server'
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const video = await prisma.video.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         categories: {
           include: {
@@ -36,11 +37,12 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await request.json()
-    const { title, titleZh, description, descriptionZh, coverUrl, videoUrl, duration, published, visitorAccessible, categoryIds } = body
+    const { title, titleZh, description, descriptionZh, coverUrl, videoUrl, duration, episodeNumber, difficulty, instructor, published, visitorAccessible, categoryIds } = body
+    const { id } = await params
 
     const updateData: any = {}
 
@@ -51,6 +53,9 @@ export async function PUT(
     if (coverUrl !== undefined) updateData.coverUrl = coverUrl
     if (videoUrl !== undefined) updateData.videoUrl = videoUrl
     if (duration !== undefined) updateData.duration = duration
+    if (episodeNumber !== undefined) updateData.episodeNumber = episodeNumber || null
+    if (difficulty !== undefined) updateData.difficulty = difficulty || null
+    if (instructor !== undefined) updateData.instructor = instructor || null
     if (published !== undefined) updateData.published = published
     if (visitorAccessible !== undefined) updateData.visitorAccessible = visitorAccessible
 
@@ -66,7 +71,7 @@ export async function PUT(
     }
 
     const video = await prisma.video.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData
     })
 
@@ -82,11 +87,12 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     await prisma.video.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Video deleted successfully' })
