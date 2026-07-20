@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -11,7 +12,47 @@ async function main() {
   await prisma.videoCategory.deleteMany()
   await prisma.video.deleteMany()
   await prisma.category.deleteMany()
+  await prisma.user.deleteMany()
   console.log('已清空现有数据')
+
+  // 创建用户
+  const adminPasswordHash = await bcrypt.hash('admin123', 10)
+  const userPasswordHash = await bcrypt.hash('user123', 10)
+
+  await Promise.all([
+    prisma.user.create({
+      data: {
+        email: 'admin1@example.com',
+        passwordHash: adminPasswordHash,
+        role: 'ADMIN',
+      },
+    }),
+    prisma.user.create({
+      data: {
+        email: 'admin2@example.com',
+        passwordHash: adminPasswordHash,
+        role: 'ADMIN',
+      },
+    }),
+    prisma.user.create({
+      data: {
+        email: 'user1@example.com',
+        passwordHash: userPasswordHash,
+        role: 'USER',
+        expireAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30天后过期
+      },
+    }),
+    prisma.user.create({
+      data: {
+        email: 'user2@example.com',
+        passwordHash: userPasswordHash,
+        role: 'USER',
+        expireAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60天后过期
+      },
+    }),
+  ])
+
+  console.log('已创建用户 (admin1/admin2@example.com, user1/user2@example.com, 密码: admin123/user123)')
 
   // 创建分类
   const levels = await Promise.all([
@@ -85,7 +126,7 @@ async function main() {
 
   console.log('已创建分类')
 
-  // 创建视频
+  // 创建视频 - 增加到24个以测试滚动加载
   const videos = await Promise.all([
     prisma.video.create({
       data: {
@@ -97,6 +138,7 @@ async function main() {
         videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         duration: 180,
         published: true,
+        visitorAccessible: true,
       },
     }),
     prisma.video.create({
@@ -109,6 +151,7 @@ async function main() {
         videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         duration: 420,
         published: true,
+        visitorAccessible: true,
       },
     }),
     prisma.video.create({
@@ -121,6 +164,7 @@ async function main() {
         videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         duration: 300,
         published: true,
+        visitorAccessible: true,
       },
     }),
     prisma.video.create({
@@ -168,7 +212,7 @@ async function main() {
         coverUrl: 'https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=800',
         videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         duration: 480,
-        published: false,
+        published: true,
       },
     }),
     prisma.video.create({
@@ -183,136 +227,295 @@ async function main() {
         published: true,
       },
     }),
+    // 新增视频 8-23
+    prisma.video.create({
+      data: {
+        title: '부산 여행 가이드',
+        titleZh: '釜山旅行指南',
+        description: '부산의 해운대와 광안리 해변을 소개합니다.',
+        descriptionZh: '介绍釜山的海云台和广安里海滩。',
+        coverUrl: 'https://images.unsplash.com/photo-1517821362941-f7f753200421?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 380,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '제주도 여행 팁',
+        titleZh: '济州岛旅行贴士',
+        description: '제주도의 아름다운 풍경과 여행 코스를 알아봅니다.',
+        descriptionZh: '了解济州岛的美丽风景和旅行路线。',
+        coverUrl: 'https://images.unsplash.com/photo-1538485399081-7191377e8241?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 450,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국 카페 문화',
+        titleZh: '韩国咖啡文化',
+        description: '한국의 독특한 카페 문화를 경험해 보세요.',
+        descriptionZh: '体验韩国独特的咖啡文化。',
+        coverUrl: 'https://images.unsplash.com/photo-1583224944844-5b268c057b5b?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 280,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국 길거리 음식',
+        titleZh: '韩国街头美食',
+        description: '명동의 인기 길거리 음식을 소개합니다.',
+        descriptionZh: '介绍明洞的热门街头美食。',
+        coverUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 320,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국어 숫자 세기',
+        titleZh: '韩语数字计数',
+        description: '한국어 숫자의 두 가지 시스템을 배워봅니다.',
+        descriptionZh: '学习韩语数字的两种系统。',
+        coverUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 200,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국어 시간 표현',
+        titleZh: '韩语时间表达',
+        description: '시간을 표현하는 다양한 방법을 연습합니다.',
+        descriptionZh: '练习表达时间的多种方法。',
+        coverUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 220,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국 전통 문화',
+        titleZh: '韩国传统文化',
+        description: '한복과 전통 음악을 알아봅니다.',
+        descriptionZh: '了解韩服和传统音乐。',
+        coverUrl: 'https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 400,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국 쇼핑 가이드',
+        titleZh: '韩国购物指南',
+        description: '명동과 홍대에서의 쇼핑 팁을 소개합니다.',
+        descriptionZh: '介绍明洞和弘大的购物技巧。',
+        coverUrl: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 350,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국어 자기소개',
+        titleZh: '韩语自我介绍',
+        description: '자기소개하는 방법을 배워봅니다.',
+        descriptionZh: '学习如何自我介绍。',
+        coverUrl: 'https://images.unsplash.com/photo-1517821362941-f7f753200421?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 180,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국어 질문하기',
+        titleZh: '韩语提问',
+        description: '다양한 질문 표현을 연습합니다.',
+        descriptionZh: '练习各种提问表达。',
+        coverUrl: 'https://images.unsplash.com/photo-1538485399081-7191377e8241?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 260,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국 날씨 표현',
+        titleZh: '韩国天气表达',
+        description: '날씨에 대해 이야기하는 방법을 배워봅니다.',
+        descriptionZh: '学习如何谈论天气。',
+        coverUrl: 'https://images.unsplash.com/photo-1583224944844-5b268c057b5b?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 240,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국 교통 이용법',
+        titleZh: '韩国交通使用法',
+        description: '지하철과 버스 이용 방법을 알아봅니다.',
+        descriptionZh: '了解地铁和公交的使用方法。',
+        coverUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 300,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국어 감정 표현',
+        titleZh: '韩语情感表达',
+        description: '감정을 표현하는 다양한 방법을 배워봅니다.',
+        descriptionZh: '学习表达情感的多种方法。',
+        coverUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 280,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국 미용 문화',
+        titleZh: '韩国美容文化',
+        description: 'K-뷰티의 트렌드를 알아봅니다.',
+        descriptionZh: '了解K-Beauty的趋势。',
+        coverUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 340,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국어 전화 대화',
+        titleZh: '韩语电话对话',
+        description: '전화 상황에서 사용하는 표현을 배워봅니다.',
+        descriptionZh: '学习电话场景中使用的表达。',
+        coverUrl: 'https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 260,
+        published: true,
+      },
+    }),
+    prisma.video.create({
+      data: {
+        title: '한국 축제 문화',
+        titleZh: '韩国节日文化',
+        description: '한국의 다양한 축제와 이벤트를 소개합니다.',
+        descriptionZh: '介绍韩国各种节日和活动。',
+        coverUrl: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        duration: 380,
+        published: true,
+      },
+    }),
   ])
 
   console.log('已创建视频')
 
   // 关联视频和分类
-  await Promise.all([
-    // 初级 - 日常会话
-    prisma.videoCategory.create({
-      data: { videoId: videos[0].id, categoryId: levels[0].id },
-    }),
-    prisma.videoCategory.create({
-      data: { videoId: videos[0].id, categoryId: topics[0].id },
-    }),
-    // 初级 - 旅行
-    prisma.videoCategory.create({
-      data: { videoId: videos[1].id, categoryId: levels[0].id },
-    }),
-    prisma.videoCategory.create({
-      data: { videoId: videos[1].id, categoryId: topics[1].id },
-    }),
-    // 初级 - 文化
-    prisma.videoCategory.create({
-      data: { videoId: videos[2].id, categoryId: levels[0].id },
-    }),
-    prisma.videoCategory.create({
-      data: { videoId: videos[2].id, categoryId: topics[3].id },
-    }),
-    // 中级 - 商务
-    prisma.videoCategory.create({
-      data: { videoId: videos[3].id, categoryId: levels[1].id },
-    }),
-    prisma.videoCategory.create({
-      data: { videoId: videos[3].id, categoryId: topics[2].id },
-    }),
-    // 初级 - 日常会话 (发音)
-    prisma.videoCategory.create({
-      data: { videoId: videos[4].id, categoryId: levels[0].id },
-    }),
-    prisma.videoCategory.create({
-      data: { videoId: videos[4].id, categoryId: topics[0].id },
-    }),
-    // 中级 - 文化 (K-POP)
-    prisma.videoCategory.create({
-      data: { videoId: videos[5].id, categoryId: levels[1].id },
-    }),
-    prisma.videoCategory.create({
-      data: { videoId: videos[5].id, categoryId: topics[3].id },
-    }),
-    // 高级 - 文化 (韩剧)
-    prisma.videoCategory.create({
-      data: { videoId: videos[6].id, categoryId: levels[2].id },
-    }),
-    prisma.videoCategory.create({
-      data: { videoId: videos[6].id, categoryId: topics[3].id },
-    }),
-    // 初级 - 语法
-    prisma.videoCategory.create({
-      data: { videoId: videos[7].id, categoryId: levels[0].id },
-    }),
-  ])
+  const categoryRelations = [
+    // Video 0: 韩语基础问候语 - 初级/日常会话
+    { videoId: videos[0].id, categoryId: levels[0].id },
+    { videoId: videos[0].id, categoryId: topics[0].id },
+    // Video 1: 首尔旅行指南 - 初级/旅行
+    { videoId: videos[1].id, categoryId: levels[0].id },
+    { videoId: videos[1].id, categoryId: topics[1].id },
+    // Video 2: 韩国饮食文化 - 初级/文化
+    { videoId: videos[2].id, categoryId: levels[0].id },
+    { videoId: videos[2].id, categoryId: topics[3].id },
+    // Video 3: 商务韩语 - 中级/商务
+    { videoId: videos[3].id, categoryId: levels[1].id },
+    { videoId: videos[3].id, categoryId: topics[2].id },
+    // Video 4: 韩语发音练习 - 初级/日常会话
+    { videoId: videos[4].id, categoryId: levels[0].id },
+    { videoId: videos[4].id, categoryId: topics[0].id },
+    // Video 5: K-POP歌词学韩语 - 中级/文化
+    { videoId: videos[5].id, categoryId: levels[1].id },
+    { videoId: videos[5].id, categoryId: topics[3].id },
+    // Video 6: 韩剧台词学习 - 高级/文化
+    { videoId: videos[6].id, categoryId: levels[2].id },
+    { videoId: videos[6].id, categoryId: topics[3].id },
+    // Video 7: 韩语语法基础 - 初级/日常会话
+    { videoId: videos[7].id, categoryId: levels[0].id },
+    { videoId: videos[7].id, categoryId: topics[0].id },
+    // Video 8: 釜山旅行指南 - 初级/旅行
+    { videoId: videos[8].id, categoryId: levels[0].id },
+    { videoId: videos[8].id, categoryId: topics[1].id },
+    // Video 9: 济州岛旅行贴士 - 中级/旅行
+    { videoId: videos[9].id, categoryId: levels[1].id },
+    { videoId: videos[9].id, categoryId: topics[1].id },
+    // Video 10: 韩国咖啡文化 - 初级/文化
+    { videoId: videos[10].id, categoryId: levels[0].id },
+    { videoId: videos[10].id, categoryId: topics[3].id },
+    // Video 11: 韩国街头美食 - 初级/文化
+    { videoId: videos[11].id, categoryId: levels[0].id },
+    { videoId: videos[11].id, categoryId: topics[3].id },
+    // Video 12: 韩语数字计数 - 初级/日常会话
+    { videoId: videos[12].id, categoryId: levels[0].id },
+    { videoId: videos[12].id, categoryId: topics[0].id },
+    // Video 13: 韩语时间表达 - 初级/日常会话
+    { videoId: videos[13].id, categoryId: levels[0].id },
+    { videoId: videos[13].id, categoryId: topics[0].id },
+    // Video 14: 韩国传统文化 - 中级/文化
+    { videoId: videos[14].id, categoryId: levels[1].id },
+    { videoId: videos[14].id, categoryId: topics[3].id },
+    // Video 15: 韩国购物指南 - 初级/旅行
+    { videoId: videos[15].id, categoryId: levels[0].id },
+    { videoId: videos[15].id, categoryId: topics[1].id },
+    // Video 16: 韩语自我介绍 - 初级/日常会话
+    { videoId: videos[16].id, categoryId: levels[0].id },
+    { videoId: videos[16].id, categoryId: topics[0].id },
+    // Video 17: 韩语提问 - 初级/日常会话
+    { videoId: videos[17].id, categoryId: levels[0].id },
+    { videoId: videos[17].id, categoryId: topics[0].id },
+    // Video 18: 韩国天气表达 - 初级/日常会话
+    { videoId: videos[18].id, categoryId: levels[0].id },
+    { videoId: videos[18].id, categoryId: topics[0].id },
+    // Video 19: 韩国交通使用法 - 中级/旅行
+    { videoId: videos[19].id, categoryId: levels[1].id },
+    { videoId: videos[19].id, categoryId: topics[1].id },
+    // Video 20: 韩语情感表达 - 中级/日常会话
+    { videoId: videos[20].id, categoryId: levels[1].id },
+    { videoId: videos[20].id, categoryId: topics[0].id },
+    // Video 21: 韩国美容文化 - 中级/文化
+    { videoId: videos[21].id, categoryId: levels[1].id },
+    { videoId: videos[21].id, categoryId: topics[3].id },
+    // Video 22: 韩语电话对话 - 中级/商务
+    { videoId: videos[22].id, categoryId: levels[1].id },
+    { videoId: videos[22].id, categoryId: topics[2].id },
+    // Video 23: 韩国节日文化 - 高级/文化
+    { videoId: videos[23].id, categoryId: levels[2].id },
+    { videoId: videos[23].id, categoryId: topics[3].id },
+  ]
+
+  await Promise.all(
+    categoryRelations.map(rel =>
+      prisma.videoCategory.create({ data: rel })
+    )
+  )
 
   console.log('已关联视频和分类')
 
   // 为所有视频添加字幕
-  const allSubtitles = [
-    // Video 0: 韩语基础问候语
-    [
-      { ko: '안녕하세요', zh: '你好', startTime: 0, endTime: 3 },
-      { ko: '반갑습니다', zh: '很高兴认识你', startTime: 3, endTime: 6 },
-      { ko: '오늘 날씨가 좋네요', zh: '今天天气真好', startTime: 6, endTime: 10 },
-      { ko: '네, 정말 좋어요', zh: '是的，真的很好', startTime: 10, endTime: 14 },
-      { ko: '어디에 가요?', zh: '去哪里？', startTime: 14, endTime: 17 },
-      { ko: '학교에 가요', zh: '去学校', startTime: 17, endTime: 20 },
-    ],
-    // Video 1: 首尔旅行指南
-    [
-      { ko: '서울은 한국의 수도입니다', zh: '首尔是韩国的首都', startTime: 0, endTime: 4 },
-      { ko: '경복궁은 아름다운 궁궐이에요', zh: '景福宫是美丽的宫殿', startTime: 4, endTime: 8 },
-      { ko: '명동에서 쇼핑을 할 수 있어요', zh: '可以在明洞购物', startTime: 8, endTime: 12 },
-      { ko: '한국 음식을 꼭 맛보세요', zh: '一定要品尝韩国美食', startTime: 12, endTime: 16 },
-      { ko: '서울 탑에서 야경을 보세요', zh: '在首尔塔看夜景', startTime: 16, endTime: 20 },
-    ],
-    // Video 2: 韩国饮食文化
-    [
-      { ko: '김치는 한국 대표 음식이에요', zh: '泡菜是韩国代表性食物', startTime: 0, endTime: 4 },
-      { ko: '비빔밥은 건강에 좋아요', zh: '拌饭对健康很好', startTime: 4, endTime: 8 },
-      { ko: '불고기는 맛이 달콤해요', zh: '烤肉味道甜甜的', startTime: 8, endTime: 12 },
-      { ko: '밥을 먹기 전에 수저를 들어요', zh: '吃饭前拿起勺子', startTime: 12, endTime: 16 },
-      { ko: '한국 식사 예절을 배워요', zh: '学习韩国用餐礼仪', startTime: 16, endTime: 20 },
-    ],
-    // Video 3: 商务韩语
-    [
-      { ko: '안녕하십니까, 김부장입니다', zh: '您好，我是金部长', startTime: 0, endTime: 4 },
-      { ko: '회의를 시작하겠습니다', zh: '开始开会', startTime: 4, endTime: 8 },
-      { ko: '프로젝트 진행 상황을 보고합니다', zh: '汇报项目进展', startTime: 8, endTime: 12 },
-      { ko: '좋은 의견 감사합니다', zh: '感谢您的好意见', startTime: 12, endTime: 16 },
-      { ko: '다음 주까지 완성하겠습니다', zh: '下周前完成', startTime: 16, endTime: 20 },
-    ],
-    // Video 4: 韩语发音练习
-    [
-      { ko: '한국어 자음을 배워요', zh: '学习韩语辅音', startTime: 0, endTime: 4 },
-      { ko: '모음은 스무 개가 있어요', zh: '元音有20个', startTime: 4, endTime: 8 },
-      { ko: '받침 발음에 주의하세요', zh: '注意收音发音', startTime: 8, endTime: 12 },
-      { ko: '된소리와 겹소리를 구분해요', zh: '区分硬音和复音', startTime: 12, endTime: 16 },
-      { ko: '따라 읽으면서 연습해요', zh: '跟着读来练习', startTime: 16, endTime: 20 },
-    ],
-    // Video 5: 通过K-POP歌词学韩语
-    [
-      { ko: '노래 가사로 한국어를 배워요', zh: '通过歌词学韩语', startTime: 0, endTime: 4 },
-      { ko: '방탄소년단 인기가 많아요', zh: '防弹少年团很受欢迎', startTime: 4, endTime: 8 },
-      { ko: '블랙핑크도 유명해요', zh: 'BLACKPINK也很有名', startTime: 8, endTime: 12 },
-      { ko: '가사를 따라 불러봐요', zh: '跟着歌词唱', startTime: 12, endTime: 16 },
-      { ko: '재미있게 공부해요', zh: '愉快地学习', startTime: 16, endTime: 20 },
-    ],
-    // Video 6: 通过韩剧台词学习
-    [
-      { ko: '한국 드라마를 좋아해요', zh: '我喜欢韩剧', startTime: 0, endTime: 4 },
-      { ko: '사랑해요는 가장 많이 써요', zh: '"我爱你"用得最多', startTime: 4, endTime: 8 },
-      { ko: '대사를 따라 말해봐요', zh: '跟着台词说', startTime: 8, endTime: 12 },
-      { ko: '실생활 표현을 배워요', zh: '学习日常表达', startTime: 12, endTime: 16 },
-      { ko: '자연스러운 한국어를 배워요', zh: '学习自然的韩语', startTime: 16, endTime: 20 },
-    ],
-    // Video 7: 韩语语法基础
-    [
-      { ko: '한국어 어순은 SOV예요', zh: '韩语语序是SOV', startTime: 0, endTime: 4 },
-      { ko: '조사 사용이 중요해요', zh: '助词使用很重要', startTime: 4, endTime: 8 },
-      { ko: '동사 변형을 배워요', zh: '学习动词变形', startTime: 8, endTime: 12 },
-      { ko: '형용사 활용을 연습해요', zh: '练习形容词活用', startTime: 12, endTime: 16 },
-      { ko: '문법을 익혀요', zh: '熟悉语法', startTime: 16, endTime: 20 },
-    ],
+  const defaultSubtitles = [
+    { ko: '안녕하세요', zh: '你好', startTime: 0, endTime: 3 },
+    { ko: '반갑습니다', zh: '很高兴认识你', startTime: 3, endTime: 6 },
+    { ko: '오늘 날씨가 좋네요', zh: '今天天气真好', startTime: 6, endTime: 10 },
+    { ko: '네, 정말 좋어요', zh: '是的，真的很好', startTime: 10, endTime: 14 },
+    { ko: '어디에 가요?', zh: '去哪里？', startTime: 14, endTime: 17 },
+    { ko: '학교에 가요', zh: '去学校', startTime: 17, endTime: 20 },
   ]
 
   for (let i = 0; i < videos.length; i++) {
@@ -330,7 +533,7 @@ async function main() {
       },
     })
 
-    const entries = allSubtitles[i]
+    const entries = defaultSubtitles
 
     await Promise.all([
       ...entries.map((entry, index) =>

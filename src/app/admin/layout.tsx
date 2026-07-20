@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import { AntdProvider } from '@/components/providers/AntdProvider'
 
 export default async function AdminLayout({
   children,
@@ -64,7 +65,9 @@ export default async function AdminLayout({
             </Link>
           </div>
         </aside>
-        <main className="flex-1 p-8">{children}</main>
+        <main className="flex-1 p-8">
+          <AntdProvider>{children}</AntdProvider>
+        </main>
       </div>
     </div>
   )

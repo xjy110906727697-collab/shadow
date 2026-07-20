@@ -112,37 +112,37 @@ export default function SubtitleEditorPage() {
         body: JSON.stringify({ youtubeUrl })
       })
 
-      if (!res.ok) throw new Error('Failed to import subtitles')
+      if (!res.ok) throw new Error('导入字幕失败')
 
       const data = await res.json()
       setEntries(data.entries)
-      alert('Imported ' + data.entries.length + ' subtitle entries')
+      alert('成功导入 ' + data.entries.length + ' 条字幕')
     } catch (error) {
       console.error('Failed to import subtitles:', error)
-      alert('Failed to import subtitles')
+      alert('导入字幕失败')
     }
   }
 
   if (loading) {
-    return <p className="text-gray-500">Loading...</p>
+    return <p className="text-gray-500">加载中...</p>
   }
 
   if (!video) {
-    return <p className="text-gray-500">Video not found</p>
+    return <p className="text-gray-500">视频未找到</p>
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Subtitle Editor</h1>
+          <h1 className="text-3xl font-bold">字幕编辑器</h1>
           <p className="text-gray-600 mt-2">{video.titleZh}</p>
         </div>
         <button
           onClick={() => router.push('/admin/videos')}
           className="text-gray-600 hover:text-gray-900"
         >
-          ← Back to Videos
+          ← 返回视频列表
         </button>
       </div>
 
@@ -170,22 +170,22 @@ export default function SubtitleEditorPage() {
 
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Subtitle Entries ({entries.length})</h2>
+          <h2 className="text-xl font-semibold">字幕条目 ({entries.length})</h2>
           <div className="flex gap-2">
             <button
               onClick={handleAddEntry}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
             >
-              Add Entry
+              添加条目
             </button>
             <button
               onClick={() => {
-                const url = prompt('Enter YouTube URL:')
+                const url = prompt('请输入 YouTube URL：')
                 if (url) handleImportYouTube(url)
               }}
               className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200"
             >
-              Import from YouTube
+              从 YouTube 导入
             </button>
           </div>
         </div>

@@ -85,7 +85,7 @@ export default async function AdminDashboardPage() {
                   <td className="px-6 py-4 text-sm">
                     {user.expireAt
                       ? new Date(user.expireAt).toLocaleDateString()
-                      : 'Never'}
+                      : '无期限'}
                   </td>
                   <td className="px-6 py-4 text-sm">
                     {new Date(user.createdAt).toLocaleDateString()}

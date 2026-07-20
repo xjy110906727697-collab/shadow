@@ -94,6 +94,7 @@ export function VideoPlayer({ videoUrl, onTimeUpdate }: VideoPlayerProps) {
         src={videoUrl}
         className="w-full aspect-video"
         onClick={togglePlay}
+        autoPlay
       />
 
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">

@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { VideoPlayer } from '@/components/public/VideoPlayer'
 import { SubtitlePanel } from '@/components/public/SubtitlePanel'
 
@@ -28,15 +29,23 @@ interface VideoDetail {
 
 export default function VideoDetailPage() {
   const params = useParams()
+  const router = useRouter()
   const [video, setVideo] = useState<VideoDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [currentTime, setCurrentTime] = useState(0)
-  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium')
+  const [isLocked, setIsLocked] = useState(false)
 
   useEffect(() => {
     const fetchVideo = async () => {
       try {
         const res = await fetch(`/api/videos/${params.id}`)
+        
+        if (res.status === 403) {
+          setIsLocked(true)
+          setLoading(false)
+          return
+        }
+        
         const data = await res.json()
         setVideo(data)
       } catch (error) {
@@ -67,6 +76,28 @@ export default function VideoDetailPage() {
     )
   }
 
+  if (isLocked) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow p-8 text-center">
+          <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <h2 className="text-2xl font-bold mb-2">需要订阅</h2>
+          <p className="text-gray-600 mb-6">此视频需要订阅后才能观看，请登录或注册以获取完整访问权限。</p>
+          <div className="flex gap-3">
+            <Link href="/login" className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+              登录 / 注册
+            </Link>
+            <Link href="/pricing" className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200">
+              查看订阅
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (!video) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -86,36 +117,18 @@ export default function VideoDetailPage() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        <div className="lg:w-3/5">
+        <div className="lg:w-[65%]">
           <VideoPlayer
             videoUrl={video.videoUrl}
             onTimeUpdate={setCurrentTime}
           />
         </div>
 
-        <div className="lg:w-2/5 flex flex-col">
-          <div className="flex items-center justify-end gap-2 mb-3">
-            <span className="text-sm text-gray-600">字号：</span>
-            {(['small', 'medium', 'large'] as const).map(size => (
-              <button
-                key={size}
-                onClick={() => setFontSize(size)}
-                className={`px-3 py-1 text-sm rounded ${
-                  fontSize === size
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {size === 'small' ? 'S' : size === 'medium' ? 'M' : 'L'}
-              </button>
-            ))}
-          </div>
-
+        <div className="lg:w-[35%] flex flex-col">
           <SubtitlePanel
             subtitles={video.subtitles}
             currentTime={currentTime}
             onSeek={handleSeek}
-            fontSize={fontSize}
           />
         </div>
       </div>

@@ -38,20 +38,21 @@ enum CategoryType {
 }
 
 model Video {
-  id              String          @id @default(cuid())
-  title           String
-  titleZh         String
-  description     String?
-  descriptionZh   String?
-  coverUrl        String
-  videoUrl        String
-  audioUrl        String?
-  duration        Int
-  published       Boolean         @default(false)
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  categories      VideoCategory[]
-  subtitleTracks  SubtitleTrack[]
+  id                String          @id @default(cuid())
+  title             String
+  titleZh           String
+  description       String?
+  descriptionZh     String?
+  coverUrl          String
+  videoUrl          String
+  audioUrl          String?
+  duration          Int
+  published         Boolean         @default(false)
+  visitorAccessible Boolean         @default(false)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  categories        VideoCategory[]
+  subtitleTracks    SubtitleTrack[]
 }
 
 model VideoCategory {

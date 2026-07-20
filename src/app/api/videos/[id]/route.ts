@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 export async function GET(
   request: Request,
@@ -7,6 +9,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params
+    const session = await getServerSession(authOptions)
+    const isVisitor = !session
+
     const video = await prisma.video.findUnique({
       where: { id },
       include: {
@@ -29,6 +34,13 @@ export async function GET(
       return NextResponse.json(
         { error: 'Video not found' },
         { status: 404 }
+      )
+    }
+
+    if (isVisitor && !video.visitorAccessible) {
+      return NextResponse.json(
+        { error: '需要订阅', code: 'LOCKED' },
+        { status: 403 }
       )
     }
 

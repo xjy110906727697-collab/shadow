@@ -1,6 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { Table, Button, Space, Input, Tabs, Modal, Form, message, Popconfirm } from 'antd'
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import type { ColumnsType } from 'antd/es/table'
 
 interface Category {
   id: string
@@ -13,41 +16,51 @@ interface Category {
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'LEVEL' | 'TOPIC'>('LEVEL')
+  const [search, setSearch] = useState('')
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
+  const [sortField, setSortField] = useState('sortOrder')
+  const [sortOrder, setSortOrder] = useState<string>('asc')
   const [showForm, setShowForm] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
-  const [formData, setFormData] = useState({
-    name: '',
-    nameZh: '',
-    slug: '',
-    sortOrder: 0
-  })
+  const [form] = Form.useForm()
+
+  const fetchCategories = useCallback(async () => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams()
+      params.set('page', pagination.current.toString())
+      params.set('pageSize', pagination.pageSize.toString())
+      params.set('type', activeTab)
+      params.set('sortField', sortField)
+      params.set('sortOrder', sortOrder)
+      if (search) params.set('search', search)
+
+      const res = await fetch(`/api/admin/categories?${params.toString()}`)
+      const data = await res.json()
+      setCategories(data.categories)
+      setPagination(prev => ({ ...prev, total: data.pagination.total }))
+    } catch (error) {
+      console.error('Failed to fetch categories:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [pagination.current, pagination.pageSize, activeTab, sortField, sortOrder, search])
 
   useEffect(() => {
     fetchCategories()
-  }, [])
-
-  const fetchCategories = async () => {
-    try {
-      const res = await fetch('/api/admin/categories')
-      const data = await res.json()
-      setCategories(data)
-    } catch (error) {
-      console.error('Failed to fetch categories:', error)
-    }
-  }
-
-  const filteredCategories = categories.filter(c => c.type === activeTab)
+  }, [fetchCategories])
 
   const handleAdd = () => {
     setEditingCategory(null)
-    setFormData({ name: '', nameZh: '', slug: '', sortOrder: 0 })
+    form.resetFields()
     setShowForm(true)
   }
 
   const handleEdit = (category: Category) => {
     setEditingCategory(category)
-    setFormData({
+    form.setFieldsValue({
       name: category.name,
       nameZh: category.nameZh,
       slug: category.slug,
@@ -57,20 +70,19 @@ export default function AdminCategoriesPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('确定要删除这个分类吗？')) return
-
     try {
       await fetch(`/api/admin/categories/${id}`, { method: 'DELETE' })
-      setCategories(categories.filter(c => c.id !== id))
+      message.success('删除成功')
+      fetchCategories()
     } catch (error) {
-      console.error('Failed to delete category:', error)
+      message.error('删除失败')
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+  const handleSubmit = async () => {
     try {
+      const values = await form.validateFields()
+
       const url = editingCategory
         ? `/api/admin/categories/${editingCategory.id}`
         : '/api/admin/categories'
@@ -81,169 +93,169 @@ export default function AdminCategoriesPage() {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formData,
+          ...values,
           type: activeTab
         })
       })
 
-      if (!res.ok) throw new Error('Failed to save category')
+      if (!res.ok) throw new Error('保存失败')
 
-      await fetchCategories()
+      message.success('保存成功')
       setShowForm(false)
+      fetchCategories()
     } catch (error) {
-      console.error('Failed to save category:', error)
+      message.error('保存失败')
     }
   }
 
+  const handleSearch = () => {
+    setPagination(prev => ({ ...prev, current: 1 }))
+  }
+
+  const handleTableChange = (pag: any, _filters: any, sorter: any) => {
+    setPagination(prev => ({
+      ...prev,
+      current: pag.current || 1,
+      pageSize: pag.pageSize || 10,
+    }))
+    if (sorter.field) {
+      setSortField(sorter.field)
+      setSortOrder(sorter.order || 'asc')
+    }
+  }
+
+  const handleTabChange = (key: string) => {
+    setActiveTab(key as 'LEVEL' | 'TOPIC')
+    setPagination(prev => ({ ...prev, current: 1 }))
+  }
+
+  const columns: ColumnsType<Category> = [
+    {
+      title: '韩语名称',
+      dataIndex: 'name',
+      sorter: true,
+    },
+    {
+      title: '中文名称',
+      dataIndex: 'nameZh',
+      sorter: true,
+    },
+    {
+      title: '标识符',
+      dataIndex: 'slug',
+      sorter: true,
+      render: (slug: string) => <code>{slug}</code>,
+    },
+    {
+      title: '排序',
+      dataIndex: 'sortOrder',
+      sorter: true,
+      width: 100,
+    },
+    {
+      title: '操作',
+      key: 'action',
+      width: 150,
+      render: (_: any, record: Category) => (
+        <Space>
+          <Button type="link" size="small" onClick={() => handleEdit(record)}>
+            编辑
+          </Button>
+          <Popconfirm title="确定要删除这个分类吗？" onConfirm={() => handleDelete(record.id)} okText="确定" cancelText="取消">
+            <Button type="link" danger size="small">删除</Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ]
+
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">分类管理</h1>
-        <button
-          onClick={handleAdd}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
           添加{activeTab === 'LEVEL' ? '等级' : '主题'}
-        </button>
+        </Button>
       </div>
 
-      <div className="flex gap-4 mb-6 border-b border-gray-200">
-        <button
-          onClick={() => setActiveTab('LEVEL')}
-          className={`px-4 py-2 border-b-2 ${
-            activeTab === 'LEVEL'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          等级
-        </button>
-        <button
-          onClick={() => setActiveTab('TOPIC')}
-          className={`px-4 py-2 border-b-2 ${
-            activeTab === 'TOPIC'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          主题
-        </button>
+      <div className="bg-white rounded-lg shadow p-4 mb-4">
+        <Space wrap>
+          <Input
+            placeholder="搜索名称或标识符"
+            prefix={<SearchOutlined />}
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            onPressEnter={handleSearch}
+            style={{ width: 220 }}
+            allowClear
+          />
+          <Button type="primary" onClick={handleSearch}>搜索</Button>
+        </Space>
       </div>
-
-      {showForm && (
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">
-            {editingCategory ? '编辑' : '添加'}{activeTab === 'LEVEL' ? '等级' : '主题'}
-          </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  韩语名称 *
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  中文名称 *
-                </label>
-                <input
-                  type="text"
-                  value={formData.nameZh}
-                  onChange={e => setFormData({ ...formData, nameZh: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                标识符 *
-              </label>
-              <input
-                type="text"
-                value={formData.slug}
-                onChange={e => setFormData({ ...formData, slug: e.target.value })}
-                required
-                placeholder="例如：beginner, travel"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                排序
-              </label>
-              <input
-                type="number"
-                value={formData.sortOrder}
-                onChange={e => setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div className="flex gap-4">
-              <button
-                type="submit"
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-              >
-                {editingCategory ? '更新' : '创建'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200"
-              >
-                取消
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
 
       <div className="bg-white rounded-lg shadow">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">韩语名称</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">中文名称</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">标识符</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">排序</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">操作</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredCategories.map(category => (
-                <tr key={category.id}>
-                  <td className="px-6 py-4 text-sm">{category.name}</td>
-                  <td className="px-6 py-4 text-sm">{category.nameZh}</td>
-                  <td className="px-6 py-4 text-sm font-mono">{category.slug}</td>
-                  <td className="px-6 py-4 text-sm">{category.sortOrder}</td>
-                  <td className="px-6 py-4 text-right space-x-2">
-                    <button
-                      onClick={() => handleEdit(category)}
-                      className="text-blue-600 hover:text-blue-700 text-sm"
-                    >
-                      编辑
-                    </button>
-                    <button
-                      onClick={() => handleDelete(category.id)}
-                      className="text-red-600 hover:text-red-700 text-sm"
-                    >
-                      删除
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabs
+          activeKey={activeTab}
+          onChange={handleTabChange}
+          items={[
+            { key: 'LEVEL', label: '等级' },
+            { key: 'TOPIC', label: '主题' }
+          ]}
+          style={{ padding: '0 16px' }}
+        />
+
+        <Table<Category>
+          columns={columns}
+          dataSource={categories}
+          rowKey="id"
+          loading={loading}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            showTotal: (total) => `共 ${total} 条`,
+            pageSizeOptions: ['10', '20', '50'],
+          }}
+          onChange={handleTableChange}
+        />
       </div>
+
+      <Modal
+        title={editingCategory ? '编辑' : '添加'}{activeTab === 'LEVEL' ? '等级' : '主题'}
+        open={showForm}
+        onOk={handleSubmit}
+        onCancel={() => setShowForm(false)}
+        okText="保存"
+        cancelText="取消"
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            name="name"
+            label="韩语名称"
+            rules={[{ required: true, message: '请输入韩语名称' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="nameZh"
+            label="中文名称"
+            rules={[{ required: true, message: '请输入中文名称' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="slug"
+            label="标识符"
+            rules={[{ required: true, message: '请输入标识符' }]}
+          >
+            <Input placeholder="例如：beginner, travel" />
+          </Form.Item>
+          <Form.Item name="sortOrder" label="排序">
+            <Input type="number" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   )
 }

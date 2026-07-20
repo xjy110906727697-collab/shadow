@@ -1,6 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { Table, Button, Tag, Space, Input, message } from 'antd'
+import { SearchOutlined } from '@ant-design/icons'
+import type { ColumnsType } from 'antd/es/table'
 
 interface User {
   id: string
@@ -13,24 +16,37 @@ interface User {
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
+  const [sortField, setSortField] = useState('createdAt')
+  const [sortOrder, setSortOrder] = useState<string>('desc')
   const [editingUserId, setEditingUserId] = useState<string | null>(null)
   const [editingExpireAt, setEditingExpireAt] = useState('')
 
-  useEffect(() => {
-    fetchUsers()
-  }, [])
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
+    setLoading(true)
     try {
-      const res = await fetch('/api/admin/users')
+      const params = new URLSearchParams()
+      params.set('page', pagination.current.toString())
+      params.set('pageSize', pagination.pageSize.toString())
+      params.set('sortField', sortField)
+      params.set('sortOrder', sortOrder)
+      if (search) params.set('search', search)
+
+      const res = await fetch(`/api/admin/users?${params.toString()}`)
       const data = await res.json()
-      setUsers(data)
+      setUsers(data.users)
+      setPagination(prev => ({ ...prev, total: data.pagination.total }))
     } catch (error) {
       console.error('Failed to fetch users:', error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [pagination.current, pagination.pageSize, sortField, sortOrder, search])
+
+  useEffect(() => {
+    fetchUsers()
+  }, [fetchUsers])
 
   const handleEditExpire = (user: User) => {
     setEditingUserId(user.id)
@@ -46,10 +62,11 @@ export default function AdminUsersPage() {
           expireAt: editingExpireAt ? new Date(editingExpireAt).toISOString() : null
         })
       })
-      await fetchUsers()
+      message.success('更新成功')
+      fetchUsers()
       setEditingUserId(null)
     } catch (error) {
-      console.error('Failed to update user:', error)
+      message.error('更新失败')
     }
   }
 
@@ -58,89 +75,128 @@ export default function AdminUsersPage() {
     setEditingExpireAt('')
   }
 
-  if (loading) {
-    return <p className="text-gray-500">Loading users...</p>
+  const handleSearch = () => {
+    setPagination(prev => ({ ...prev, current: 1 }))
   }
+
+  const handleTableChange = (pag: any, _filters: any, sorter: any) => {
+    setPagination(prev => ({
+      ...prev,
+      current: pag.current || 1,
+      pageSize: pag.pageSize || 10,
+    }))
+    if (sorter.field) {
+      setSortField(sorter.field)
+      setSortOrder(sorter.order || 'desc')
+    }
+  }
+
+  const columns: ColumnsType<User> = [
+    {
+      title: '邮箱',
+      dataIndex: 'email',
+      sorter: true,
+    },
+    {
+      title: '角色',
+      dataIndex: 'role',
+      sorter: true,
+      render: (role: string) => (
+        <Tag color={role === 'ADMIN' ? 'purple' : 'default'}>
+          {role === 'ADMIN' ? '管理员' : '用户'}
+        </Tag>
+      ),
+    },
+    {
+      title: '到期时间',
+      dataIndex: 'expireAt',
+      sorter: true,
+      render: (expireAt: string | null, record: User) => {
+        if (editingUserId === record.id) {
+          return (
+            <Space>
+              <Input
+                type="date"
+                value={editingExpireAt}
+                onChange={e => setEditingExpireAt(e.target.value)}
+                size="small"
+              />
+              <Button size="small" type="link" onClick={() => handleSaveExpire(record.id)}>
+                保存
+              </Button>
+              <Button size="small" type="link" onClick={handleCancelEdit}>
+                取消
+              </Button>
+            </Space>
+          )
+        }
+
+        if (!expireAt) {
+          return <span>无期限</span>
+        }
+
+        const isExpired = new Date(expireAt) < new Date()
+        return (
+          <span style={{ color: isExpired ? '#ff4d4f' : undefined }}>
+            {new Date(expireAt).toLocaleDateString()}
+          </span>
+        )
+      },
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createdAt',
+      sorter: true,
+      render: (val: string) => new Date(val).toLocaleDateString(),
+    },
+    {
+      title: '操作',
+      key: 'action',
+      render: (_: any, record: User) => (
+        editingUserId !== record.id && (
+          <Button type="link" size="small" onClick={() => handleEditExpire(record)}>
+            编辑到期时间
+          </Button>
+        )
+      ),
+    },
+  ]
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-8">Users</h1>
+      <h1 className="text-3xl font-bold mb-6">用户管理</h1>
+
+      <div className="bg-white rounded-lg shadow p-4 mb-4">
+        <Space wrap>
+          <Input
+            placeholder="搜索邮箱"
+            prefix={<SearchOutlined />}
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            onPressEnter={handleSearch}
+            style={{ width: 220 }}
+            allowClear
+          />
+          <Button type="primary" onClick={handleSearch}>搜索</Button>
+        </Space>
+      </div>
 
       <div className="bg-white rounded-lg shadow">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expires</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {users.map(user => (
-                <tr key={user.id}>
-                  <td className="px-6 py-4 text-sm">{user.email}</td>
-                  <td className="px-6 py-4 text-sm">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      user.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    {editingUserId === user.id ? (
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="date"
-                          value={editingExpireAt}
-                          onChange={e => setEditingExpireAt(e.target.value)}
-                          className="px-2 py-1 border border-gray-300 rounded text-sm"
-                        />
-                        <button
-                          onClick={() => handleSaveExpire(user.id)}
-                          className="text-green-600 hover:text-green-700 text-sm"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={handleCancelEdit}
-                          className="text-gray-600 hover:text-gray-700 text-sm"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      <span className={
-                        user.expireAt && new Date(user.expireAt) < new Date()
-                          ? 'text-red-600'
-                          : ''
-                      }>
-                        {user.expireAt
-                          ? new Date(user.expireAt).toLocaleDateString()
-                          : 'Never'}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    {new Date(user.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    {editingUserId !== user.id && (
-                      <button
-                        onClick={() => handleEditExpire(user)}
-                        className="text-blue-600 hover:text-blue-700 text-sm"
-                      >
-                        Edit Expire
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table<User>
+          columns={columns}
+          dataSource={users}
+          rowKey="id"
+          loading={loading}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            showTotal: (total) => `共 ${total} 条`,
+            pageSizeOptions: ['10', '20', '50'],
+          }}
+          onChange={handleTableChange}
+        />
       </div>
     </div>
   )

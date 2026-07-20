@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { LogoutButton } from './LogoutButton'
 
 export async function Header() {
   const session = await getServerSession(authOptions)
@@ -30,6 +31,7 @@ export async function Header() {
                   管理
                 </Link>
               )}
+              <LogoutButton />
             </>
           ) : (
             <>

@@ -21,6 +21,7 @@ interface VideoFormData {
   videoUrl: string
   duration: number
   published: boolean
+  visitorAccessible: boolean
   levelId: string
   topicIds: string[]
 }
@@ -39,6 +40,7 @@ export default function VideoFormPage() {
     videoUrl: '',
     duration: 0,
     published: false,
+    visitorAccessible: false,
     levelId: '',
     topicIds: []
   })
@@ -70,12 +72,12 @@ export default function VideoFormPage() {
 
       if (!res.ok) {
         const data = await res.json()
-        throw new Error(data.error || 'Failed to create video')
+        throw new Error(data.error || '创建视频失败')
       }
 
       router.push('/admin/videos')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : '发生错误')
     } finally {
       setLoading(false)
     }
@@ -93,9 +95,9 @@ export default function VideoFormPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Add Video</h1>
+        <h1 className="text-3xl font-bold">添加视频</h1>
         <Link href="/admin/videos" className="text-gray-600 hover:text-gray-900">
-          ← Back to Videos
+          ← 返回视频列表
         </Link>
       </div>
 
@@ -110,7 +112,7 @@ export default function VideoFormPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Korean Title *
+                韩语标题 *
               </label>
               <input
                 type="text"
@@ -123,7 +125,7 @@ export default function VideoFormPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Chinese Title *
+                中文标题 *
               </label>
               <input
                 type="text"
@@ -138,7 +140,7 @@ export default function VideoFormPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Korean Description
+                韩语描述
               </label>
               <textarea
                 value={formData.description}
@@ -150,7 +152,7 @@ export default function VideoFormPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Chinese Description
+                中文描述
               </label>
               <textarea
                 value={formData.descriptionZh}
@@ -164,7 +166,7 @@ export default function VideoFormPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Cover Image URL *
+                封面图片 URL *
               </label>
               <input
                 type="url"
@@ -178,7 +180,7 @@ export default function VideoFormPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Video URL *
+                视频 URL *
               </label>
               <input
                 type="url"
@@ -193,7 +195,7 @@ export default function VideoFormPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Duration (seconds) *
+              时长（秒） *
             </label>
             <input
               type="number"
@@ -207,7 +209,7 @@ export default function VideoFormPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Level *
+              等级 *
             </label>
             <select
               value={formData.levelId}
@@ -215,7 +217,7 @@ export default function VideoFormPage() {
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="">Select a level</option>
+              <option value="">选择等级</option>
               {levels.map(level => (
                 <option key={level.id} value={level.id}>
                   {level.nameZh}
@@ -226,7 +228,7 @@ export default function VideoFormPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Topics
+              主题
             </label>
             <div className="flex flex-wrap gap-2">
               {topics.map(topic => (
@@ -255,7 +257,20 @@ export default function VideoFormPage() {
               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
             <label htmlFor="published" className="ml-2 text-sm font-medium text-gray-700">
-              Publish immediately
+              立即发布
+            </label>
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="visitorAccessible"
+              checked={formData.visitorAccessible}
+              onChange={e => setFormData({ ...formData, visitorAccessible: e.target.checked })}
+              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="visitorAccessible" className="ml-2 text-sm font-medium text-gray-700">
+              允许访客观看
             </label>
           </div>
 
@@ -265,13 +280,13 @@ export default function VideoFormPage() {
               disabled={loading}
               className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creating...' : 'Create Video'}
+              {loading ? '创建中...' : '创建视频'}
             </button>
             <Link
               href="/admin/videos"
               className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200"
             >
-              Cancel
+              取消
             </Link>
           </div>
         </form>

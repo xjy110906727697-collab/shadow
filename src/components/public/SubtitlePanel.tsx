@@ -15,14 +15,12 @@ interface SubtitlePanelProps {
   subtitles: SubtitleEntry[]
   currentTime: number
   onSeek?: (time: number) => void
-  fontSize?: 'small' | 'medium' | 'large'
 }
 
 export function SubtitlePanel({
   subtitles,
   currentTime,
   onSeek,
-  fontSize = 'medium'
 }: SubtitlePanelProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef<HTMLDivElement>(null)
@@ -44,12 +42,6 @@ export function SubtitlePanel({
     }
   }, [activeIndex])
 
-  const fontSizeClasses = {
-    small: { ko: 'text-base', zh: 'text-sm' },
-    medium: { ko: 'text-lg', zh: 'text-base' },
-    large: { ko: 'text-xl', zh: 'text-lg' }
-  }
-
   const handleEntryClick = (entry: SubtitleEntry) => {
     onSeek?.(entry.startTime)
   }
@@ -62,7 +54,7 @@ export function SubtitlePanel({
 
       <div
         ref={containerRef}
-        className="overflow-y-auto max-h-[400px] p-4 space-y-3"
+        className="overflow-y-auto max-h-[600px] p-4 space-y-3"
       >
         {!subtitles || subtitles.length === 0 ? (
           <p className="text-gray-500 text-center py-8">暂无字幕</p>
@@ -80,12 +72,12 @@ export function SubtitlePanel({
                     : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
                 }`}
               >
-                <div className={`${fontSizeClasses[fontSize].ko} font-medium mb-1 ${
+                <div className={`text-lg font-medium mb-1 ${
                   isActive ? 'text-blue-900' : 'text-gray-900'
                 }`}>
                   {entry.ko}
                 </div>
-                <div className={`${fontSizeClasses[fontSize].zh} ${
+                <div className={`text-base ${
                   isActive ? 'text-blue-700' : 'text-gray-600'
                 }`}>
                   {entry.zh}

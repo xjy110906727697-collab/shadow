@@ -1,7 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
+import { Table, Button, Tag, Space, Input, Select, message, Popconfirm } from 'antd'
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
+import type { SorterResult } from 'antd/es/table/interface'
 
 interface Video {
   id: string
@@ -9,37 +13,68 @@ interface Video {
   titleZh: string
   duration: number
   published: boolean
+  visitorAccessible: boolean
   createdAt: string
 }
 
 export default function AdminVideosPage() {
   const [videos, setVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [publishedFilter, setPublishedFilter] = useState<string>('')
+  const [visitorFilter, setVisitorFilter] = useState<string>('')
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
+  const [sortField, setSortField] = useState('createdAt')
+  const [sortOrder, setSortOrder] = useState<string>('descend')
 
-  useEffect(() => {
-    fetchVideos()
-  }, [])
-
-  const fetchVideos = async () => {
+  const fetchVideos = useCallback(async () => {
+    setLoading(true)
     try {
-      const res = await fetch('/api/admin/videos')
+      const params = new URLSearchParams()
+      params.set('page', pagination.current.toString())
+      params.set('pageSize', pagination.pageSize.toString())
+      params.set('sortField', sortField)
+      params.set('sortOrder', sortOrder)
+      if (search) params.set('search', search)
+      if (publishedFilter) params.set('published', publishedFilter)
+      if (visitorFilter) params.set('visitorAccessible', visitorFilter)
+
+      const res = await fetch(`/api/admin/videos?${params.toString()}`)
       const data = await res.json()
-      setVideos(data)
+      setVideos(data.videos)
+      setPagination(prev => ({ ...prev, total: data.pagination.total }))
     } catch (error) {
       console.error('Failed to fetch videos:', error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [pagination.current, pagination.pageSize, sortField, sortOrder, search, publishedFilter, visitorFilter])
+
+  useEffect(() => {
+    fetchVideos()
+  }, [fetchVideos])
 
   const handleDelete = async (id: string) => {
-    if (!confirm('确定要删除这个视频吗？')) return
-
     try {
       await fetch(`/api/admin/videos/${id}`, { method: 'DELETE' })
-      setVideos(videos.filter(v => v.id !== id))
+      message.success('删除成功')
+      fetchVideos()
     } catch (error) {
-      console.error('Failed to delete video:', error)
+      message.error('删除失败')
+    }
+  }
+
+  const handleToggleVisitor = async (id: string, current: boolean) => {
+    try {
+      await fetch(`/api/admin/videos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visitorAccessible: !current }),
+      })
+      message.success('更新成功')
+      fetchVideos()
+    } catch (error) {
+      message.error('更新失败')
     }
   }
 
@@ -49,77 +84,158 @@ export default function AdminVideosPage() {
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  if (loading) {
-    return <p className="text-gray-500">加载视频中...</p>
+  const handleTableChange = (
+    pag: TablePaginationConfig,
+    _filters: any,
+    sorter: SorterResult<Video> | SorterResult<Video>[]
+  ) => {
+    const s = Array.isArray(sorter) ? sorter[0] : sorter
+    setPagination(prev => ({
+      ...prev,
+      current: pag.current || 1,
+      pageSize: pag.pageSize || 10,
+    }))
+    if (s?.field) {
+      setSortField(s.field as string)
+      setSortOrder(s.order || 'descend')
+    }
   }
+
+  const handleSearch = () => {
+    setPagination(prev => ({ ...prev, current: 1 }))
+  }
+
+  const columns: ColumnsType<Video> = [
+    {
+      title: '标题',
+      dataIndex: 'titleZh',
+      sorter: true,
+      render: (_: any, record: Video) => (
+        <div>
+          <div className="font-medium">{record.titleZh}</div>
+          <div className="text-sm text-gray-500">{record.title}</div>
+        </div>
+      ),
+    },
+    {
+      title: '时长',
+      dataIndex: 'duration',
+      sorter: true,
+      width: 100,
+      render: (val: number) => formatDuration(val),
+    },
+    {
+      title: '状态',
+      dataIndex: 'published',
+      sorter: true,
+      width: 100,
+      render: (val: boolean) => (
+        <Tag color={val ? 'green' : 'default'}>{val ? '已发布' : '草稿'}</Tag>
+      ),
+    },
+    {
+      title: '访客可看',
+      dataIndex: 'visitorAccessible',
+      sorter: true,
+      width: 100,
+      render: (val: boolean, record: Video) => (
+        <Button
+          type="link"
+          size="small"
+          onClick={() => handleToggleVisitor(record.id, val)}
+          style={{ color: val ? '#52c41a' : '#999' }}
+        >
+          {val ? '是' : '否'}
+        </Button>
+      ),
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createdAt',
+      sorter: true,
+      width: 150,
+      render: (val: string) => new Date(val).toLocaleDateString(),
+    },
+    {
+      title: '操作',
+      key: 'action',
+      width: 200,
+      render: (_: any, record: Video) => (
+        <Space>
+          <Link href={`/admin/videos/${record.id}/subtitles`} className="text-blue-600">
+            字幕
+          </Link>
+          <Link href={`/admin/videos/${record.id}/edit`} className="text-blue-600">
+            编辑
+          </Link>
+          <Popconfirm title="确定要删除这个视频吗？" onConfirm={() => handleDelete(record.id)} okText="确定" cancelText="取消">
+            <Button type="link" danger size="small">删除</Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ]
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">视频管理</h1>
-        <Link
-          href="/admin/videos/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
-          添加视频
+        <Link href="/admin/videos/new">
+          <Button type="primary" icon={<PlusOutlined />}>添加视频</Button>
         </Link>
       </div>
 
+      <div className="bg-white rounded-lg shadow p-4 mb-4">
+        <Space wrap>
+          <Input
+            placeholder="搜索标题"
+            prefix={<SearchOutlined />}
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            onPressEnter={handleSearch}
+            style={{ width: 220 }}
+            allowClear
+          />
+          <Select
+            value={publishedFilter}
+            onChange={val => { setPublishedFilter(val); setPagination(prev => ({ ...prev, current: 1 })) }}
+            style={{ width: 120 }}
+            options={[
+              { value: '', label: '全部状态' },
+              { value: 'true', label: '已发布' },
+              { value: 'false', label: '草稿' },
+            ]}
+          />
+          <Select
+            value={visitorFilter}
+            onChange={val => { setVisitorFilter(val); setPagination(prev => ({ ...prev, current: 1 })) }}
+            style={{ width: 120 }}
+            options={[
+              { value: '', label: '全部' },
+              { value: 'true', label: '访客可看' },
+              { value: 'false', label: '仅会员' },
+            ]}
+          />
+          <Button type="primary" onClick={handleSearch}>搜索</Button>
+        </Space>
+      </div>
+
       <div className="bg-white rounded-lg shadow">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">标题</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">时长</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">操作</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {videos.map(video => (
-                <tr key={video.id}>
-                  <td className="px-6 py-4">
-                    <div className="font-medium">{video.titleZh}</div>
-                    <div className="text-sm text-gray-500">{video.title}</div>
-                  </td>
-                  <td className="px-6 py-4 text-sm">{formatDuration(video.duration)}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      video.published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {video.published ? '已发布' : '草稿'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    {new Date(video.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-right space-x-2">
-                    <Link
-                      href={`/admin/videos/${video.id}/subtitles`}
-                      className="text-blue-600 hover:text-blue-700 text-sm"
-                    >
-                      字幕
-                    </Link>
-                    <Link
-                      href={`/admin/videos/${video.id}/edit`}
-                      className="text-blue-600 hover:text-blue-700 text-sm"
-                    >
-                      编辑
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(video.id)}
-                      className="text-red-600 hover:text-red-700 text-sm"
-                    >
-                      删除
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table<Video>
+          columns={columns}
+          dataSource={videos}
+          rowKey="id"
+          loading={loading}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            showTotal: (total) => `共 ${total} 条`,
+            pageSizeOptions: ['10', '20', '50'],
+          }}
+          onChange={handleTableChange}
+        />
       </div>
     </div>
   )

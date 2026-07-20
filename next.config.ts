@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['images.unsplash.com'],
   },
+  transpilePackages: ['antd', '@ant-design/icons'],
+  serverExternalPackages: ['openid-client'],
 };
 
 export default nextConfig;

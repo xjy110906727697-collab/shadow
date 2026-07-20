@@ -1,8 +1,13 @@
 import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 export async function GET(request: Request) {
   try {
+    const session = await getServerSession(authOptions)
+    const isVisitor = !session
+
     const { searchParams } = new URL(request.url)
     const level = searchParams.get('level')
     const topic = searchParams.get('topic')
@@ -57,6 +62,8 @@ export async function GET(request: Request) {
       }
     }
 
+    const effectiveLimit = isVisitor ? Math.min(limit, 12) : limit
+
     const [videos, total] = await Promise.all([
       prisma.video.findMany({
         where,
@@ -69,7 +76,7 @@ export async function GET(request: Request) {
         },
         orderBy: { createdAt: 'desc' },
         skip,
-        take: limit,
+        take: effectiveLimit,
       }),
       prisma.video.count({ where })
     ])
@@ -79,17 +86,19 @@ export async function GET(request: Request) {
       return {
         ...video,
         level: levelCategory?.category.nameZh || null,
+        visitorAccessible: video.visitorAccessible,
         categories: undefined
       }
     })
 
     return NextResponse.json({
       videos: videosWithLevel,
+      isVisitor,
       pagination: {
         page,
-        limit,
+        limit: effectiveLimit,
         total,
-        totalPages: Math.ceil(total / limit)
+        totalPages: Math.ceil(total / effectiveLimit)
       }
     })
   } catch (error) {

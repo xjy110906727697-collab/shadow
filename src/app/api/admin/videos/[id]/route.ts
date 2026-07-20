@@ -40,28 +40,34 @@ export async function PUT(
 ) {
   try {
     const body = await request.json()
-    const { title, titleZh, description, descriptionZh, coverUrl, videoUrl, duration, published, categoryIds } = body
+    const { title, titleZh, description, descriptionZh, coverUrl, videoUrl, duration, published, visitorAccessible, categoryIds } = body
+
+    const updateData: any = {}
+
+    if (title !== undefined) updateData.title = title
+    if (titleZh !== undefined) updateData.titleZh = titleZh
+    if (description !== undefined) updateData.description = description
+    if (descriptionZh !== undefined) updateData.descriptionZh = descriptionZh
+    if (coverUrl !== undefined) updateData.coverUrl = coverUrl
+    if (videoUrl !== undefined) updateData.videoUrl = videoUrl
+    if (duration !== undefined) updateData.duration = duration
+    if (published !== undefined) updateData.published = published
+    if (visitorAccessible !== undefined) updateData.visitorAccessible = visitorAccessible
+
+    if (categoryIds !== undefined) {
+      updateData.categories = {
+        deleteMany: {},
+        create: categoryIds?.map((categoryId: string) => ({
+          category: {
+            connect: { id: categoryId }
+          }
+        })) || []
+      }
+    }
 
     const video = await prisma.video.update({
       where: { id: params.id },
-      data: {
-        title,
-        titleZh,
-        description,
-        descriptionZh,
-        coverUrl,
-        videoUrl,
-        duration,
-        published,
-        categories: {
-          deleteMany: {},
-          create: categoryIds?.map((categoryId: string) => ({
-            category: {
-              connect: { id: categoryId }
-            }
-          })) || []
-        }
-      }
+      data: updateData
     })
 
     return NextResponse.json(video)
