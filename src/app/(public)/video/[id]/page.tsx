@@ -62,7 +62,7 @@ export default function VideoDetailPage() {
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <p className="text-center text-gray-500">Loading video...</p>
+        <p className="text-center text-gray-500">加载视频中...</p>
       </div>
     )
   }
@@ -70,13 +70,13 @@ export default function VideoDetailPage() {
   if (!video) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <p className="text-center text-gray-500">Video not found</p>
+        <p className="text-center text-gray-500">视频未找到</p>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="container mx-auto px-4 py-8 max-w-[1400px]">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">{video.titleZh}</h1>
         <p className="text-gray-600 mb-2">{video.title}</p>
@@ -85,35 +85,39 @@ export default function VideoDetailPage() {
         )}
       </div>
 
-      <div className="space-y-6">
-        <VideoPlayer
-          videoUrl={video.videoUrl}
-          onTimeUpdate={setCurrentTime}
-        />
-
-        <div className="flex items-center justify-end gap-2">
-          <span className="text-sm text-gray-600">Font size:</span>
-          {(['small', 'medium', 'large'] as const).map(size => (
-            <button
-              key={size}
-              onClick={() => setFontSize(size)}
-              className={`px-3 py-1 text-sm rounded ${
-                fontSize === size
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {size === 'small' ? 'S' : size === 'medium' ? 'M' : 'L'}
-            </button>
-          ))}
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="lg:w-3/5">
+          <VideoPlayer
+            videoUrl={video.videoUrl}
+            onTimeUpdate={setCurrentTime}
+          />
         </div>
 
-        <SubtitlePanel
-          subtitles={video.subtitles}
-          currentTime={currentTime}
-          onSeek={handleSeek}
-          fontSize={fontSize}
-        />
+        <div className="lg:w-2/5 flex flex-col">
+          <div className="flex items-center justify-end gap-2 mb-3">
+            <span className="text-sm text-gray-600">字号：</span>
+            {(['small', 'medium', 'large'] as const).map(size => (
+              <button
+                key={size}
+                onClick={() => setFontSize(size)}
+                className={`px-3 py-1 text-sm rounded ${
+                  fontSize === size
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {size === 'small' ? 'S' : size === 'medium' ? 'M' : 'L'}
+              </button>
+            ))}
+          </div>
+
+          <SubtitlePanel
+            subtitles={video.subtitles}
+            currentTime={currentTime}
+            onSeek={handleSeek}
+            fontSize={fontSize}
+          />
+        </div>
       </div>
     </div>
   )

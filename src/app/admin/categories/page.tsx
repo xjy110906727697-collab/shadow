@@ -57,7 +57,7 @@ export default function AdminCategoriesPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this category?')) return
+    if (!confirm('确定要删除这个分类吗？')) return
 
     try {
       await fetch(`/api/admin/categories/${id}`, { method: 'DELETE' })
@@ -98,12 +98,12 @@ export default function AdminCategoriesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Categories</h1>
+        <h1 className="text-3xl font-bold">分类管理</h1>
         <button
           onClick={handleAdd}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Add {activeTab === 'LEVEL' ? 'Level' : 'Topic'}
+          添加{activeTab === 'LEVEL' ? '等级' : '主题'}
         </button>
       </div>
 
@@ -116,7 +116,7 @@ export default function AdminCategoriesPage() {
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          Levels
+          等级
         </button>
         <button
           onClick={() => setActiveTab('TOPIC')}
@@ -126,20 +126,20 @@ export default function AdminCategoriesPage() {
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          Topics
+          主题
         </button>
       </div>
 
       {showForm && (
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">
-            {editingCategory ? 'Edit' : 'Add'} {activeTab === 'LEVEL' ? 'Level' : 'Topic'}
+            {editingCategory ? '编辑' : '添加'}{activeTab === 'LEVEL' ? '等级' : '主题'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Korean Name *
+                  韩语名称 *
                 </label>
                 <input
                   type="text"
@@ -151,7 +151,7 @@ export default function AdminCategoriesPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Chinese Name *
+                  中文名称 *
                 </label>
                 <input
                   type="text"
@@ -164,20 +164,20 @@ export default function AdminCategoriesPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Slug *
+                标识符 *
               </label>
               <input
                 type="text"
                 value={formData.slug}
                 onChange={e => setFormData({ ...formData, slug: e.target.value })}
                 required
-                placeholder="e.g., beginner, travel"
+                placeholder="例如：beginner, travel"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Sort Order
+                排序
               </label>
               <input
                 type="number"
@@ -191,14 +191,14 @@ export default function AdminCategoriesPage() {
                 type="submit"
                 className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
               >
-                {editingCategory ? 'Update' : 'Create'}
+                {editingCategory ? '更新' : '创建'}
               </button>
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
                 className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200"
               >
-                Cancel
+                取消
               </button>
             </div>
           </form>
@@ -210,11 +210,11 @@ export default function AdminCategoriesPage() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Korean Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Chinese Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">韩语名称</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">中文名称</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">标识符</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">排序</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -229,13 +229,13 @@ export default function AdminCategoriesPage() {
                       onClick={() => handleEdit(category)}
                       className="text-blue-600 hover:text-blue-700 text-sm"
                     >
-                      Edit
+                      编辑
                     </button>
                     <button
                       onClick={() => handleDelete(category.id)}
                       className="text-red-600 hover:text-red-700 text-sm"
                     >
-                      Delete
+                      删除
                     </button>
                   </td>
                 </tr>

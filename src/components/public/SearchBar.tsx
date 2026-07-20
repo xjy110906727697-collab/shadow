@@ -29,7 +29,7 @@ export function SearchBar() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search videos..."
+          placeholder="搜索视频..."
           className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
         <svg
@@ -49,7 +49,7 @@ export function SearchBar() {
           type="submit"
           className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Search
+          搜索
         </button>
       </div>
     </form>

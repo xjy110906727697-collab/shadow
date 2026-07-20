@@ -33,7 +33,7 @@ export default function AdminVideosPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this video?')) return
+    if (!confirm('确定要删除这个视频吗？')) return
 
     try {
       await fetch(`/api/admin/videos/${id}`, { method: 'DELETE' })
@@ -50,18 +50,18 @@ export default function AdminVideosPage() {
   }
 
   if (loading) {
-    return <p className="text-gray-500">Loading videos...</p>
+    return <p className="text-gray-500">加载视频中...</p>
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Videos</h1>
+        <h1 className="text-3xl font-bold">视频管理</h1>
         <Link
           href="/admin/videos/new"
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Add Video
+          添加视频
         </Link>
       </div>
 
@@ -70,11 +70,11 @@ export default function AdminVideosPage() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Duration</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">标题</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">时长</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -89,7 +89,7 @@ export default function AdminVideosPage() {
                     <span className={`px-2 py-1 rounded text-xs ${
                       video.published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
                     }`}>
-                      {video.published ? 'Published' : 'Draft'}
+                      {video.published ? '已发布' : '草稿'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm">
@@ -100,19 +100,19 @@ export default function AdminVideosPage() {
                       href={`/admin/videos/${video.id}/subtitles`}
                       className="text-blue-600 hover:text-blue-700 text-sm"
                     >
-                      Subtitles
+                      字幕
                     </Link>
                     <Link
                       href={`/admin/videos/${video.id}/edit`}
                       className="text-blue-600 hover:text-blue-700 text-sm"
                     >
-                      Edit
+                      编辑
                     </Link>
                     <button
                       onClick={() => handleDelete(video.id)}
                       className="text-red-600 hover:text-red-700 text-sm"
                     >
-                      Delete
+                      删除
                     </button>
                   </td>
                 </tr>

@@ -37,27 +37,22 @@ export function VideoCard({
             alt={titleZh}
             fill
             className="object-cover group-hover:scale-105 transition-transform"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
           />
           {level && (
-            <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+            <div className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded">
               {level}
             </div>
           )}
-          <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+          <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
             {formatDuration(duration)}
           </div>
         </div>
-        <div className="p-4">
-          <h3 className="font-semibold text-lg mb-1 line-clamp-1 group-hover:text-blue-600">
+        <div className="p-2">
+          <h3 className="font-semibold text-sm mb-0.5 line-clamp-1 group-hover:text-blue-600">
             {titleZh}
           </h3>
-          <p className="text-sm text-gray-500 mb-2 line-clamp-1">{title}</p>
-          {(descriptionZh || description) && (
-            <p className="text-sm text-gray-600 line-clamp-2">
-              {descriptionZh || description}
-            </p>
-          )}
+          <p className="text-xs text-gray-500 line-clamp-1">{title}</p>
         </div>
       </div>
     </Link>

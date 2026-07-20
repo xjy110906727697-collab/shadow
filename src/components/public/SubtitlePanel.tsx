@@ -27,7 +27,7 @@ export function SubtitlePanel({
   const containerRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef<HTMLDivElement>(null)
 
-  const activeIndex = subtitles.findIndex(
+  const activeIndex = (subtitles ?? []).findIndex(
     entry => currentTime >= entry.startTime && currentTime <= entry.endTime
   )
 
@@ -57,17 +57,17 @@ export function SubtitlePanel({
   return (
     <div className="bg-white rounded-lg shadow">
       <div className="border-b border-gray-200 px-4 py-3">
-        <h3 className="font-semibold text-gray-900">Subtitles</h3>
+        <h3 className="font-semibold text-gray-900">字幕</h3>
       </div>
 
       <div
         ref={containerRef}
         className="overflow-y-auto max-h-[400px] p-4 space-y-3"
       >
-        {subtitles.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No subtitles available</p>
+        {!subtitles || subtitles.length === 0 ? (
+          <p className="text-gray-500 text-center py-8">暂无字幕</p>
         ) : (
-          subtitles.map((entry, idx) => {
+          (subtitles ?? []).map((entry, idx) => {
             const isActive = idx === activeIndex
             return (
               <div

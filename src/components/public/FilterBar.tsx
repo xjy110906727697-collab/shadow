@@ -50,7 +50,7 @@ export function FilterBar() {
   return (
     <div className="space-y-4 mb-6">
       <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Level</h3>
+        <h3 className="text-sm font-medium text-gray-700 mb-2">等级</h3>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => {
@@ -63,7 +63,7 @@ export function FilterBar() {
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            All
+            全部
           </button>
           {levels.map(level => (
             <button
@@ -85,7 +85,7 @@ export function FilterBar() {
       </div>
 
       <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Topic</h3>
+        <h3 className="text-sm font-medium text-gray-700 mb-2">主题</h3>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => {
@@ -98,7 +98,7 @@ export function FilterBar() {
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            All
+            全部
           </button>
           {topics.map(topic => (
             <button

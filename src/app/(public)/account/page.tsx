@@ -22,12 +22,12 @@ export default function AccountPage() {
     setSuccess('')
 
     if (newPassword !== confirmPassword) {
-      setError('New passwords do not match')
+      setError('两次密码不一致')
       return
     }
 
     if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters')
+      setError('密码至少6个字符')
       return
     }
 
@@ -43,23 +43,23 @@ export default function AccountPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || 'Failed to change password')
+        setError(data.error || '修改密码失败')
         return
       }
 
-      setSuccess('Password changed successfully')
+      setSuccess('密码修改成功')
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
     } catch (err) {
-      setError('An error occurred')
+      setError('发生错误')
     } finally {
       setLoading(false)
     }
   }
 
   const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return 'No expiration'
+    if (!dateStr) return '无到期时间'
     return new Date(dateStr).toLocaleDateString('zh-CN', {
       year: 'numeric',
       month: 'long',
@@ -69,27 +69,27 @@ export default function AccountPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <h1 className="text-3xl font-bold mb-8">My Account</h1>
+      <h1 className="text-3xl font-bold mb-8">我的账号</h1>
 
       {isExpired && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-          Your subscription has expired. Please contact us to renew.
+          您的订阅已过期，请联系我们续订。
         </div>
       )}
 
       <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Account Information</h2>
+        <h2 className="text-xl font-semibold mb-4">账号信息</h2>
         <div className="space-y-3">
           <div>
-            <span className="text-gray-600">Email:</span>{' '}
+            <span className="text-gray-600">邮箱：</span>
             <span className="font-medium">{session?.user.email}</span>
           </div>
           <div>
-            <span className="text-gray-600">Role:</span>{' '}
+            <span className="text-gray-600">角色：</span>
             <span className="font-medium">{session?.user.role}</span>
           </div>
           <div>
-            <span className="text-gray-600">Subscription expires:</span>{' '}
+            <span className="text-gray-600">订阅到期：</span>
             <span className={`font-medium ${isExpired ? 'text-red-600' : ''}`}>
               {formatDate(session?.user.expireAt || null)}
             </span>
@@ -98,7 +98,7 @@ export default function AccountPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Change Password</h2>
+        <h2 className="text-xl font-semibold mb-4">修改密码</h2>
 
         <form onSubmit={handlePasswordChange} className="space-y-4">
           {error && (
@@ -115,7 +115,7 @@ export default function AccountPage() {
 
           <div>
             <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">
-              Current Password
+              当前密码
             </label>
             <input
               id="currentPassword"
@@ -129,7 +129,7 @@ export default function AccountPage() {
 
           <div>
             <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">
-              New Password
+              新密码
             </label>
             <input
               id="newPassword"
@@ -143,7 +143,7 @@ export default function AccountPage() {
 
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-              Confirm New Password
+              确认新密码
             </label>
             <input
               id="confirmPassword"
@@ -160,7 +160,7 @@ export default function AccountPage() {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            {loading ? 'Changing password...' : 'Change Password'}
+            {loading ? '修改中...' : '修改密码'}
           </button>
         </form>
       </div>

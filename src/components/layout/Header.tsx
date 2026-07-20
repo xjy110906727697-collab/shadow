@@ -14,10 +14,10 @@ export async function Header() {
 
         <nav className="flex items-center gap-6">
           <Link href="/browse" className="text-gray-600 hover:text-gray-900">
-            Browse
+            浏览
           </Link>
           <Link href="/pricing" className="text-gray-600 hover:text-gray-900">
-            Pricing
+            订阅
           </Link>
 
           {session ? (
@@ -27,20 +27,20 @@ export async function Header() {
               </Link>
               {session.user.role === 'ADMIN' && (
                 <Link href="/admin" className="text-blue-600 hover:text-blue-700">
-                  Admin
+                  管理
                 </Link>
               )}
             </>
           ) : (
             <>
               <Link href="/login" className="text-gray-600 hover:text-gray-900">
-                Login
+                登录
               </Link>
               <Link
                 href="/register"
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
               >
-                Register
+                注册
               </Link>
             </>
           )}

@@ -71,12 +71,12 @@ export default function BrowsePage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Browse Videos</h1>
+      <h1 className="text-3xl font-bold mb-8">浏览视频</h1>
 
       <div className="flex flex-col md:flex-row gap-8">
         <aside className="md:w-64 space-y-6">
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Level</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-2">等级</h3>
             <div className="space-y-1">
               <button
                 onClick={() => handleFilterChange('', selectedTopic)}
@@ -84,7 +84,7 @@ export default function BrowsePage() {
                   !selectedLevel ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100'
                 }`}
               >
-                All Levels
+                全部等级
               </button>
               {levels.map(level => (
                 <button
@@ -101,7 +101,7 @@ export default function BrowsePage() {
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Topic</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-2">主题</h3>
             <div className="space-y-1">
               <button
                 onClick={() => handleFilterChange(selectedLevel, '')}
@@ -109,7 +109,7 @@ export default function BrowsePage() {
                   !selectedTopic ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100'
                 }`}
               >
-                All Topics
+                全部主题
               </button>
               {topics.map(topic => (
                 <button
@@ -131,14 +131,14 @@ export default function BrowsePage() {
 
           {loading ? (
             <div className="text-center py-16">
-              <p className="text-gray-500">Loading videos...</p>
+              <p className="text-gray-500">加载视频中...</p>
             </div>
           ) : videos.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-gray-500">No videos found</p>
+              <p className="text-gray-500">暂无视频</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {videos.map(video => (
                 <VideoCard key={video.id} {...video} />
               ))}

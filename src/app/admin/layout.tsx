@@ -20,7 +20,7 @@ export default async function AdminLayout({
         <aside className="w-64 bg-white border-r border-gray-200 min-h-screen">
           <div className="p-6">
             <Link href="/admin" className="text-2xl font-bold text-blue-600">
-              Admin
+              管理后台
             </Link>
           </div>
           <nav className="px-4 space-y-2">
@@ -28,31 +28,31 @@ export default async function AdminLayout({
               href="/admin"
               className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
             >
-              Dashboard
+              仪表盘
             </Link>
             <Link
               href="/admin/videos"
               className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
             >
-              Videos
+              视频管理
             </Link>
             <Link
               href="/admin/categories"
               className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
             >
-              Categories
+              分类管理
             </Link>
             <Link
               href="/admin/users"
               className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
             >
-              Users
+              用户管理
             </Link>
             <Link
               href="/admin/settings"
               className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
             >
-              Settings
+              系统设置
             </Link>
           </nav>
           <div className="px-4 mt-8 pt-8 border-t border-gray-200">
@@ -60,7 +60,7 @@ export default async function AdminLayout({
               href="/"
               className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
             >
-              ← Back to Site
+              ← 返回前台
             </Link>
           </div>
         </aside>
