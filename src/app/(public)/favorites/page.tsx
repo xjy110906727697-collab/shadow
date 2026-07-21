@@ -24,27 +24,31 @@ export default function FavoritesPage() {
   const isVisitor = !session
 
   useEffect(() => {
-    // Get favorite video IDs from localStorage
-    const stored = localStorage.getItem('favorites')
-    const ids: string[] = stored ? JSON.parse(stored) : []
+    const fetchFavorites = async () => {
+      try {
+        const res = await fetch('/api/favorites')
+        const data = await res.json()
+        const ids: string[] = data.favorites || []
 
-    if (ids.length === 0) {
-      setFavorites([])
-      setLoading(false)
-      return
+        if (ids.length === 0) {
+          setFavorites([])
+          setLoading(false)
+          return
+        }
+
+        const results = await Promise.all(
+          ids.map(id =>
+            fetch(`/api/videos/${id}`).then(r => r.ok ? r.json() : null)
+          )
+        )
+        setFavorites(results.filter((v): v is Video => v && v.id))
+      } catch (e) {
+        console.error(e)
+      } finally {
+        setLoading(false)
+      }
     }
-
-    // Fetch each video's details
-    Promise.all(
-      ids.map(id =>
-        fetch(`/api/videos/${id}`).then(res => res.json())
-      )
-    )
-      .then(data => {
-        setFavorites(data.filter((v): v is Video => v && v.id))
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false))
+    fetchFavorites()
   }, [])
 
   return (

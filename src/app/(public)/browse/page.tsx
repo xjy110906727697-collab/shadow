@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { VideoCard } from '@/components/public/VideoCard'
@@ -49,6 +49,7 @@ type DurationFilter = '' | 'lt3' | '3to5' | 'gt5'
 
 function BrowsePageContent() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const searchQuery = searchParams.get('search') || ''
   const showFavorites = searchParams.get('show') === 'favorites'
   const { data: session } = useSession()
@@ -99,11 +100,17 @@ function BrowsePageContent() {
   useEffect(() => {
     const handleVideoLocked = () => setShowSubscribeModal(true)
     const handleFavoriteLogin = () => setShowLoginPrompt(true)
+    const handleOpenFilter = () => setFilterDrawerOpen(true)
+    const handleToggleSearch = () => setShowMobileSearch(prev => !prev)
     window.addEventListener('video-locked', handleVideoLocked)
     window.addEventListener('favorite-login', handleFavoriteLogin)
+    window.addEventListener('open-filter-drawer', handleOpenFilter)
+    window.addEventListener('toggle-mobile-search', handleToggleSearch)
     return () => {
       window.removeEventListener('video-locked', handleVideoLocked)
       window.removeEventListener('favorite-login', handleFavoriteLogin)
+      window.removeEventListener('open-filter-drawer', handleOpenFilter)
+      window.removeEventListener('toggle-mobile-search', handleToggleSearch)
     }
   }, [])
 
@@ -126,9 +133,12 @@ function BrowsePageContent() {
 
         // Filter by favorites if in favorites mode
         if (showFavorites) {
-          const stored = localStorage.getItem('favorites')
-          const favIds: string[] = stored ? JSON.parse(stored) : []
-          fetchedVideos = fetchedVideos.filter((v: Video) => favIds.includes(v.id))
+          try {
+            const favRes = await fetch('/api/favorites')
+            const favData = await favRes.json()
+            const favIds: string[] = favData.favorites || []
+            fetchedVideos = fetchedVideos.filter((v: Video) => favIds.includes(v.id))
+          } catch { /* ignore */ }
         }
 
         setVideos(fetchedVideos)
@@ -192,6 +202,24 @@ function BrowsePageContent() {
 
     return () => observer.disconnect()
   }, [loading, loadingMore, page, totalPages])
+
+  const [showMobileSearch, setShowMobileSearch] = useState(false)
+  const [mobileSearchText, setMobileSearchText] = useState(searchQuery)
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false)
+
+  // Debounced mobile search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (mobileSearchText !== searchQuery) {
+        const params = new URLSearchParams(searchParams)
+        if (mobileSearchText) params.set('search', mobileSearchText)
+        else params.delete('search')
+        params.set('page', '1')
+        router.push(`?${params.toString()}`)
+      }
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [mobileSearchText])
 
   const topics = categories.filter(c => c.type === 'TOPIC')
 
@@ -406,18 +434,19 @@ function BrowsePageContent() {
         </div>
       )}
 
-      {/* Mobile filter trigger */}
-      <div className="md:hidden mb-3">
-        <button
-          onClick={() => setFilterDrawerOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-          </svg>
-          筛选
-        </button>
-      </div>
+      {/* Mobile search input */}
+      {showMobileSearch && (
+        <div className="md:hidden mb-3">
+          <input
+            type="text"
+            value={mobileSearchText}
+            onChange={e => setMobileSearchText(e.target.value)}
+            placeholder="搜索视频..."
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            autoFocus
+          />
+        </div>
+      )}
 
       <FilterDrawer open={filterDrawerOpen} onClose={() => setFilterDrawerOpen(false)}>
         <div className="p-4 space-y-3">
@@ -441,7 +470,7 @@ function BrowsePageContent() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
+              <div className="grid gap-3 md:gap-5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}>
                 {videos.map(video => (
                   <VideoCard
                     key={video.id}

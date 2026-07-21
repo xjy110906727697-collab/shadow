@@ -25,42 +25,24 @@ export default async function AdminLayout({
             </Link>
           </div>
           <nav className="px-4 space-y-2">
-            <Link
-              href="/admin"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
-            >
+            <Link href="/admin" className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
               仪表盘
             </Link>
-            <Link
-              href="/admin/videos"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
-            >
+            <Link href="/admin/videos" className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
               视频管理
             </Link>
-            <Link
-              href="/admin/categories"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
-            >
+            <Link href="/admin/categories" className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
               分类管理
             </Link>
-            <Link
-              href="/admin/users"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
-            >
+            <Link href="/admin/users" className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
               用户管理
             </Link>
-            <Link
-              href="/admin/settings"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
-            >
-              系统设置
+            <Link href="/admin/feedback" className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+              意见反馈
             </Link>
           </nav>
           <div className="px-4 mt-8 pt-8 border-t border-gray-200">
-            <Link
-              href="/"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
-            >
+            <Link href="/" className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
               ← 返回前台
             </Link>
           </div>

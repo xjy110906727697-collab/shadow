@@ -38,8 +38,8 @@ export default function VideoDetailPage() {
     "双语" | "韩文" | "中文" | "盲听"
   >("双语");
   const [isFavorited, setIsFavorited] = useState(() => {
-    if (typeof window === 'undefined' || !params.id) return false;
-    const stored = localStorage.getItem('favorites');
+    if (typeof window === "undefined" || !params.id) return false;
+    const stored = localStorage.getItem("favorites");
     const ids: string[] = stored ? JSON.parse(stored) : [];
     return ids.includes(params.id as string);
   });
@@ -142,30 +142,31 @@ export default function VideoDetailPage() {
   }
 
   return (
-    <div className="w-full px-4 md:px-8 py-4 pb-32 md:pb-4">
+    <div className="w-full px-2 md:px-4 py-4 pb-32 md:pb-4 min-[1000px]:pt-8">
       {/* Player + Subtitles */}
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="lg:w-[70%]">
+      <div className="max-w-[1400px] mx-auto">
+        <div className="flex flex-col min-[1000px]:flex-row gap-4">
+          <div className="min-[1000px]:w-[72%]">
             <VideoPlayer
               videoUrl={video.videoUrl}
               onTimeUpdate={setCurrentTime}
             />
           </div>
 
-          <div className="lg:w-[30%] flex flex-col max-h-[600px]">
+          <div className="min-[1000px]:w-[28%] flex flex-col h-[50vh] min-[1000px]:h-[70vh]">
             <SubtitlePanel
               subtitles={video.subtitles}
               currentTime={currentTime}
               onSeek={handleSeek}
               mode={subtitleMode}
+              onModeChange={setSubtitleMode}
             />
           </div>
         </div>
 
         {/* Description below */}
         {(video.descriptionZh || video.description) && (
-          <div className="mt-6 text-sm text-gray-600 leading-relaxed">
+          <div className="mt-4 text-sm text-gray-600 leading-relaxed">
             <p>{video.descriptionZh || video.description}</p>
           </div>
         )}
@@ -173,55 +174,6 @@ export default function VideoDetailPage() {
 
       {/* Mobile bottom action bar */}
       <div className="fixed bottom-14 left-0 right-0 z-30 bg-white border-t border-gray-200 md:hidden">
-        <div className="flex items-center gap-2 px-3 py-2 overflow-x-auto">
-          {(['双语', '韩文', '中文', '盲听'] as const).map(mode => (
-            <button
-              key={mode}
-              onClick={() => {
-                setSubtitleMode(mode)
-                window.dispatchEvent(new CustomEvent('subtitle-mode', { detail: mode }))
-              }}
-              className={`text-xs px-3 py-1.5 rounded-full border whitespace-nowrap transition-colors ${
-                subtitleMode === mode
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-500 border-gray-300 hover:border-blue-400 hover:text-blue-600'
-              }`}
-            >
-              {mode}
-            </button>
-          ))}
-          <div className="h-5 w-px bg-gray-200 mx-1" />
-          <button
-            onClick={() => window.dispatchEvent(new CustomEvent('toggle-loop'))}
-            className="text-xs px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-500 hover:border-blue-400 hover:text-blue-600 transition-colors whitespace-nowrap"
-            title="循环播放"
-          >
-            🔁 循环
-          </button>
-          <button
-            onClick={() => {
-              const videoId = params.id as string
-              const stored = localStorage.getItem('favorites')
-              let ids: string[] = stored ? JSON.parse(stored) : []
-              if (ids.includes(videoId)) {
-                ids = ids.filter(id => id !== videoId)
-                setIsFavorited(false)
-              } else {
-                ids.push(videoId)
-                setIsFavorited(true)
-              }
-              localStorage.setItem('favorites', JSON.stringify(ids))
-            }}
-            className={`text-xs px-3 py-1.5 rounded-full border transition-colors whitespace-nowrap ${
-              isFavorited
-                ? 'bg-red-50 text-red-500 border-red-300'
-                : 'border-gray-300 bg-white text-gray-500 hover:border-red-400 hover:text-red-500'
-            }`}
-            title="收藏"
-          >
-            {isFavorited ? '❤️' : '🤍'} 收藏
-          </button>
-        </div>
         <div className="pb-[env(safe-area-inset-bottom)]" />
       </div>
     </div>

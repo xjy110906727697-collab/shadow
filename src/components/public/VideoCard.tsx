@@ -46,32 +46,31 @@ export function VideoCard({
   const [isFavorited, setIsFavorited] = useState(false)
 
   useEffect(() => {
-    const stored = localStorage.getItem('favorites')
-    const ids: string[] = stored ? JSON.parse(stored) : []
-    setIsFavorited(ids.includes(id))
-  }, [id])
+    if (isVisitor) { setIsFavorited(false); return }
+    fetch('/api/favorites')
+      .then(res => res.json())
+      .then(data => setIsFavorited(data.favorites?.includes(id) || false))
+      .catch(() => setIsFavorited(false))
+  }, [id, isVisitor])
 
-  const handleFavorite = (e: React.MouseEvent) => {
+  const handleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
     if (isVisitor) {
-      const event = new CustomEvent('favorite-login')
-      window.dispatchEvent(event)
+      window.dispatchEvent(new CustomEvent('favorite-login'))
       return
     }
 
-    const stored = localStorage.getItem('favorites')
-    let ids: string[] = stored ? JSON.parse(stored) : []
-
-    if (isFavorited) {
-      ids = ids.filter(fid => fid !== id)
-      setIsFavorited(false)
-    } else {
-      ids.push(id)
-      setIsFavorited(true)
-    }
-    localStorage.setItem('favorites', JSON.stringify(ids))
+    try {
+      const res = await fetch('/api/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoId: id }),
+      })
+      const data = await res.json()
+      setIsFavorited(data.favorited)
+    } catch { /* ignore */ }
   }
 
   const formatDuration = (seconds: number) => {

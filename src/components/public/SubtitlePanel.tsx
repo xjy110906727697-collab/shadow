@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface SubtitleEntry {
   id: string
@@ -16,13 +16,21 @@ interface SubtitlePanelProps {
   currentTime: number
   onSeek?: (time: number) => void
   mode?: '双语' | '韩文' | '中文' | '盲听'
+  onModeChange?: (mode: '双语' | '韩文' | '中文' | '盲听') => void
+  isFavorited?: boolean
+  onFavoriteToggle?: () => void
 }
+
+const subtitleModes = ['双语', '韩文', '中文', '盲听'] as const
 
 export function SubtitlePanel({
   subtitles,
   currentTime,
   onSeek,
   mode = '双语',
+  onModeChange,
+  isFavorited,
+  onFavoriteToggle,
 }: SubtitlePanelProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef<HTMLDivElement>(null)
@@ -38,8 +46,8 @@ export function SubtitlePanel({
       const containerRect = container.getBoundingClientRect()
       const elementRect = element.getBoundingClientRect()
 
-      // Scroll active subtitle to upper area (25% from top)
-      const targetTop = container.scrollTop + elementRect.top - containerRect.top - containerRect.height * 0.25
+      // Scroll active subtitle to upper area (20% from top)
+      const targetTop = container.scrollTop + elementRect.top - containerRect.top - containerRect.height * 0.2
       container.scrollTo({ top: targetTop, behavior: 'smooth' })
     }
   }, [activeIndex])
@@ -56,10 +64,40 @@ export function SubtitlePanel({
 
   return (
     <div className="bg-white rounded-lg shadow flex flex-col h-full">
-      <div className="border-b border-gray-200 px-4 py-3 shrink-0">
-        <h3 className="font-semibold text-gray-900">
-          字幕 · {mode === '双语' ? '韩中' : mode === '韩文' ? '韩语' : mode === '中文' ? '中文' : '盲听'}
-        </h3>
+      {/* Header with mode switches + favorite - flush to edges */}
+      <div className="border-b border-gray-200 shrink-0">
+        <div className="flex items-stretch w-full">
+          {/* Segmented control for mode buttons */}
+          <div className="flex flex-1 overflow-hidden">
+            {subtitleModes.map((m, i) => (
+              <button
+                key={m}
+                onClick={() => onModeChange?.(m)}
+                className={`flex-1 text-[11px] py-2.5 transition-colors text-center ${
+                  mode === m
+                    ? 'bg-blue-600 text-white font-medium'
+                    : 'bg-white text-gray-500 hover:bg-gray-50'
+                } ${i > 0 ? 'border-l border-gray-200' : ''}`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+          {onFavoriteToggle && (
+            <button
+              onClick={onFavoriteToggle}
+              className={`flex-shrink-0 w-9 flex items-center justify-center border-l border-gray-200 transition-colors ${
+                isFavorited
+                  ? 'bg-red-50 text-red-500'
+                  : 'bg-white text-gray-400 hover:text-red-400'
+              }`}
+            >
+              <svg className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       <div

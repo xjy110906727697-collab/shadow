@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { Table, Button, Tag, Space, Input, Select, message, Popconfirm } from 'antd'
+import { Table, Button, Tag, Space, Input, Select, message, Popconfirm, Modal } from 'antd'
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import type { SorterResult } from 'antd/es/table/interface'
@@ -89,6 +89,9 @@ export default function AdminVideosPage() {
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [previewType, setPreviewType] = useState<'image' | 'video'>('image')
+
   const handleTableChange = (
     pag: TablePaginationConfig,
     _filters: any,
@@ -127,7 +130,12 @@ export default function AdminVideosPage() {
       width: 80,
       render: (_: any, record: Video) =>
         record.coverUrl ? (
-          <img src={record.coverUrl} alt="封面" className="w-12 h-8 rounded object-cover" />
+          <img
+            src={record.coverUrl}
+            alt="封面"
+            className="w-12 h-8 rounded object-cover cursor-pointer hover:opacity-80"
+            onClick={() => { setPreviewUrl(record.coverUrl); setPreviewType('image') }}
+          />
         ) : (
           <span className="text-xs text-gray-400">无</span>
         ),
@@ -137,7 +145,12 @@ export default function AdminVideosPage() {
       width: 60,
       render: (_: any, record: Video) =>
         record.videoUrl ? (
-          <video src={record.videoUrl} className="w-12 h-8 rounded object-cover" controls preload="none" />
+          <video
+            src={record.videoUrl}
+            className="w-12 h-8 rounded object-cover cursor-pointer hover:opacity-80"
+            preload="none"
+            onClick={() => { setPreviewUrl(record.videoUrl); setPreviewType('video') }}
+          />
         ) : (
           <span className="text-xs text-gray-400">无</span>
         ),
@@ -281,6 +294,20 @@ export default function AdminVideosPage() {
           onChange={handleTableChange}
         />
       </div>
+
+      <Modal
+        open={!!previewUrl}
+        footer={null}
+        width={previewType === 'video' ? 800 : 500}
+        onCancel={() => setPreviewUrl(null)}
+        centered
+      >
+        {previewType === 'video' ? (
+          <video src={previewUrl!} controls autoPlay className="w-full rounded" />
+        ) : (
+          <img src={previewUrl!} alt="预览" className="w-full rounded" />
+        )}
+      </Modal>
     </div>
   )
 }
