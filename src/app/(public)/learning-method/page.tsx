@@ -183,12 +183,40 @@ export default function LearningMethodPage() {
   const current = articles.find(a => a.id === activeId) || articles[0]
 
   return (
-    <div className="w-full px-4 md:px-6 py-4">
+    <div className="w-full px-4 md:px-6 py-4 pb-20 md:pb-4">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">学习方法</h1>
+
+        {/* Mobile: horizontal scrollable chips */}
+        <div className="md:hidden mb-4 -mx-4 px-4 overflow-x-auto">
+          <div className="flex gap-2 w-max">
+            {articles.map(article => {
+              const isActive = article.id === activeId
+              return (
+                <button
+                  key={article.id}
+                  onClick={() => setActiveId(article.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border whitespace-nowrap text-sm transition-colors ${
+                    isActive
+                      ? 'border-blue-300 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
+                    tagColors[article.tag] || 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {article.tag}
+                  </span>
+                  {article.title}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
         <div className="flex flex-row gap-8">
-          {/* Left sidebar — article cards */}
-          <aside className="w-72 shrink-0">
+          {/* Desktop sidebar */}
+          <aside className="hidden md:block w-72 shrink-0">
             <nav className="space-y-3 sticky top-4">
               {articles.map(article => {
                 const isActive = article.id === activeId
@@ -246,7 +274,7 @@ export default function LearningMethodPage() {
 
           {/* Right content — article detail */}
           <main className="flex-1 min-w-0">
-            <div className="bg-white border border-gray-200 rounded-lg p-8">
+            <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-8">
               <div className="flex items-center gap-3 mb-5">
                 <h2 className="text-xl font-semibold">{current.title}</h2>
                 {current.date && (

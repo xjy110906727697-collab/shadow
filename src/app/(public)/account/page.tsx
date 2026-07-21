@@ -70,7 +70,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-8">
+    <div className="max-w-lg mx-auto px-4 py-8 pb-20 md:pb-8">
       {status === 'unauthenticated' && (
         <div className="text-center py-16">
           <div className="text-4xl mb-4">🔑</div>

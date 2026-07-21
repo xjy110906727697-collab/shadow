@@ -68,7 +68,7 @@ export function Header() {
           <Link href="/browse" className="text-lg font-bold text-blue-600">
             HangulStudy
           </Link>
-          <nav className="flex items-center gap-4 text-sm">
+          <nav className="hidden md:flex items-center gap-4 text-sm">
             <Link href="/browse" className="text-gray-600 hover:text-gray-900">首页</Link>
             <Link href="/browse?show=favorites" className="text-gray-600 hover:text-gray-900">收藏</Link>
             <Link href="/learning-method" className="text-gray-600 hover:text-gray-900">学习方法</Link>
@@ -105,7 +105,7 @@ export function Header() {
         </div>
 
         {/* Right: subtitle switches + action buttons */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="hidden md:flex items-center gap-1.5 shrink-0">
           {subtitleModes.map(mode => (
             <button
               key={mode}

@@ -48,7 +48,7 @@ export default function FavoritesPage() {
   }, [])
 
   return (
-    <div className="w-full px-4 md:px-8 py-4">
+    <div className="w-full px-4 md:px-8 py-4 pb-20 md:pb-4">
       <h1 className="text-3xl font-bold mb-6">我的收藏</h1>
 
       {loading ? (

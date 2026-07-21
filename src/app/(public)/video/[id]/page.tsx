@@ -37,6 +37,12 @@ export default function VideoDetailPage() {
   const [subtitleMode, setSubtitleMode] = useState<
     "双语" | "韩文" | "中文" | "盲听"
   >("双语");
+  const [isFavorited, setIsFavorited] = useState(() => {
+    if (typeof window === 'undefined' || !params.id) return false;
+    const stored = localStorage.getItem('favorites');
+    const ids: string[] = stored ? JSON.parse(stored) : [];
+    return ids.includes(params.id as string);
+  });
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -136,7 +142,7 @@ export default function VideoDetailPage() {
   }
 
   return (
-    <div className="w-full px-4 md:px-8 py-4">
+    <div className="w-full px-4 md:px-8 py-4 pb-32 md:pb-4">
       {/* Player + Subtitles */}
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-6">
@@ -163,6 +169,60 @@ export default function VideoDetailPage() {
             <p>{video.descriptionZh || video.description}</p>
           </div>
         )}
+      </div>
+
+      {/* Mobile bottom action bar */}
+      <div className="fixed bottom-14 left-0 right-0 z-30 bg-white border-t border-gray-200 md:hidden">
+        <div className="flex items-center gap-2 px-3 py-2 overflow-x-auto">
+          {(['双语', '韩文', '中文', '盲听'] as const).map(mode => (
+            <button
+              key={mode}
+              onClick={() => {
+                setSubtitleMode(mode)
+                window.dispatchEvent(new CustomEvent('subtitle-mode', { detail: mode }))
+              }}
+              className={`text-xs px-3 py-1.5 rounded-full border whitespace-nowrap transition-colors ${
+                subtitleMode === mode
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-500 border-gray-300 hover:border-blue-400 hover:text-blue-600'
+              }`}
+            >
+              {mode}
+            </button>
+          ))}
+          <div className="h-5 w-px bg-gray-200 mx-1" />
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('toggle-loop'))}
+            className="text-xs px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-500 hover:border-blue-400 hover:text-blue-600 transition-colors whitespace-nowrap"
+            title="循环播放"
+          >
+            🔁 循环
+          </button>
+          <button
+            onClick={() => {
+              const videoId = params.id as string
+              const stored = localStorage.getItem('favorites')
+              let ids: string[] = stored ? JSON.parse(stored) : []
+              if (ids.includes(videoId)) {
+                ids = ids.filter(id => id !== videoId)
+                setIsFavorited(false)
+              } else {
+                ids.push(videoId)
+                setIsFavorited(true)
+              }
+              localStorage.setItem('favorites', JSON.stringify(ids))
+            }}
+            className={`text-xs px-3 py-1.5 rounded-full border transition-colors whitespace-nowrap ${
+              isFavorited
+                ? 'bg-red-50 text-red-500 border-red-300'
+                : 'border-gray-300 bg-white text-gray-500 hover:border-red-400 hover:text-red-500'
+            }`}
+            title="收藏"
+          >
+            {isFavorited ? '❤️' : '🤍'} 收藏
+          </button>
+        </div>
+        <div className="pb-[env(safe-area-inset-bottom)]" />
       </div>
     </div>
   );

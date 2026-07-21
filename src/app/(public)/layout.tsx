@@ -1,5 +1,6 @@
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { BottomTabBar } from '@/components/layout/BottomTabBar'
 
 export default function PublicLayout({
   children,
@@ -12,7 +13,10 @@ export default function PublicLayout({
       <main className="flex-1">
         {children}
       </main>
-      <Footer />
+      <div className="hidden md:block">
+        <Footer />
+      </div>
+      <BottomTabBar />
     </div>
   )
 }

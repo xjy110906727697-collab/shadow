@@ -92,7 +92,7 @@ export function VideoPlayer({ videoUrl, onTimeUpdate }: VideoPlayerProps) {
       <video
         ref={videoRef}
         src={videoUrl}
-        className="w-full aspect-[4/3]"
+        className="w-full aspect-video"
         onClick={togglePlay}
         autoPlay
       />
@@ -111,7 +111,7 @@ export function VideoPlayer({ videoUrl, onTimeUpdate }: VideoPlayerProps) {
           <div className="flex items-center gap-4">
             <button
               onClick={togglePlay}
-              className="text-white hover:text-blue-400"
+              className="text-white hover:text-blue-400 min-h-11 min-w-11 flex items-center justify-center"
             >
               {isPlaying ? (
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">

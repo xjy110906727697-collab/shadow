@@ -51,7 +51,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4">
+    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4 pb-20">
       <div className="max-w-md w-full">
         <h1 className="text-3xl font-bold mb-8 text-center">注册</h1>
 

@@ -6,7 +6,7 @@ export default async function PricingPage() {
   })
 
   return (
-    <div className="w-full px-4 md:px-8 py-8">
+    <div className="w-full px-4 md:px-8 py-8 pb-20 md:pb-8">
       <h1 className="text-3xl font-bold mb-8 text-center">订阅价格</h1>
 
       <div className="bg-white rounded-lg shadow p-8 text-center max-w-xl mx-auto">

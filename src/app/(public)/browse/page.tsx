@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { VideoCard } from '@/components/public/VideoCard'
 import { SearchBar } from '@/components/public/SearchBar'
+import { FilterDrawer } from '@/components/layout/FilterDrawer'
 
 interface Category {
   id: string
@@ -73,6 +74,7 @@ function BrowsePageContent() {
   const [showSubscribeModal, setShowSubscribeModal] = useState(false)
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
   const [activeStat, setActiveStat] = useState<'all' | 'learned' | 'unlearned'>('all')
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
   const observerRef = useRef<HTMLDivElement>(null)
   const isVisitor = !session
 
@@ -221,8 +223,141 @@ function BrowsePageContent() {
     setActiveStat(key)
   }
 
+  const sidebarContent = (
+    <>
+      <SearchBar />
+
+      {/* Combined Stats Card - clickable rows */}
+      <div className="border border-gray-200 rounded-lg bg-white overflow-hidden divide-y divide-gray-200">
+        {statsCards.map(card => {
+          const isActive = activeStat === card.key
+          return (
+            <button
+              key={card.key}
+              onClick={() => handleStatClick(card.key)}
+              className={`w-full flex items-center justify-between px-4 py-3 transition-all cursor-pointer ${
+                isActive
+                  ? `${card.color} ring-2 ring-inset ring-blue-400 scale-[1.02] shadow-sm`
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                {card.key === 'all' && (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                )}
+                {card.key === 'learned' && (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                )}
+                {card.key === 'unlearned' && (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                )}
+                <span className={`text-sm font-medium ${isActive ? 'opacity-100' : 'opacity-80'}`}>
+                  {card.label}
+                </span>
+              </div>
+              <span className={`text-lg font-bold ${!isActive ? card.color.split(' ').slice(0,2).join(' ') : ''}`}>
+                {card.value}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Combined Filters Card - bigger */}
+      <div className="border border-gray-200 rounded-lg bg-white p-4 space-y-4">
+        <h3 className="text-sm font-semibold text-gray-700 border-b border-gray-100 pb-2">筛选条件</h3>
+
+        {/* 时长 + 难度 on one row — aligned */}
+        <div className="flex gap-3 items-start">
+          <div className="flex-1">
+            <h4 className="text-xs font-medium text-gray-500 mb-1.5">时长</h4>
+            <select
+              value={durationDraft}
+              onChange={e => setDurationDraft(e.target.value as DurationFilter)}
+              className="w-full text-sm border border-gray-200 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">全部</option>
+              <option value="lt3">&lt; 3分钟</option>
+              <option value="3to5">3-5分钟</option>
+              <option value="gt5">&gt; 5分钟</option>
+            </select>
+          </div>
+          <div className="flex-1">
+            <h4 className="text-xs font-medium text-gray-500 mb-1.5">难度</h4>
+            <div className="flex items-center h-[38px] gap-0.5">
+              {[1, 2, 3, 4, 5].map(star => (
+                <button
+                  key={star}
+                  onClick={() => setDifficultyDraft(difficultyDraft === star ? 0 : star)}
+                  className={`text-lg px-0.5 leading-none transition-colors cursor-pointer ${
+                    star <= difficultyDraft ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-300'
+                  }`}
+                  title={`${star}星`}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 博主单独一行 — 一半宽度 */}
+        <div className="w-1/2">
+          <h4 className="text-xs font-medium text-gray-500 mb-1.5">博主</h4>
+          <select
+            value={instructorDraft}
+            onChange={e => setInstructorDraft(e.target.value)}
+            className="w-full text-sm border border-gray-200 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">全部</option>
+            {instructors.map(name => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* 主题标签 as toggle chips */}
+        <div>
+          <h4 className="text-xs font-medium text-gray-500 mb-1.5">主题标签</h4>
+          <div className="grid grid-cols-3 gap-1.5">
+            {topics.map(topic => (
+              <button
+                key={topic.id}
+                onClick={() => toggleTopic(topic.slug)}
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer ${
+                  topicDraft === topic.slug
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
+                }`}
+              >
+                {topic.nameZh}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 视频筛选 button */}
+        <button
+          onClick={() => {
+            handleApplyFilters()
+            setFilterDrawerOpen(false)
+          }}
+          className="w-full bg-blue-600 text-white text-sm font-medium py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          视频筛选
+        </button>
+      </div>
+    </>
+  )
+
   return (
-    <div className="w-full px-4 md:px-6 py-3 min-w-[500px] overflow-x-auto">
+    <div className="w-full px-4 md:px-6 py-3 pb-20 md:pb-3">
       {showLoginPrompt && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowLoginPrompt(false)}>
           <div className="bg-white rounded-lg p-8 max-w-md text-center" onClick={e => e.stopPropagation()}>
@@ -270,134 +405,29 @@ function BrowsePageContent() {
           </div>
         </div>
       )}
+
+      {/* Mobile filter trigger */}
+      <div className="md:hidden mb-3">
+        <button
+          onClick={() => setFilterDrawerOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          筛选
+        </button>
+      </div>
+
+      <FilterDrawer open={filterDrawerOpen} onClose={() => setFilterDrawerOpen(false)}>
+        <div className="p-4 space-y-3">
+          {sidebarContent}
+        </div>
+      </FilterDrawer>
       
-      <div className="flex flex-row gap-4 overflow-x-auto">
-        <aside className="w-56 md:w-80 shrink-0 space-y-3">
-          <SearchBar />
-
-          {/* Combined Stats Card - clickable rows */}
-          <div className="border border-gray-200 rounded-lg bg-white overflow-hidden divide-y divide-gray-200">
-            {statsCards.map(card => {
-              const isActive = activeStat === card.key
-              return (
-                <button
-                  key={card.key}
-                  onClick={() => handleStatClick(card.key)}
-                  className={`w-full flex items-center justify-between px-4 py-3 transition-all cursor-pointer ${
-                    isActive
-                      ? `${card.color} ring-2 ring-inset ring-blue-400 scale-[1.02] shadow-sm`
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    {card.key === 'all' && (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
-                    )}
-                    {card.key === 'learned' && (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    )}
-                    {card.key === 'unlearned' && (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    )}
-                    <span className={`text-sm font-medium ${isActive ? 'opacity-100' : 'opacity-80'}`}>
-                      {card.label}
-                    </span>
-                  </div>
-                  <span className={`text-lg font-bold ${!isActive ? card.color.split(' ').slice(0,2).join(' ') : ''}`}>
-                    {card.value}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Combined Filters Card - bigger */}
-          <div className="border border-gray-200 rounded-lg bg-white p-4 space-y-4">
-            <h3 className="text-sm font-semibold text-gray-700 border-b border-gray-100 pb-2">筛选条件</h3>
-
-            {/* 时长 + 难度 on one row — aligned */}
-            <div className="flex gap-3 items-start">
-              <div className="flex-1">
-                <h4 className="text-xs font-medium text-gray-500 mb-1.5">时长</h4>
-                <select
-                  value={durationDraft}
-                  onChange={e => setDurationDraft(e.target.value as DurationFilter)}
-                  className="w-full text-sm border border-gray-200 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">全部</option>
-                  <option value="lt3">&lt; 3分钟</option>
-                  <option value="3to5">3-5分钟</option>
-                  <option value="gt5">&gt; 5分钟</option>
-                </select>
-              </div>
-              <div className="flex-1">
-                <h4 className="text-xs font-medium text-gray-500 mb-1.5">难度</h4>
-                <div className="flex items-center h-[38px] gap-0.5">
-                  {[1, 2, 3, 4, 5].map(star => (
-                    <button
-                      key={star}
-                      onClick={() => setDifficultyDraft(difficultyDraft === star ? 0 : star)}
-                      className={`text-lg px-0.5 leading-none transition-colors cursor-pointer ${
-                        star <= difficultyDraft ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-300'
-                      }`}
-                      title={`${star}星`}
-                    >
-                      ★
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* 博主单独一行 — 一半宽度 */}
-            <div className="w-1/2">
-              <h4 className="text-xs font-medium text-gray-500 mb-1.5">博主</h4>
-              <select
-                value={instructorDraft}
-                onChange={e => setInstructorDraft(e.target.value)}
-                className="w-full text-sm border border-gray-200 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">全部</option>
-                {instructors.map(name => (
-                  <option key={name} value={name}>{name}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* 主题标签 as toggle chips */}
-            <div>
-              <h4 className="text-xs font-medium text-gray-500 mb-1.5">主题标签</h4>
-              <div className="grid grid-cols-3 gap-1.5">
-                {topics.map(topic => (
-                  <button
-                    key={topic.id}
-                    onClick={() => toggleTopic(topic.slug)}
-                    className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer ${
-                      topicDraft === topic.slug
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
-                    }`}
-                  >
-                    {topic.nameZh}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 视频筛选 button */}
-            <button
-              onClick={handleApplyFilters}
-              className="w-full bg-blue-600 text-white text-sm font-medium py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              视频筛选
-            </button>
-          </div>
+      <div className="flex flex-row gap-4">
+        <aside className="hidden md:block w-56 md:w-80 shrink-0 space-y-3">
+          {sidebarContent}
         </aside>
 
         <main className="flex-1 min-w-0">
@@ -411,7 +441,7 @@ function BrowsePageContent() {
             </div>
           ) : (
             <>
-              <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
                 {videos.map(video => (
                   <VideoCard
                     key={video.id}
