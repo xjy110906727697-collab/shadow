@@ -42,4 +42,8 @@ yarn-error.log*
 next-env.d.ts
 
 # reasonix
-.reasonix
+/.reasonix/
+
+# uploads
+public/uploads/videos
+public/uploads/covers
