@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { WaveformView } from '@/components/admin/WaveformView'
-import { EntryEditor } from '@/components/admin/EntryEditor'
 import { EntryList } from '@/components/admin/EntryList'
 
 interface SubtitleEntry {
@@ -20,7 +19,9 @@ export default function SubtitleEditorPage() {
   const router = useRouter()
   const [video, setVideo] = useState<any>(null)
   const [entries, setEntries] = useState<SubtitleEntry[]>([])
-  const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [addingEntry, setAddingEntry] = useState<SubtitleEntry | null>(null)
+  const [addingAfterId, setAddingAfterId] = useState<string | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [loading, setLoading] = useState(true)
 
@@ -41,14 +42,22 @@ export default function SubtitleEditorPage() {
     }
   }
 
-  const selectedEntry = entries.find(e => e.id === selectedEntryId)
+  const handleStartEdit = (entryId: string) => {
+    // 如果正在添加中且点击了其他行，丢弃未确认的添加
+    if (addingEntry) {
+      setAddingEntry(null)
+      setAddingAfterId(null)
+    }
+    setEditingId(entryId)
+  }
 
-  const handleUpdateEntry = async (entry: SubtitleEntry) => {
+  const handleConfirmEdit = async (entry: SubtitleEntry) => {
     try {
       const updatedEntries = entries.map(e =>
         e.id === entry.id ? entry : e
       )
       setEntries(updatedEntries)
+      setEditingId(null)
 
       await fetch(`/api/admin/videos/${params.id}/subtitles`, {
         method: 'PUT',
@@ -58,6 +67,10 @@ export default function SubtitleEditorPage() {
     } catch (error) {
       console.error('Failed to update entry:', error)
     }
+  }
+
+  const handleCancelEdit = () => {
+    setEditingId(null)
   }
 
   const handleDeleteEntry = async (entryId: string) => {
@@ -71,28 +84,58 @@ export default function SubtitleEditorPage() {
         body: JSON.stringify({ entries: updatedEntries })
       })
 
-      if (selectedEntryId === entryId) {
-        setSelectedEntryId(null)
+      if (editingId === entryId) {
+        setEditingId(null)
       }
     } catch (error) {
       console.error('Failed to delete entry:', error)
     }
   }
 
-  const handleAddEntry = async () => {
-    const newEntry: SubtitleEntry = {
-      id: Math.random().toString(36),
-      index: entries.length,
-      startTime: currentTime,
-      endTime: currentTime + 3,
-      ko: '',
-      zh: ''
+  const handleAddAfterEntry = (entryId: string) => {
+    const currentEntry = entries.find(e => e.id === entryId)
+    if (!currentEntry) return
+
+    // 如果已有未确认的添加，先丢弃
+    if (addingEntry) {
+      setAddingEntry(null)
+      setAddingAfterId(null)
     }
 
+    const newEntry: SubtitleEntry = {
+      id: Math.random().toString(36),
+      index: currentEntry.index + 1,
+      startTime: currentEntry.startTime,
+      endTime: currentEntry.endTime,
+      ko: currentEntry.ko,
+      zh: currentEntry.zh,
+    }
+
+    setAddingEntry(newEntry)
+    setAddingAfterId(entryId)
+    setEditingId(newEntry.id)
+  }
+
+  const handleConfirmAdd = async (entry: SubtitleEntry) => {
+    if (!addingEntry || !addingAfterId) return
+
+    const insertIndex = entries.findIndex(e => e.id === addingAfterId)
+    if (insertIndex === -1) return
+
     try {
-      const updatedEntries = [...entries, newEntry]
+      const updatedEntries = [
+        ...entries.slice(0, insertIndex + 1),
+        entry,
+        ...entries.slice(insertIndex + 1).map(e => ({
+          ...e,
+          index: e.index + 1,
+        })),
+      ]
+
       setEntries(updatedEntries)
-      setSelectedEntryId(newEntry.id)
+      setAddingEntry(null)
+      setAddingAfterId(null)
+      setEditingId(null)
 
       await fetch(`/api/admin/videos/${params.id}/subtitles`, {
         method: 'PUT',
@@ -102,6 +145,12 @@ export default function SubtitleEditorPage() {
     } catch (error) {
       console.error('Failed to add entry:', error)
     }
+  }
+
+  const handleCancelAdd = () => {
+    setAddingEntry(null)
+    setAddingAfterId(null)
+    setEditingId(null)
   }
 
   const handleImportSRT = async (file: File) => {
@@ -163,19 +212,9 @@ export default function SubtitleEditorPage() {
             audioUrl={video.audioUrl}
             entries={entries}
             currentTime={currentTime}
-            selectedEntryId={selectedEntryId}
+            selectedEntryId={editingId}
             onTimeUpdate={setCurrentTime}
-            onEntrySelect={setSelectedEntryId}
-          />
-        </div>
-      )}
-
-      {selectedEntry && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <EntryEditor
-            entry={selectedEntry}
-            onUpdate={handleUpdateEntry}
-            onClose={() => setSelectedEntryId(null)}
+            onEntrySelect={setEditingId}
           />
         </div>
       )}
@@ -184,12 +223,6 @@ export default function SubtitleEditorPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">字幕条目 ({entries.length})</h2>
           <div className="flex gap-2">
-            <button
-              onClick={handleAddEntry}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-            >
-              添加条目
-            </button>
             <input
               ref={fileInputRef}
               type="file"
@@ -207,9 +240,16 @@ export default function SubtitleEditorPage() {
         </div>
         <EntryList
           entries={entries}
-          selectedEntryId={selectedEntryId}
-          onSelect={setSelectedEntryId}
+          editingId={editingId}
+          addingEntry={addingEntry}
+          addAfterId={addingAfterId}
+          onStartEdit={handleStartEdit}
+          onConfirmEdit={handleConfirmEdit}
+          onConfirmAdd={handleConfirmAdd}
+          onCancelAdd={handleCancelAdd}
+          onCancelEdit={handleCancelEdit}
           onDelete={handleDeleteEntry}
+          onAdd={handleAddAfterEntry}
         />
       </div>
     </div>

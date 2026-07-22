@@ -1,34 +1,32 @@
-import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-import Providers from './providers'
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import Providers from "./providers";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export const viewport: Viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  viewportFit: 'cover',
-}
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
-  title: 'ShadowVideo - Learn Korean',
-  description: 'Learn Korean with video lessons and interactive subtitles',
-}
+  title: "Shadow Video - Fluent Korean",
+  description: "Learn Korean with video lessons and interactive subtitles",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="zh">
       <body className={inter.className}>
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
-  )
+  );
 }

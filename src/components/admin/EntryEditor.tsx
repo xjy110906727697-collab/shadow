@@ -31,12 +31,12 @@ export function EntryEditor({ entry, onUpdate, onClose }: EntryEditorProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Edit Entry #{entry.index + 1}</h2>
+      <h2 className="text-xl font-semibold">编辑条目 #{entry.index + 1}</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Korean Text
+            韩语文本
           </label>
           <textarea
             value={formData.ko}
@@ -47,7 +47,7 @@ export function EntryEditor({ entry, onUpdate, onClose }: EntryEditorProps) {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Chinese Text
+            中文文本
           </label>
           <textarea
             value={formData.zh}
@@ -61,7 +61,7 @@ export function EntryEditor({ entry, onUpdate, onClose }: EntryEditorProps) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Start Time (seconds)
+            开始时间（秒）
           </label>
           <input
             type="number"
@@ -73,7 +73,7 @@ export function EntryEditor({ entry, onUpdate, onClose }: EntryEditorProps) {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            End Time (seconds)
+            结束时间（秒）
           </label>
           <input
             type="number"
@@ -90,13 +90,13 @@ export function EntryEditor({ entry, onUpdate, onClose }: EntryEditorProps) {
           onClick={handleSave}
           className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
         >
-          Save Changes
+          保存修改
         </button>
         <button
           onClick={onClose}
           className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200"
         >
-          Cancel
+          取消
         </button>
       </div>
     </div>

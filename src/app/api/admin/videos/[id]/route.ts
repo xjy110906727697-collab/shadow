@@ -2,7 +2,6 @@ import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
-import { deleteVideo } from '@/lib/vod'
 
 const uploadsDir = path.join(process.cwd(), 'public')
 
@@ -56,11 +55,7 @@ export async function PUT(
     if (description !== undefined) updateData.description = description
     if (descriptionZh !== undefined) updateData.descriptionZh = descriptionZh
     if (coverUrl !== undefined) updateData.coverUrl = coverUrl
-    if (videoUrl !== undefined) {
-      updateData.videoUrl = videoUrl
-      const isVod = !videoUrl.startsWith('/uploads/')
-      updateData.vodVideoId = isVod ? videoUrl : null
-    }
+    if (videoUrl !== undefined) updateData.videoUrl = videoUrl
     if (duration !== undefined) updateData.duration = duration
     if (episodeNumber !== undefined) updateData.episodeNumber = episodeNumber || null
     if (difficulty !== undefined) updateData.difficulty = difficulty || null
@@ -104,21 +99,14 @@ export async function DELETE(
     // Get file URLs before deleting the record
     const video = await prisma.video.findUnique({
       where: { id },
-      select: { videoUrl: true, coverUrl: true, audioUrl: true, vodVideoId: true }
+      select: { videoUrl: true, coverUrl: true, audioUrl: true }
     })
-
-    if (video?.vodVideoId) {
-      try {
-        await deleteVideo(video.vodVideoId)
-      } catch (error) {
-        console.error('Error deleting VOD video:', error)
-      }
-    }
 
     await prisma.video.delete({
       where: { id }
     })
 
+    // Delete physical files from uploads
     if (video) {
       for (const url of [video.videoUrl, video.coverUrl, video.audioUrl]) {
         if (url && url.startsWith('/uploads/')) {

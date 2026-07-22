@@ -160,6 +160,20 @@ export default function VideoDetailPage() {
               onSeek={handleSeek}
               mode={subtitleMode}
               onModeChange={setSubtitleMode}
+              isFavorited={isFavorited}
+              onFavoriteToggle={() => {
+                if (!params.id) return;
+                const stored = localStorage.getItem("favorites");
+                let ids: string[] = stored ? JSON.parse(stored) : [];
+                if (ids.includes(params.id as string)) {
+                  ids = ids.filter(id => id !== params.id);
+                  setIsFavorited(false);
+                } else {
+                  ids.push(params.id as string);
+                  setIsFavorited(true);
+                }
+                localStorage.setItem("favorites", JSON.stringify(ids));
+              }}
             />
           </div>
         </div>
