@@ -12,6 +12,7 @@ echo "Pulling latest code..."
 git pull origin "$BRANCH"
 
 echo "Installing dependencies..."
+npm config set registry https://registry.npmmirror.com
 npm ci
 
 echo "Generating Prisma client..."
