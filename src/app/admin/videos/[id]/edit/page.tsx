@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { FileUpload } from '@/components/admin/FileUpload'
+import { VodVideoUpload } from '@/components/admin/VodVideoUpload'
 
 interface Category {
   id: string
@@ -17,7 +18,6 @@ interface VideoFormData {
   title: string
   titleZh: string
   coverUrl: string
-  videoUrl: string
   duration: number
   episodeNumber: number
   difficulty: number
@@ -173,14 +173,11 @@ export default function VideoEditPage() {
               required
               placeholder="支持 JPG、PNG 等格式"
             />
-            <FileUpload
-              label="视频文件"
-              accept="video/*"
-              type="videos"
+            <VodVideoUpload
+              label="视频文件 (阿里云VOD)"
               value={formData.videoUrl}
-              onChange={url => setFormData({ ...formData, videoUrl: url })}
+              onChange={vodVideoId => setFormData({ ...formData, videoUrl: vodVideoId })}
               required
-              placeholder="支持 MP4、WebM 等格式"
             />
           </div>
 

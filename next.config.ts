@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     ],
   },
   transpilePackages: ['antd', '@ant-design/icons'],
-  serverExternalPackages: ['openid-client'],
+  serverExternalPackages: ['openid-client', 'ali-oss', 'urllib'],
   allowedDevOrigins: ['192.168.1.12'],
 };
 

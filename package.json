@@ -15,12 +15,15 @@
     "seed:difficulty": "tsx scripts/seed-difficulty.ts"
   },
   "dependencies": {
+    "@alicloud/openapi-client": "^0.4.15",
+    "@alicloud/vod20170321": "^3.11.3",
     "@ant-design/icons": "^5.5.0",
     "@jridgewell/remapping": "^2.3.5",
     "@prisma/client": "^6.0.0",
     "ali-oss": "^6.21.0",
     "antd": "^5.22.0",
     "bcryptjs": "^2.4.3",
+    "hls.js": "^1.6.16",
     "next": "16.2.10",
     "next-auth": "^4.24.0",
     "react": "19.2.4",

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { FileUpload } from '@/components/admin/FileUpload'
+import { VodVideoUpload } from '@/components/admin/VodVideoUpload'
 
 interface Category {
   id: string
@@ -32,6 +33,8 @@ export default function VideoFormPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [dbId, setDbId] = useState<string | null>(null)
+  const [vodVideoId, setVodVideoId] = useState('')
   const [formData, setFormData] = useState<VideoFormData>({
     title: '',
     titleZh: '',
@@ -62,17 +65,29 @@ export default function VideoFormPage() {
     setLoading(true)
 
     try {
-      const res = await fetch('/api/admin/videos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          episodeNumber: formData.episodeNumber || null,
-          difficulty: formData.difficulty || null,
-          instructor: formData.instructor || null,
-          categoryIds: formData.topicIds
+      const payload = {
+        ...formData,
+        videoUrl: vodVideoId,
+        episodeNumber: formData.episodeNumber || null,
+        difficulty: formData.difficulty || null,
+        instructor: formData.instructor || null,
+        categoryIds: formData.topicIds
+      }
+
+      let res: Response
+      if (dbId) {
+        res = await fetch(`/api/admin/videos/${dbId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         })
-      })
+      } else {
+        res = await fetch('/api/admin/videos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+      }
 
       if (!res.ok) {
         const data = await res.json()
@@ -151,14 +166,18 @@ export default function VideoFormPage() {
               required
               placeholder="支持 JPG、PNG 等格式"
             />
-            <FileUpload
-              label="视频文件"
-              accept="video/*"
-              type="videos"
-              value={formData.videoUrl}
-              onChange={url => setFormData({ ...formData, videoUrl: url })}
+            <VodVideoUpload
+              label="视频文件 (阿里云VOD)"
+              vodVideoId={vodVideoId}
+              onUploadComplete={(newVodId, newDbId) => {
+                setVodVideoId(newVodId)
+                setDbId(newDbId)
+              }}
+              onRemove={() => {
+                setVodVideoId('')
+                setDbId(null)
+              }}
               required
-              placeholder="支持 MP4、WebM 等格式"
             />
           </div>
 

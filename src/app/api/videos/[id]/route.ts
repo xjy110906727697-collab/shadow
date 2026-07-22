@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { getPlayInfo } from '@/lib/vod'
 
 export async function GET(
   request: Request,
@@ -56,8 +57,26 @@ export async function GET(
       zh: zhTrack?.entries[idx]?.text || ''
     })) || []
 
+    let playUrl = video.videoUrl
+    let coverUrl = video.coverUrl
+
+    if (video.vodVideoId) {
+      try {
+        const vodInfo = await getPlayInfo(video.vodVideoId)
+        const playInfoList = vodInfo.body.playInfoList?.playInfo || []
+        const mp4Url = playInfoList.find((p: { format: string }) => p.format === 'mp4')?.playURL
+        const m3u8Url = playInfoList.find((p: { format: string }) => p.format === 'm3u8')?.playURL
+        playUrl = m3u8Url || mp4Url || video.videoUrl
+        coverUrl = vodInfo.body.videoBase?.coverURL || video.coverUrl
+      } catch (error) {
+        console.error('Error fetching VOD play info:', error)
+      }
+    }
+
     return NextResponse.json({
       ...video,
+      videoUrl: playUrl,
+      coverUrl,
       subtitles,
       categories: undefined,
       subtitleTracks: undefined

@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
+import Hls from 'hls.js'
 
 interface VideoPlayerProps {
   videoUrl: string
@@ -9,6 +10,7 @@ interface VideoPlayerProps {
 
 export function VideoPlayer({ videoUrl, onTimeUpdate }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const hlsRef = useRef<Hls | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -16,7 +18,27 @@ export function VideoPlayer({ videoUrl, onTimeUpdate }: VideoPlayerProps) {
 
   useEffect(() => {
     const video = videoRef.current
-    if (!video) return
+    if (!video || !videoUrl) return
+
+    if (hlsRef.current) {
+      hlsRef.current.destroy()
+      hlsRef.current = null
+    }
+
+    const isHls = videoUrl.includes('.m3u8')
+
+    if (isHls) {
+      if (Hls.isSupported()) {
+        const hls = new Hls()
+        hlsRef.current = hls
+        hls.loadSource(videoUrl)
+        hls.attachMedia(video)
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = videoUrl
+      }
+    } else {
+      video.src = videoUrl
+    }
 
     const handleTimeUpdate = () => {
       const time = video.currentTime
@@ -38,8 +60,12 @@ export function VideoPlayer({ videoUrl, onTimeUpdate }: VideoPlayerProps) {
       video.removeEventListener('loadedmetadata', handleLoadedMetadata)
       video.removeEventListener('play', handlePlay)
       video.removeEventListener('pause', handlePause)
+      if (hlsRef.current) {
+        hlsRef.current.destroy()
+        hlsRef.current = null
+      }
     }
-  }, [onTimeUpdate])
+  }, [videoUrl, onTimeUpdate])
 
   const togglePlay = () => {
     const video = videoRef.current

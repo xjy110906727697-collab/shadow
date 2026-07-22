@@ -53,6 +53,7 @@ model Video {
   instructor        String?
   published         Boolean         @default(false)
   visitorAccessible Boolean         @default(false)
+  vodVideoId        String?         @unique
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
   categories        VideoCategory[]

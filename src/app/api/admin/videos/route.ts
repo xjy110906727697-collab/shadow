@@ -75,6 +75,7 @@ export async function POST(request: Request) {
       )
     }
 
+    const isVod = !videoUrl.startsWith('/uploads/')
     const video = await prisma.video.create({
       data: {
         title,
@@ -89,6 +90,7 @@ export async function POST(request: Request) {
         instructor: instructor || null,
         published: published || false,
         visitorAccessible: visitorAccessible || false,
+        vodVideoId: isVod ? videoUrl : null,
         categories: {
           create: categoryIds?.map((categoryId: string) => ({
             category: {
