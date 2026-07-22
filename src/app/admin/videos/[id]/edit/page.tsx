@@ -18,6 +18,7 @@ interface VideoFormData {
   title: string
   titleZh: string
   coverUrl: string
+  videoUrl: string
   duration: number
   episodeNumber: number
   difficulty: number
@@ -33,6 +34,8 @@ export default function VideoEditPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [vodVideoId, setVodVideoId] = useState('')
+  const [dbId, setDbId] = useState<string | null>(null)
   const [formData, setFormData] = useState<VideoFormData>({
     title: '',
     titleZh: '',
@@ -71,6 +74,8 @@ export default function VideoEditPage() {
           visitorAccessible: data.visitorAccessible || false,
           topicIds: topicCategories?.map((c: any) => c.category.id) || []
         })
+        setVodVideoId(data.vodVideoId || '')
+        setDbId(data.id || null)
       })
       .catch(console.error)
   }, [params.id])
@@ -175,8 +180,15 @@ export default function VideoEditPage() {
             />
             <VodVideoUpload
               label="视频文件 (阿里云VOD)"
-              value={formData.videoUrl}
-              onChange={vodVideoId => setFormData({ ...formData, videoUrl: vodVideoId })}
+              vodVideoId={vodVideoId}
+              onUploadComplete={(newVodId, newDbId) => {
+                setVodVideoId(newVodId)
+                setDbId(newDbId)
+              }}
+              onRemove={() => {
+                setVodVideoId('')
+                setDbId(null)
+              }}
               required
             />
           </div>

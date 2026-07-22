@@ -17,10 +17,14 @@ export async function GET(
 
     const result = await getPlayInfo(vodVideoId)
 
+    if (!result.body) {
+      return NextResponse.json({ error: 'Failed to get video info' }, { status: 500 })
+    }
+
     const playInfoList = result.body.playInfoList?.playInfo || []
     
-    const mp4Url = playInfoList.find((p: { format: string }) => p.format === 'mp4')?.playURL
-    const m3u8Url = playInfoList.find((p: { format: string }) => p.format === 'm3u8')?.playURL
+    const mp4Url = playInfoList.find((p: any) => p.format === 'mp4')?.playURL
+    const m3u8Url = playInfoList.find((p: any) => p.format === 'm3u8')?.playURL
     const coverUrl = result.body.videoBase?.coverURL
     const duration = parseFloat(result.body.videoBase?.duration || '0')
 

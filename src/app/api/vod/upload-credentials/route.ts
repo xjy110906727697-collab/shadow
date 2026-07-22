@@ -26,9 +26,9 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({
-      videoId: result.body.videoId,
-      uploadAddress: result.body.uploadAddress,
-      uploadAuth: result.body.uploadAuth,
+      videoId: result.body?.videoId,
+      uploadAddress: result.body?.uploadAddress,
+      uploadAuth: result.body?.uploadAuth,
     })
   } catch (error) {
     console.error('Error getting upload credentials:', error)

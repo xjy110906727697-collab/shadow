@@ -21,10 +21,17 @@ export async function POST(request: Request) {
 
     const result = await refreshUploadVideo(videoId)
 
+    if (!result.body) {
+      return NextResponse.json(
+        { error: 'Failed to refresh upload credentials' },
+        { status: 500 }
+      )
+    }
+
     return NextResponse.json({
-      videoId: result.body.videoId,
-      uploadAddress: result.body.uploadAddress,
-      uploadAuth: result.body.uploadAuth,
+      videoId: result.body?.videoId,
+      uploadAddress: result.body?.uploadAddress,
+      uploadAuth: result.body?.uploadAuth,
     })
   } catch (error) {
     console.error('Error refreshing upload credentials:', error)

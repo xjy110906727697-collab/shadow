@@ -63,11 +63,11 @@ export async function GET(
     if (video.vodVideoId) {
       try {
         const vodInfo = await getPlayInfo(video.vodVideoId)
-        const playInfoList = vodInfo.body.playInfoList?.playInfo || []
-        const mp4Url = playInfoList.find((p: { format: string }) => p.format === 'mp4')?.playURL
-        const m3u8Url = playInfoList.find((p: { format: string }) => p.format === 'm3u8')?.playURL
+        const playInfoList = vodInfo.body?.playInfoList?.playInfo || []
+        const mp4Url = playInfoList.find((p: any) => p.format === 'mp4')?.playURL
+        const m3u8Url = playInfoList.find((p: any) => p.format === 'm3u8')?.playURL
         playUrl = m3u8Url || mp4Url || video.videoUrl
-        coverUrl = vodInfo.body.videoBase?.coverURL || video.coverUrl
+        coverUrl = vodInfo.body?.videoBase?.coverURL || video.coverUrl
       } catch (error) {
         console.error('Error fetching VOD play info:', error)
       }

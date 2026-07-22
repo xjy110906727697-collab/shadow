@@ -26,7 +26,15 @@ export async function POST(request: Request) {
       fileSize: file.size,
     })
 
+    if (!uploadResult.body) {
+      return NextResponse.json({ error: 'Failed to create upload video' }, { status: 500 })
+    }
+
     const { videoId, uploadAddress, uploadAuth } = uploadResult.body
+
+    if (!uploadAddress || !uploadAuth) {
+      return NextResponse.json({ error: 'Invalid upload response' }, { status: 500 })
+    }
 
     const address = JSON.parse(Buffer.from(uploadAddress, 'base64').toString())
     const auth = JSON.parse(Buffer.from(uploadAuth, 'base64').toString())
