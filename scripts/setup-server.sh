@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "=== Setting up Ali ECS for hangul-study ==="
+echo "=== Setting up Ali ECS for ShadowVideo ==="
 
 sudo yum update -y
 
@@ -67,15 +67,15 @@ sudo chown "$USER":"$USER" /var/www
 echo "Configuring PostgreSQL..."
 sudo systemctl start postgresql
 sudo systemctl enable postgresql
-sudo -u postgres psql -c "CREATE USER hangul_user WITH PASSWORD 'CHANGE_ME';" || true
-sudo -u postgres psql -c "CREATE DATABASE hangul_study OWNER hangul_user;" || true
+sudo -u postgres psql -c "CREATE USER admin WITH PASSWORD 'CHANGE_ME';" || true
+sudo -u postgres psql -c "CREATE DATABASE ShadowVideo OWNER admin;" || true
 
 sudo systemctl enable nginx
 sudo systemctl start nginx
 
 echo "=== Server setup complete ==="
 echo "Next steps:"
-echo "  1. Set PostgreSQL password: sudo -u postgres psql -c \"ALTER USER hangul_user WITH PASSWORD 'your-password';\""
+echo "  1. Set PostgreSQL password: sudo -u postgres psql -c \"ALTER USER admin WITH PASSWORD 'your-password';\""
 echo "  2. Clone repo: git clone <repo-url> /var/www/shadow"
 echo "  3. cd /var/www/shadow && cp .env.example .env  (edit .env with real values)"
 echo "  4. npm ci && npx prisma generate && npx prisma db push"

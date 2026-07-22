@@ -13,7 +13,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'HangulStudy - Learn Korean',
+  title: 'ShadowVideo - Learn Korean',
   description: 'Learn Korean with video lessons and interactive subtitles',
 }
 

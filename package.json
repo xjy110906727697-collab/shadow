@@ -1,5 +1,5 @@
 {
-  "name": "hangul-study",
+  "name": "ShadowVideo",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,15 +10,12 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio",
-    "seed:tags": "tsx scripts/seed-topic-tags.ts",
-    "seed:difficulty": "tsx scripts/seed-difficulty.ts"
+    "db:studio": "prisma studio"
   },
   "dependencies": {
     "@alicloud/openapi-client": "^0.4.15",
     "@alicloud/vod20170321": "^3.11.3",
     "@ant-design/icons": "^5.5.0",
-    "@jridgewell/remapping": "^2.3.5",
     "@prisma/client": "^6.0.0",
     "ali-oss": "^6.21.0",
     "antd": "^5.22.0",
