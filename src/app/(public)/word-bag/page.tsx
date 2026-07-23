@@ -36,8 +36,6 @@ export default function WordBagPage() {
 
   return (
     <div className="w-full px-4 md:px-8 py-4 pb-20 md:pb-4">
-      <h1 className="text-3xl font-bold mb-6">我的词卡</h1>
-
       {loading ? (
         <div className="text-center py-16">
           <p className="text-gray-500">加载中...</p>

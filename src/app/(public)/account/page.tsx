@@ -6,14 +6,14 @@ import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 
 const avatars = [
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=Felix',
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=Aneka',
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=Salem',
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=Misty',
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=Coco',
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=Simba',
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=Oreo',
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=Pepper',
+  '/avatars/avatar-1.svg',
+  '/avatars/avatar-2.svg',
+  '/avatars/avatar-3.svg',
+  '/avatars/avatar-4.svg',
+  '/avatars/avatar-5.svg',
+  '/avatars/avatar-6.svg',
+  '/avatars/avatar-7.svg',
+  '/avatars/avatar-8.svg',
 ]
 
 function getAvatar(email?: string | null) {
