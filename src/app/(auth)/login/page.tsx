@@ -103,18 +103,6 @@ export default function LoginPage() {
       {/* Right Side - Login Form */}
       <div className="w-full lg:w-[55%] bg-gray-50 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-[400px]">
-          {/* Mobile Logo */}
-          <div className="lg:hidden text-center mb-8">
-            <div className="inline-flex items-center gap-2.5 mb-3">
-              <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <span className="text-2xl font-bold text-gray-900">Shadow Korean</span>
-            </div>
-          </div>
-
           {/* Header */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-1.5">Shadow Korean</h2>

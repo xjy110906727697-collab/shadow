@@ -33,6 +33,13 @@ export default function AccountPage() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [loginModalMsg, setLoginModalMsg] = useState('')
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
+  const [feedbackType, setFeedbackType] = useState('问题反馈')
+  const [feedbackContent, setFeedbackContent] = useState('')
+  const [feedbackContact, setFeedbackContact] = useState('')
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false)
+  const [feedbackDone, setFeedbackDone] = useState(false)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
 
   useEffect(() => {
     fetch('/api/user/progress/stats')
@@ -45,6 +52,23 @@ export default function AccountPage() {
 
   const isLoggedIn = status === 'authenticated'
   const avatarUrl = getAvatar(session?.user?.email)
+
+  const handleSubmitFeedback = async () => {
+    if (!feedbackContent.trim()) return
+    setFeedbackSubmitting(true)
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: feedbackType, content: feedbackContent, contact: feedbackContact }),
+      })
+      setFeedbackDone(true)
+    } catch {
+      alert('提交失败')
+    } finally {
+      setFeedbackSubmitting(false)
+    }
+  }
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -71,7 +95,7 @@ export default function AccountPage() {
     { label: '我的收藏', href: '/favorites', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>) },
     { label: '学习方法', href: '/learning-method', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>) },
     { label: '联系客服', href: 'javascript:;', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>), onClick: () => alert('客服邮箱：support@ShadowKorean.com') },
-    { label: '反馈', href: 'javascript:;', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>), onClick: () => { if (!isLoggedIn) { setLoginModalMsg('登录后即可提交反馈'); return }; alert('感谢您的反馈！请将意见发送至 support@ShadowKorean.com') } },
+    { label: '反馈', href: 'javascript:;', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>), onClick: () => { if (!isLoggedIn) { setShowLoginPrompt(true); return }; setShowFeedbackModal(true) } },
     { label: '修改密码', href: 'javascript:;', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>), onClick: () => { if (!isLoggedIn) { setLoginModalMsg('登录后即可修改密码'); return }; setShowPasswordForm(!showPasswordForm) } },
   ]
 
@@ -255,6 +279,132 @@ export default function AccountPage() {
             <p className="text-gray-600 mb-6 leading-relaxed">{loginModalMsg}</p>
             <Link href="/login" className="block w-full bg-blue-600 text-white text-center py-2.5 rounded-lg hover:bg-blue-700 font-medium mb-2">立即登录</Link>
             <Link href="/register" className="block w-full text-gray-500 text-sm text-center py-2 rounded-lg hover:text-gray-700 hover:bg-gray-50">注册账号</Link>
+          </div>
+        </div>
+      )}
+
+      {/* Feedback Modal */}
+      {showFeedbackModal && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => {
+            setShowFeedbackModal(false)
+            setFeedbackDone(false)
+          }}
+        >
+          <div
+            className="bg-white rounded-lg p-6 w-full max-w-sm mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {feedbackDone ? (
+              <div className="text-center py-6">
+                <div className="text-4xl mb-3">✅</div>
+                <h3 className="text-lg font-semibold mb-2">感谢您的反馈！</h3>
+                <p className="text-gray-500 text-sm mb-4">
+                  我们会认真阅读每一条意见
+                </p>
+                <button
+                  onClick={() => {
+                    setShowFeedbackModal(false)
+                    setFeedbackDone(false)
+                  }}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 text-sm"
+                >
+                  关闭
+                </button>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-xl font-bold mb-2">意见反馈</h2>
+                <p className="text-sm text-gray-500 mb-5">
+                  您的反馈对我们非常重要，帮助我们不断改进
+                </p>
+
+                <div className="mb-4">
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    反馈类型
+                  </label>
+                  <div className="flex gap-2">
+                    {['问题反馈', '功能建议', '其他'].map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setFeedbackType(t)}
+                        className={`px-4 py-1.5 rounded-full text-sm border transition-colors ${feedbackType === t ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400'}`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    反馈内容 *
+                  </label>
+                  <textarea
+                    value={feedbackContent}
+                    onChange={(e) => setFeedbackContent(e.target.value)}
+                    placeholder="请详细描述您的问题或建议..."
+                    rows={4}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  />
+                </div>
+
+                <div className="mb-5">
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    联系方式{' '}
+                    <span className="text-gray-400 font-normal">
+                      （选填）
+                    </span>
+                  </label>
+                  <input
+                    value={feedbackContact}
+                    onChange={(e) => setFeedbackContact(e.target.value)}
+                    placeholder="邮箱或手机号，方便我们与您联系"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <button
+                  onClick={handleSubmitFeedback}
+                  disabled={feedbackSubmitting || !feedbackContent.trim()}
+                  className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-sm font-medium"
+                >
+                  {feedbackSubmitting ? '提交中...' : '提交反馈'}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Login Prompt Modal */}
+      {showLoginPrompt && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setShowLoginPrompt(false)}
+        >
+          <div
+            className="bg-white rounded-lg p-8 max-w-sm w-full text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-4xl mb-4">🔑</div>
+            <h3 className="text-xl font-bold mb-3">需要登录</h3>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              登录后即可提交反馈
+            </p>
+            <Link
+              href="/login"
+              className="block w-full bg-blue-600 text-white text-center py-2.5 rounded-lg hover:bg-blue-700 font-medium mb-2"
+            >
+              立即登录
+            </Link>
+            <Link
+              href="/register"
+              className="block w-full text-gray-500 text-sm text-center py-2 rounded-lg hover:text-gray-700 hover:bg-gray-50"
+            >
+              注册账号
+            </Link>
           </div>
         </div>
       )}

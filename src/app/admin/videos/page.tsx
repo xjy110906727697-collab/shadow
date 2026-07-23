@@ -94,7 +94,7 @@ export default function AdminVideosPage() {
 
   const handleTableChange = (
     pag: TablePaginationConfig,
-    _filters: any,
+    _filters: Record<string, unknown>,
     sorter: SorterResult<Video> | SorterResult<Video>[]
   ) => {
     const s = Array.isArray(sorter) ? sorter[0] : sorter
@@ -118,68 +118,83 @@ export default function AdminVideosPage() {
       title: '标题',
       dataIndex: 'titleZh',
       sorter: true,
-      render: (_: any, record: Video) => (
-        <div>
-          <div className="font-medium">{record.titleZh}</div>
-          <div className="text-sm text-gray-500">{record.title}</div>
+      render: (_: unknown, record: Video) => (
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-white text-sm font-medium shadow-sm">
+            {record.episodeNumber || '?'}
+          </div>
+          <div>
+            <div className="font-semibold text-slate-900">{record.titleZh}</div>
+            <div className="text-xs text-slate-500 truncate max-w-[200px]">{record.title}</div>
+          </div>
         </div>
       ),
     },
     {
       title: '封面',
-      width: 80,
-      render: (_: any, record: Video) =>
+      width: 90,
+      render: (_: unknown, record: Video) =>
         record.coverUrl ? (
           <img
             src={record.coverUrl}
             alt="封面"
-            className="w-12 h-8 rounded object-cover cursor-pointer hover:opacity-80"
+            className="w-14 h-10 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity shadow-sm"
             onClick={() => { setPreviewUrl(record.coverUrl); setPreviewType('image') }}
           />
         ) : (
-          <span className="text-xs text-gray-400">无</span>
+          <div className="w-14 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+            <svg className="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
         ),
     },
     {
       title: '视频',
-      width: 60,
-      render: (_: any, record: Video) =>
+      width: 70,
+      render: (_: unknown, record: Video) =>
         record.videoUrl ? (
           <video
             src={record.videoUrl}
-            className="w-12 h-8 rounded object-cover cursor-pointer hover:opacity-80"
+            className="w-14 h-10 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity shadow-sm"
             preload="none"
             onClick={() => { setPreviewUrl(record.videoUrl); setPreviewType('video') }}
           />
         ) : (
-          <span className="text-xs text-gray-400">无</span>
+          <span className="text-xs text-slate-400">无</span>
         ),
-    },
-    {
-      title: '期数',
-      dataIndex: 'episodeNumber',
-      width: 60,
-      render: (val: number | null) => val ? <span>第{val}期</span> : '-',
     },
     {
       title: '难度',
       dataIndex: 'difficulty',
-      width: 80,
+      width: 100,
       render: (val: number | null) =>
-        val ? <span className="text-yellow-500">{'★'.repeat(val)}{'☆'.repeat(5 - val)}</span> : '-',
+        val ? (
+          <div className="flex items-center gap-1">
+            {[1, 2, 3, 4, 5].map(star => (
+              <span key={star} className={`text-sm ${star <= val ? 'text-yellow-400' : 'text-slate-200'}`}>★</span>
+            ))}
+          </div>
+        ) : '-',
     },
     {
-      title: '博主',
+      title: '频道',
       dataIndex: 'instructor',
-      width: 100,
-      render: (val: string | null) => val || '-',
+      width: 120,
+      render: (val: string | null) => val ? (
+        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+          {val}
+        </span>
+      ) : '-',
     },
     {
       title: '时长',
       dataIndex: 'duration',
       sorter: true,
-      width: 100,
-      render: (val: number) => formatDuration(val),
+      width: 90,
+      render: (val: number) => (
+        <span className="text-sm font-medium text-slate-700">{formatDuration(val)}</span>
+      ),
     },
     {
       title: '状态',
@@ -187,7 +202,15 @@ export default function AdminVideosPage() {
       sorter: true,
       width: 100,
       render: (val: boolean) => (
-        <Tag color={val ? 'green' : 'default'}>{val ? '已发布' : '草稿'}</Tag>
+        <Tag 
+          className={`px-2.5 py-1 rounded-full text-xs font-medium border-0 ${
+            val 
+              ? 'bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700' 
+              : 'bg-slate-100 text-slate-600'
+          }`}
+        >
+          {val ? '已发布' : '草稿'}
+        </Tag>
       ),
     },
     {
@@ -200,7 +223,7 @@ export default function AdminVideosPage() {
           type="link"
           size="small"
           onClick={() => handleToggleVisitor(record.id, val)}
-          style={{ color: val ? '#52c41a' : '#999' }}
+          className={`font-medium ${val ? 'text-emerald-600 hover:text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}
         >
           {val ? '是' : '否'}
         </Button>
@@ -210,23 +233,54 @@ export default function AdminVideosPage() {
       title: '创建时间',
       dataIndex: 'createdAt',
       sorter: true,
-      width: 150,
-      render: (val: string) => new Date(val).toLocaleDateString(),
+      width: 120,
+      render: (val: string) => (
+        <span className="text-sm text-slate-600">{new Date(val).toLocaleDateString('zh-CN')}</span>
+      ),
     },
     {
       title: '操作',
       key: 'action',
-      width: 200,
-      render: (_: any, record: Video) => (
-        <Space>
-          <Link href={`/admin/videos/${record.id}/subtitles`} className="text-blue-600">
+      width: 180,
+      render: (_: unknown, record: Video) => (
+        <Space size="small">
+          <Link 
+            href={`/admin/videos/${record.id}/subtitles`} 
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
             字幕
           </Link>
-          <Link href={`/admin/videos/${record.id}/edit`} className="text-blue-600">
+          <Link 
+            href={`/admin/videos/${record.id}/edit`} 
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-indigo-600 hover:bg-indigo-50 transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
             编辑
           </Link>
-          <Popconfirm title="确定要删除这个视频吗？" onConfirm={() => handleDelete(record.id)} okText="确定" cancelText="取消">
-            <Button type="link" danger size="small">删除</Button>
+          <Popconfirm 
+            title="确定要删除这个视频吗？" 
+            description="删除后将无法恢复"
+            onConfirm={() => handleDelete(record.id)} 
+            okText="确定" 
+            cancelText="取消"
+            okButtonProps={{ danger: true }}
+          >
+            <Button 
+              type="text" 
+              danger 
+              size="small"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              删除
+            </Button>
           </Popconfirm>
         </Space>
       ),
@@ -234,29 +288,38 @@ export default function AdminVideosPage() {
   ]
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">视频管理</h1>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">视频管理</h1>
+          <p className="text-slate-500 mt-1">管理所有视频内容</p>
+        </div>
         <Link href="/admin/videos/new">
-          <Button type="primary" icon={<PlusOutlined />}>添加视频</Button>
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />}
+            className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 border-0 shadow-lg shadow-blue-500/20"
+          >
+            添加视频
+          </Button>
         </Link>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-4 mb-4">
-        <Space wrap>
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5">
+        <Space wrap size="middle">
           <Input
-            placeholder="搜索标题"
-            prefix={<SearchOutlined />}
+            placeholder="搜索标题..."
+            prefix={<SearchOutlined className="text-slate-400" />}
             value={search}
             onChange={e => setSearch(e.target.value)}
             onPressEnter={handleSearch}
-            style={{ width: 220 }}
+            className="w-64 rounded-lg"
             allowClear
           />
           <Select
             value={publishedFilter}
             onChange={val => { setPublishedFilter(val); setPagination(prev => ({ ...prev, current: 1 })) }}
-            style={{ width: 120 }}
+            className="w-32"
             options={[
               { value: '', label: '全部状态' },
               { value: 'true', label: '已发布' },
@@ -266,18 +329,20 @@ export default function AdminVideosPage() {
           <Select
             value={visitorFilter}
             onChange={val => { setVisitorFilter(val); setPagination(prev => ({ ...prev, current: 1 })) }}
-            style={{ width: 120 }}
+            className="w-32"
             options={[
               { value: '', label: '全部' },
               { value: 'true', label: '访客可看' },
               { value: 'false', label: '仅会员' },
             ]}
           />
-          <Button type="primary" onClick={handleSearch}>搜索</Button>
+          <Button type="primary" onClick={handleSearch} className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 border-0">
+            搜索
+          </Button>
         </Space>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
         <Table<Video>
           columns={columns}
           dataSource={videos}
@@ -290,8 +355,10 @@ export default function AdminVideosPage() {
             showSizeChanger: true,
             showTotal: (total) => `共 ${total} 条`,
             pageSizeOptions: ['10', '20', '50'],
+            className: 'px-6 py-4',
           }}
           onChange={handleTableChange}
+          className="admin-table"
         />
       </div>
 
@@ -301,11 +368,12 @@ export default function AdminVideosPage() {
         width={previewType === 'video' ? 800 : 500}
         onCancel={() => setPreviewUrl(null)}
         centered
+        className="rounded-xl overflow-hidden"
       >
         {previewType === 'video' ? (
-          <video src={previewUrl!} controls autoPlay className="w-full rounded" />
+          <video src={previewUrl!} controls autoPlay className="w-full rounded-xl" />
         ) : (
-          <img src={previewUrl!} alt="预览" className="w-full rounded" />
+          <img src={previewUrl!} alt="预览" className="w-full rounded-xl" />
         )}
       </Modal>
     </div>

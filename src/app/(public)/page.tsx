@@ -292,7 +292,7 @@ function BrowsePageContent() {
       <div className="border border-gray-200 rounded-lg bg-white p-4 space-y-4">
         <h3 className="text-sm font-semibold text-gray-700 border-b border-gray-100 pb-2">筛选条件</h3>
 
-        {/* 时长 + 难度 on one row — aligned */}
+        {/* 时长 + 频道 on one row — aligned */}
         <div className="flex gap-3 items-start">
           <div className="flex-1">
             <h4 className="text-xs font-medium text-gray-500 mb-1.5">时长</h4>
@@ -308,37 +308,37 @@ function BrowsePageContent() {
             </select>
           </div>
           <div className="flex-1">
-            <h4 className="text-xs font-medium text-gray-500 mb-1.5">难度</h4>
-            <div className="flex items-center h-[38px] gap-0.5">
-              {[1, 2, 3, 4, 5].map(star => (
-                <button
-                  key={star}
-                  onClick={() => setDifficultyDraft(difficultyDraft === star ? 0 : star)}
-                  className={`text-lg px-0.5 leading-none transition-colors cursor-pointer ${
-                    star <= difficultyDraft ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-300'
-                  }`}
-                  title={`${star}星`}
-                >
-                  ★
-                </button>
+            <h4 className="text-xs font-medium text-gray-500 mb-1.5">频道</h4>
+            <select
+              value={instructorDraft}
+              onChange={e => setInstructorDraft(e.target.value)}
+              className="w-full text-sm border border-gray-200 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">全部</option>
+              {instructors.map(name => (
+                <option key={name} value={name}>{name}</option>
               ))}
-            </div>
+            </select>
           </div>
         </div>
 
-        {/* 博主单独一行 — 一半宽度 */}
-        <div className="w-1/2">
-          <h4 className="text-xs font-medium text-gray-500 mb-1.5">博主</h4>
-          <select
-            value={instructorDraft}
-            onChange={e => setInstructorDraft(e.target.value)}
-            className="w-full text-sm border border-gray-200 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">全部</option>
-            {instructors.map(name => (
-              <option key={name} value={name}>{name}</option>
+        {/* 难度单独一行 */}
+        <div>
+          <h4 className="text-xs font-medium text-gray-500 mb-1.5">难度</h4>
+          <div className="flex items-center gap-0.5">
+            {[1, 2, 3, 4, 5].map(star => (
+              <button
+                key={star}
+                onClick={() => setDifficultyDraft(difficultyDraft === star ? 0 : star)}
+                className={`text-lg px-0.5 leading-none transition-colors cursor-pointer ${
+                  star <= difficultyDraft ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-300'
+                }`}
+                title={`${star}星`}
+              >
+                ★
+              </button>
             ))}
-          </select>
+          </div>
         </div>
 
         {/* 主题标签 as toggle chips */}

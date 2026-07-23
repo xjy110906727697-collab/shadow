@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Table, Button, Tag, Space, Input, message } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
-import type { ColumnsType } from 'antd/es/table'
+import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
+import type { SorterResult } from 'antd/es/table/interface'
 
 interface User {
   id: string
@@ -79,15 +80,20 @@ export default function AdminUsersPage() {
     setPagination(prev => ({ ...prev, current: 1 }))
   }
 
-  const handleTableChange = (pag: any, _filters: any, sorter: any) => {
+  const handleTableChange = (
+    pag: TablePaginationConfig,
+    _filters: Record<string, unknown>,
+    sorter: SorterResult<User> | SorterResult<User>[]
+  ) => {
+    const s = Array.isArray(sorter) ? sorter[0] : sorter
     setPagination(prev => ({
       ...prev,
       current: pag.current || 1,
       pageSize: pag.pageSize || 10,
     }))
-    if (sorter.field) {
-      setSortField(sorter.field)
-      setSortOrder(sorter.order || 'desc')
+    if (s?.field) {
+      setSortField(s.field as string)
+      setSortOrder(s.order || 'desc')
     }
   }
 
@@ -96,13 +102,27 @@ export default function AdminUsersPage() {
       title: '邮箱',
       dataIndex: 'email',
       sorter: true,
+      render: (email: string) => (
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium shadow-sm">
+            {email.charAt(0).toUpperCase()}
+          </div>
+          <span className="font-medium text-slate-900">{email}</span>
+        </div>
+      ),
     },
     {
       title: '角色',
       dataIndex: 'role',
       sorter: true,
       render: (role: string) => (
-        <Tag color={role === 'ADMIN' ? 'purple' : 'default'}>
+        <Tag 
+          className={`px-2.5 py-1 rounded-full text-xs font-medium border-0 ${
+            role === 'ADMIN' 
+              ? 'bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700' 
+              : 'bg-slate-100 text-slate-700'
+          }`}
+        >
           {role === 'ADMIN' ? '管理员' : '用户'}
         </Tag>
       ),
@@ -120,11 +140,12 @@ export default function AdminUsersPage() {
                 value={editingExpireAt}
                 onChange={e => setEditingExpireAt(e.target.value)}
                 size="small"
+                className="rounded-lg"
               />
-              <Button size="small" type="link" onClick={() => handleSaveExpire(record.id)}>
+              <Button size="small" type="link" onClick={() => handleSaveExpire(record.id)} className="text-emerald-600 hover:text-emerald-700 font-medium">
                 保存
               </Button>
-              <Button size="small" type="link" onClick={handleCancelEdit}>
+              <Button size="small" type="link" onClick={handleCancelEdit} className="text-slate-500 hover:text-slate-700">
                 取消
               </Button>
             </Space>
@@ -132,13 +153,14 @@ export default function AdminUsersPage() {
         }
 
         if (!expireAt) {
-          return <span>无期限</span>
+          return <span className="text-slate-400 text-sm">无期限</span>
         }
 
         const isExpired = new Date(expireAt) < new Date()
         return (
-          <span style={{ color: isExpired ? '#ff4d4f' : undefined }}>
-            {new Date(expireAt).toLocaleDateString()}
+          <span className={`text-sm ${isExpired ? 'text-red-600 font-medium' : 'text-slate-600'}`}>
+            {new Date(expireAt).toLocaleDateString('zh-CN')}
+            {isExpired && <span className="ml-1.5 text-xs">(已过期)</span>}
           </span>
         )
       },
@@ -147,14 +169,24 @@ export default function AdminUsersPage() {
       title: '创建时间',
       dataIndex: 'createdAt',
       sorter: true,
-      render: (val: string) => new Date(val).toLocaleDateString(),
+      render: (val: string) => (
+        <span className="text-sm text-slate-600">{new Date(val).toLocaleDateString('zh-CN')}</span>
+      ),
     },
     {
       title: '操作',
       key: 'action',
-      render: (_: any, record: User) => (
+      render: (_: unknown, record: User) => (
         editingUserId !== record.id && (
-          <Button type="link" size="small" onClick={() => handleEditExpire(record)}>
+          <Button 
+            type="text" 
+            size="small" 
+            onClick={() => handleEditExpire(record)}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
             编辑到期时间
           </Button>
         )
@@ -163,25 +195,30 @@ export default function AdminUsersPage() {
   ]
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">用户管理</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">用户管理</h1>
+        <p className="text-slate-500 mt-1">管理系统用户与权限</p>
+      </div>
 
-      <div className="bg-white rounded-lg shadow p-4 mb-4">
-        <Space wrap>
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5">
+        <Space wrap size="middle">
           <Input
-            placeholder="搜索邮箱"
-            prefix={<SearchOutlined />}
+            placeholder="搜索邮箱..."
+            prefix={<SearchOutlined className="text-slate-400" />}
             value={search}
             onChange={e => setSearch(e.target.value)}
             onPressEnter={handleSearch}
-            style={{ width: 220 }}
+            className="w-64 rounded-lg"
             allowClear
           />
-          <Button type="primary" onClick={handleSearch}>搜索</Button>
+          <Button type="primary" onClick={handleSearch} className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 border-0">
+            搜索
+          </Button>
         </Space>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
         <Table<User>
           columns={columns}
           dataSource={users}
@@ -194,8 +231,10 @@ export default function AdminUsersPage() {
             showSizeChanger: true,
             showTotal: (total) => `共 ${total} 条`,
             pageSizeOptions: ['10', '20', '50'],
+            className: 'px-6 py-4',
           }}
           onChange={handleTableChange}
+          className="admin-table"
         />
       </div>
     </div>

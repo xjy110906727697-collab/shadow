@@ -234,7 +234,7 @@ export function Header() {
             }}
           >
             <div
-              className="bg-white rounded-lg p-6 w-full max-w-md mx-4"
+              className="bg-white rounded-lg p-6 w-full max-w-xl mx-4"
               onClick={(e) => e.stopPropagation()}
             >
               {feedbackDone ? (
@@ -326,7 +326,7 @@ export function Header() {
             onClick={() => setShowLoginPrompt(false)}
           >
             <div
-              className="bg-white rounded-lg p-8 max-w-md text-center"
+              className="bg-white rounded-lg p-8 max-w-md w-full text-center"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-4xl mb-4">🔑</div>
