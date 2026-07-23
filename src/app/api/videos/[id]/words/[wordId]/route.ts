@@ -42,7 +42,7 @@ export async function PUT(
   } catch (error) {
     console.error('Error updating word:', error)
     return NextResponse.json(
-      { error: 'Failed to update word' },
+      { error: error instanceof Error ? error.message : 'Failed to update word' },
       { status: 500 }
     )
   }

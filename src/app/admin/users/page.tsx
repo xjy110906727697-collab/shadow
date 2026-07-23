@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { Table, Button, Tag, Space, Input, message } from 'antd'
-import { SearchOutlined } from '@ant-design/icons'
+import { Table, Button, Tag, Space, Input, Select, Modal, message } from 'antd'
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import type { SorterResult } from 'antd/es/table/interface'
 
@@ -14,6 +14,15 @@ interface User {
   createdAt: string
 }
 
+interface UserFormData {
+  email: string
+  password: string
+  role: 'USER' | 'ADMIN'
+  expireAt: string
+}
+
+const emptyForm: UserFormData = { email: '', password: '', role: 'USER', expireAt: '' }
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
@@ -21,8 +30,13 @@ export default function AdminUsersPage() {
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
   const [sortField, setSortField] = useState('createdAt')
   const [sortOrder, setSortOrder] = useState<string>('desc')
-  const [editingUserId, setEditingUserId] = useState<string | null>(null)
-  const [editingExpireAt, setEditingExpireAt] = useState('')
+
+  // Modal 状态
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editUserId, setEditUserId] = useState<string | null>(null)
+  const [formData, setFormData] = useState<UserFormData>(emptyForm)
+  const [submitting, setSubmitting] = useState(false)
 
   const fetchUsers = useCallback(async () => {
     setLoading(true)
@@ -49,33 +63,6 @@ export default function AdminUsersPage() {
     fetchUsers()
   }, [fetchUsers])
 
-  const handleEditExpire = (user: User) => {
-    setEditingUserId(user.id)
-    setEditingExpireAt(user.expireAt ? new Date(user.expireAt).toISOString().split('T')[0] : '')
-  }
-
-  const handleSaveExpire = async (userId: string) => {
-    try {
-      await fetch(`/api/admin/users/${userId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          expireAt: editingExpireAt ? new Date(editingExpireAt).toISOString() : null
-        })
-      })
-      message.success('更新成功')
-      fetchUsers()
-      setEditingUserId(null)
-    } catch (error) {
-      message.error('更新失败')
-    }
-  }
-
-  const handleCancelEdit = () => {
-    setEditingUserId(null)
-    setEditingExpireAt('')
-  }
-
   const handleSearch = () => {
     setPagination(prev => ({ ...prev, current: 1 }))
   }
@@ -94,6 +81,83 @@ export default function AdminUsersPage() {
     if (s?.field) {
       setSortField(s.field as string)
       setSortOrder(s.order || 'desc')
+    }
+  }
+
+  // 新增
+  const openAddModal = () => {
+    setFormData(emptyForm)
+    setAddModalOpen(true)
+  }
+
+  const handleAdd = async () => {
+    if (!formData.email || !formData.password) {
+      message.error('邮箱和密码不能为空')
+      return
+    }
+    setSubmitting(true)
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          role: formData.role,
+          expireAt: formData.expireAt || null,
+        })
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || '创建失败')
+      }
+      message.success('创建成功')
+      setAddModalOpen(false)
+      fetchUsers()
+    } catch (error) {
+      message.error(error instanceof Error ? error.message : '创建失败')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  // 编辑
+  const openEditModal = (user: User) => {
+    setEditUserId(user.id)
+    setFormData({
+      email: user.email,
+      password: '',
+      role: user.role,
+      expireAt: user.expireAt ? new Date(user.expireAt).toISOString().split('T')[0] : '',
+    })
+    setEditModalOpen(true)
+  }
+
+  const handleEdit = async () => {
+    if (!formData.email || !editUserId) {
+      message.error('邮箱不能为空')
+      return
+    }
+    setSubmitting(true)
+    try {
+      const res = await fetch(`/api/admin/users/${editUserId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          role: formData.role,
+          expireAt: formData.expireAt ? new Date(formData.expireAt).toISOString() : null,
+        })
+      })
+      if (!res.ok) throw new Error('更新失败')
+      message.success('更新成功')
+      setEditModalOpen(false)
+      setEditUserId(null)
+      fetchUsers()
+    } catch (error) {
+      message.error('更新失败')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -131,31 +195,10 @@ export default function AdminUsersPage() {
       title: '到期时间',
       dataIndex: 'expireAt',
       sorter: true,
-      render: (expireAt: string | null, record: User) => {
-        if (editingUserId === record.id) {
-          return (
-            <Space>
-              <Input
-                type="date"
-                value={editingExpireAt}
-                onChange={e => setEditingExpireAt(e.target.value)}
-                size="small"
-                className="rounded-lg"
-              />
-              <Button size="small" type="link" onClick={() => handleSaveExpire(record.id)} className="text-emerald-600 hover:text-emerald-700 font-medium">
-                保存
-              </Button>
-              <Button size="small" type="link" onClick={handleCancelEdit} className="text-slate-500 hover:text-slate-700">
-                取消
-              </Button>
-            </Space>
-          )
-        }
-
+      render: (expireAt: string | null) => {
         if (!expireAt) {
           return <span className="text-slate-400 text-sm">无期限</span>
         }
-
         const isExpired = new Date(expireAt) < new Date()
         return (
           <span className={`text-sm ${isExpired ? 'text-red-600 font-medium' : 'text-slate-600'}`}>
@@ -177,28 +220,82 @@ export default function AdminUsersPage() {
       title: '操作',
       key: 'action',
       render: (_: unknown, record: User) => (
-        editingUserId !== record.id && (
-          <Button 
-            type="text" 
-            size="small" 
-            onClick={() => handleEditExpire(record)}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            编辑到期时间
-          </Button>
-        )
+        <Button
+          type="text"
+          size="small"
+          onClick={() => openEditModal(record)}
+          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          编辑
+        </Button>
       ),
     },
   ]
 
+  const formFields = (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">邮箱 *</label>
+        <Input
+          value={formData.email}
+          onChange={e => setFormData({ ...formData, email: e.target.value })}
+          placeholder="请输入邮箱"
+          className="rounded-lg"
+        />
+      </div>
+      {addModalOpen && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">密码 *</label>
+          <Input.Password
+            value={formData.password}
+            onChange={e => setFormData({ ...formData, password: e.target.value })}
+            placeholder="请输入密码"
+            className="rounded-lg"
+          />
+        </div>
+      )}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">角色</label>
+        <Select
+          value={formData.role}
+          onChange={val => setFormData({ ...formData, role: val })}
+          className="w-full"
+          options={[
+            { value: 'USER', label: '用户' },
+            { value: 'ADMIN', label: '管理员' },
+          ]}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">到期时间</label>
+        <Input
+          type="date"
+          value={formData.expireAt}
+          onChange={e => setFormData({ ...formData, expireAt: e.target.value })}
+          className="rounded-lg"
+        />
+      </div>
+    </div>
+  )
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">用户管理</h1>
-        <p className="text-slate-500 mt-1">管理系统用户与权限</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">用户管理</h1>
+          <p className="text-slate-500 mt-1">管理系统用户与权限</p>
+        </div>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={openAddModal}
+          className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 border-0"
+        >
+          新增用户
+        </Button>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5">
@@ -237,6 +334,34 @@ export default function AdminUsersPage() {
           className="admin-table"
         />
       </div>
+
+      {/* 新增用户弹窗 */}
+      <Modal
+        title="新增用户"
+        open={addModalOpen}
+        onOk={handleAdd}
+        onCancel={() => setAddModalOpen(false)}
+        confirmLoading={submitting}
+        okText="创建"
+        cancelText="取消"
+        destroyOnClose
+      >
+        {formFields}
+      </Modal>
+
+      {/* 编辑用户弹窗 */}
+      <Modal
+        title="编辑用户"
+        open={editModalOpen}
+        onOk={handleEdit}
+        onCancel={() => { setEditModalOpen(false); setEditUserId(null) }}
+        confirmLoading={submitting}
+        okText="保存"
+        cancelText="取消"
+        destroyOnClose
+      >
+        {formFields}
+      </Modal>
     </div>
   )
 }

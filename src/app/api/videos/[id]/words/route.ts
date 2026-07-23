@@ -71,7 +71,7 @@ export async function POST(
   } catch (error) {
     console.error('Error creating word:', error)
     return NextResponse.json(
-      { error: 'Failed to create word' },
+      { error: error instanceof Error ? error.message : 'Failed to create word' },
       { status: 500 }
     )
   }

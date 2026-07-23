@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useMemo } from 'react'
+import ReactMarkdown from 'react-markdown'
 
 interface SubtitleEntry {
   id: string
@@ -23,17 +24,15 @@ interface SubtitlePanelProps {
   subtitles: SubtitleEntry[]
   currentTime: number
   onSeek?: (time: number) => void
-  mode?: '双语' | '韩文' | '中文' | '盲听'
-  onModeChange?: (mode: '双语' | '韩文' | '中文' | '盲听') => void
+  mode?: '双语' | '韩文' | '中文' | '盲听' | '词卡'
+  onModeChange?: (mode: '双语' | '韩文' | '中文' | '盲听' | '词卡') => void
   isFavorited?: boolean
   onFavoriteToggle?: () => void
   words?: VideoWord[]
   onWordClick?: (word: VideoWord) => void
-  showWordCards?: boolean
-  onToggleWordCards?: () => void
 }
 
-const subtitleModes = ['双语', '韩文', '中文', '盲听'] as const
+const subtitleModes = ['双语', '韩文', '中文', '盲听', '词卡'] as const
 
 function HighlightedText({ text, words, onWordClick, isActive }: {
   text: string
@@ -129,12 +128,12 @@ export function SubtitlePanel({
   onFavoriteToggle,
   words = [],
   onWordClick,
-  showWordCards = false,
-  onToggleWordCards,
 }: SubtitlePanelProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef<HTMLDivElement>(null)
   const [blindRevealed, setBlindRevealed] = useState<Set<string>>(new Set())
+  const [selectedWordId, setSelectedWordId] = useState<string | null>(null)
+  const isWordCards = mode === "词卡"
 
   const toggleBlind = (id: string) => {
     setBlindRevealed(prev => {
@@ -143,6 +142,11 @@ export function SubtitlePanel({
       return next
     })
   }
+
+  // 离开词卡模式时重置选中
+  useEffect(() => {
+    if (!isWordCards) setSelectedWordId(null)
+  }, [isWordCards])
 
   const activeIndex = (subtitles ?? []).findIndex(
     entry => currentTime >= entry.startTime && currentTime <= entry.endTime
@@ -185,21 +189,10 @@ export function SubtitlePanel({
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                {m}
+                {m === '词卡' && words.length > 0 ? `词卡(${words.length})` : m}
               </button>
             ))}
           </div>
-
-          <button
-            onClick={onToggleWordCards}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              showWordCards
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            词卡
-          </button>
 
           {onFavoriteToggle && (
             <button
@@ -218,28 +211,52 @@ export function SubtitlePanel({
         </div>
       </div>
 
-      {showWordCards ? (
-        <div
-          ref={containerRef}
-          className="overflow-y-auto flex-1 p-3 space-y-2"
-        >
-          {!words || words.length === 0 ? (
-            <p className="text-gray-400 text-center py-8 text-sm">该视频暂无词卡</p>
-          ) : (
-            words.map(w => (
-              <div
-                key={w.id}
-                onClick={() => onWordClick?.(w)}
-                className="px-4 py-4 rounded-lg cursor-pointer bg-gray-50 hover:bg-blue-50 border border-transparent hover:border-blue-200 transition-all"
-              >
-                <div className="flex items-baseline gap-2 mb-1.5">
-                  <span className="text-xl font-bold text-gray-900">{w.word}</span>
+      {isWordCards ? (
+        <div className="flex flex-1 overflow-hidden">
+          {/* 左侧：词卡列表 */}
+          <div className="w-[25%] overflow-y-auto border-r border-gray-200 p-2 space-y-1.5">
+            {!words || words.length === 0 ? (
+              <p className="text-gray-400 text-center py-8 text-sm">该视频暂无词卡</p>
+            ) : (
+              words.map(w => (
+                <button
+                  key={w.id}
+                  onClick={() => setSelectedWordId(w.id)}
+                  className={`w-full text-left px-3.5 py-3 rounded-xl transition-all ${
+                    selectedWordId === w.id
+                      ? 'bg-blue-50 border border-blue-200 shadow-sm'
+                      : 'bg-gray-50 hover:bg-gray-100 border border-transparent'
+                  }`}
+                >
+                  <div className="font-bold text-gray-900 text-sm mb-0.5">{w.word}</div>
+                  <div className="text-xs text-gray-500 truncate">{w.meaningZh}</div>
+                </button>
+              ))
+            )}
+          </div>
+
+          {/* 右侧：词卡详情 */}
+          <div className="flex-1 overflow-y-auto p-4">
+            {(() => {
+              const selected = words.find(w => w.id === selectedWordId)
+              if (!selected) {
+                return (
+                  <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                    点击左侧词卡查看详情
+                  </div>
+                )
+              }
+              return (
+                <div className="space-y-4">
+                  {selected.meaning && (
+                    <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
+                      <ReactMarkdown>{selected.meaning}</ReactMarkdown>
+                    </div>
+                  )}
                 </div>
-                <div className="text-sm text-gray-600 mb-0.5">{w.meaning}</div>
-                <div className="text-sm text-gray-500">{w.meaningZh}</div>
-              </div>
-            ))
-          )}
+              )
+            })()}
+          </div>
         </div>
       ) : (
         <div

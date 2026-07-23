@@ -123,196 +123,186 @@ export default function VideoEditPage() {
     }))
   }
 
+  const inputClass = "w-full px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+  const labelClass = "block text-sm font-medium text-gray-700 mb-1"
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">编辑视频</h1>
-        <Link href="/admin/videos" className="text-gray-600 hover:text-gray-900">
-          ← 返回视频列表
-        </Link>
-      </div>
+    <div className="min-h-screen bg-black/20 flex items-start justify-center py-10">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl mx-4 overflow-hidden">
+        {/* 头部 */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">编辑视频</h2>
+          <Link href="/admin/videos" className="text-gray-500 hover:text-gray-700 text-sm">
+            ✕
+          </Link>
+        </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-              {error}
+        <div className="px-6 py-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>韩语标题 *</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={e => setFormData({ ...formData, title: e.target.value })}
+                  required
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>中文标题 *</label>
+                <input
+                  type="text"
+                  value={formData.titleZh}
+                  onChange={e => setFormData({ ...formData, titleZh: e.target.value })}
+                  required
+                  className={inputClass}
+                />
+              </div>
             </div>
-          )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FileUpload
+                label="封面图片"
+                accept="image/*"
+                type="covers"
+                value={formData.coverUrl}
+                onChange={url => setFormData({ ...formData, coverUrl: url })}
+                required
+                placeholder="支持 JPG、PNG 等格式"
+              />
+              <VodVideoUpload
+                label="视频文件 (阿里云VOD)"
+                vodVideoId={vodVideoId}
+                onUploadComplete={(newVodId, newDbId) => {
+                  setVodVideoId(newVodId)
+                  setDbId(newDbId)
+                }}
+                onRemove={() => {
+                  setVodVideoId('')
+                  setDbId(null)
+                }}
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className={labelClass}>时长（秒） *</label>
+                <input
+                  type="number"
+                  value={formData.duration}
+                  onChange={e => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
+                  required
+                  min={0}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>期数</label>
+                <input
+                  type="number"
+                  value={formData.episodeNumber}
+                  onChange={e => setFormData({ ...formData, episodeNumber: parseInt(e.target.value) || 0 })}
+                  min={0}
+                  placeholder="如 11"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>难度（1-5星）</label>
+                <input
+                  type="number"
+                  value={formData.difficulty}
+                  onChange={e => setFormData({ ...formData, difficulty: parseInt(e.target.value) || 0 })}
+                  min={0}
+                  max={5}
+                  placeholder="1-5"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                韩语标题 *
-              </label>
+              <label className={labelClass}>频道</label>
               <input
                 type="text"
-                value={formData.title}
-                onChange={e => setFormData({ ...formData, title: e.target.value })}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={formData.instructor}
+                onChange={e => setFormData({ ...formData, instructor: e.target.value })}
+                placeholder="频道"
+                className={inputClass}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                中文标题 *
-              </label>
-              <input
-                type="text"
-                value={formData.titleZh}
-                onChange={e => setFormData({ ...formData, titleZh: e.target.value })}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <label className={labelClass}>主题</label>
+              <div className="flex flex-wrap gap-2">
+                {topics.map(topic => (
+                  <button
+                    key={topic.id}
+                    type="button"
+                    onClick={() => toggleTopic(topic.id)}
+                    className={`px-3 py-1.5 rounded-lg text-sm ${
+                      formData.topicIds.includes(topic.id)
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {topic.nameZh}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FileUpload
-              label="封面图片"
-              accept="image/*"
-              type="covers"
-              value={formData.coverUrl}
-              onChange={url => setFormData({ ...formData, coverUrl: url })}
-              required
-              placeholder="支持 JPG、PNG 等格式"
-            />
-            <VodVideoUpload
-              label="视频文件 (阿里云VOD)"
-              vodVideoId={vodVideoId}
-              onUploadComplete={(newVodId, newDbId) => {
-                setVodVideoId(newVodId)
-                setDbId(newDbId)
-              }}
-              onRemove={() => {
-                setVodVideoId('')
-                setDbId(null)
-              }}
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                时长（秒） *
-              </label>
-              <input
-                type="number"
-                value={formData.duration}
-                onChange={e => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
-                required
-                min={0}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                期数
-              </label>
-              <input
-                type="number"
-                value={formData.episodeNumber}
-                onChange={e => setFormData({ ...formData, episodeNumber: parseInt(e.target.value) || 0 })}
-                min={0}
-                placeholder="如 11"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                难度（1-5星）
-              </label>
-              <input
-                type="number"
-                value={formData.difficulty}
-                onChange={e => setFormData({ ...formData, difficulty: parseInt(e.target.value) || 0 })}
-                min={0}
-                max={5}
-                placeholder="1-5"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              频道
-            </label>
-            <input
-              type="text"
-              value={formData.instructor}
-              onChange={e => setFormData({ ...formData, instructor: e.target.value })}
-              placeholder="频道"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              主题
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {topics.map(topic => (
-                <button
-                  key={topic.id}
-                  type="button"
-                  onClick={() => toggleTopic(topic.id)}
-                  className={`px-4 py-2 rounded-lg text-sm ${
-                    formData.topicIds.includes(topic.id)
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>发布状态</label>
+                <select
+                  value={formData.published ? 'true' : 'false'}
+                  onChange={e => setFormData({ ...formData, published: e.target.value === 'true' })}
+                  className={inputClass}
                 >
-                  {topic.nameZh}
-                </button>
-              ))}
+                  <option value="false">草稿</option>
+                  <option value="true">已发布</option>
+                </select>
+              </div>
+              <div>
+                <label className={labelClass}>允许访客观看</label>
+                <select
+                  value={formData.visitorAccessible ? 'true' : 'false'}
+                  onChange={e => setFormData({ ...formData, visitorAccessible: e.target.value === 'true' })}
+                  className={inputClass}
+                >
+                  <option value="false">否</option>
+                  <option value="true">是</option>
+                </select>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="published"
-              checked={formData.published}
-              onChange={e => setFormData({ ...formData, published: e.target.checked })}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="published" className="ml-2 text-sm font-medium text-gray-700">
-              已发布
-            </label>
-          </div>
-
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="visitorAccessible"
-              checked={formData.visitorAccessible}
-              onChange={e => setFormData({ ...formData, visitorAccessible: e.target.checked })}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="visitorAccessible" className="ml-2 text-sm font-medium text-gray-700">
-              允许访客观看
-            </label>
-          </div>
-
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              {loading ? '更新中...' : '更新视频'}
-            </button>
-            <Link
-              href="/admin/videos"
-              className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200"
-            >
-              取消
-            </Link>
-          </div>
-        </form>
+            <div className="flex gap-3 pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+              >
+                {loading ? '更新中...' : '更新视频'}
+              </button>
+              <Link
+                href="/admin/videos"
+                className="bg-gray-100 text-gray-700 px-5 py-2 rounded-lg hover:bg-gray-200 text-sm"
+              >
+                取消
+              </Link>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   )

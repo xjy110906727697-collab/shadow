@@ -44,7 +44,7 @@ export default function VideoDetailPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [subtitleMode, setSubtitleMode] = useState<
-    "双语" | "韩文" | "中文" | "盲听"
+    "双语" | "韩文" | "中文" | "盲听" | "词卡"
   >("双语");
   const [isFavorited, setIsFavorited] = useState(() => {
     if (typeof window === "undefined" || !params.id) return false;
@@ -53,7 +53,6 @@ export default function VideoDetailPage() {
     return ids.includes(params.id as string);
   });
   const [words, setWords] = useState<VideoWord[]>([]);
-  const [showWordCards, setShowWordCards] = useState(false);
   const [selectedWord, setSelectedWord] = useState<VideoWord | null>(null);
 
   useEffect(() => {
@@ -169,14 +168,14 @@ export default function VideoDetailPage() {
       {/* Player + Subtitles */}
       <div className="max-w-[1400px] mx-auto">
         <div className="flex flex-col min-[1000px]:flex-row gap-4">
-          <div className="min-[1000px]:w-[72%]">
+          <div className="min-[1000px]:w-[68%]">
             <VideoPlayer
               videoUrl={video.videoUrl}
               onTimeUpdate={setCurrentTime}
             />
           </div>
 
-          <div className="min-[1000px]:w-[28%] flex flex-col h-[50vh] min-[1000px]:h-[70vh]">
+          <div className="min-[1000px]:w-[32%] flex flex-col h-[50vh] min-[1000px]:h-[590px]">
             <SubtitlePanel
               subtitles={video.subtitles}
               currentTime={currentTime}
@@ -189,7 +188,7 @@ export default function VideoDetailPage() {
                 const stored = localStorage.getItem("favorites");
                 let ids: string[] = stored ? JSON.parse(stored) : [];
                 if (ids.includes(params.id as string)) {
-                  ids = ids.filter(id => id !== params.id);
+                  ids = ids.filter((id) => id !== params.id);
                   setIsFavorited(false);
                 } else {
                   ids.push(params.id as string);
@@ -199,8 +198,6 @@ export default function VideoDetailPage() {
               }}
               words={words}
               onWordClick={setSelectedWord}
-              showWordCards={showWordCards}
-              onToggleWordCards={() => setShowWordCards(!showWordCards)}
             />
           </div>
         </div>
@@ -215,7 +212,11 @@ export default function VideoDetailPage() {
 
       {selectedWord && (
         <WordPopup
-          word={{ ...selectedWord, videoId: video.id, videoTitle: video.titleZh || video.title }}
+          word={{
+            ...selectedWord,
+            videoId: video.id,
+            videoTitle: video.titleZh || video.title,
+          }}
           onClose={() => setSelectedWord(null)}
         />
       )}

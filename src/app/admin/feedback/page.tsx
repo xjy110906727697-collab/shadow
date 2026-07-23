@@ -80,7 +80,7 @@ export default function AdminFeedbackPage() {
     {
       title: '反馈类型',
       dataIndex: 'type',
-      width: 130,
+      width: 150,
       render: (type: string) => {
         const config = typeConfig[type] || typeConfig['其他']
         return (
@@ -93,6 +93,7 @@ export default function AdminFeedbackPage() {
     {
       title: '反馈内容',
       dataIndex: 'content',
+      width: 280,
       ellipsis: true,
       render: (content: string) => (
         <span className="text-slate-700 text-sm">{content}</span>
@@ -101,7 +102,7 @@ export default function AdminFeedbackPage() {
     {
       title: '联系方式',
       dataIndex: 'contact',
-      width: 180,
+      width: 200,
       render: (contact: string) => (
         <span className="text-sm text-slate-600">{contact || <span className="text-slate-300">未提供</span>}</span>
       ),
@@ -110,7 +111,7 @@ export default function AdminFeedbackPage() {
       title: '提交时间',
       dataIndex: 'createdAt',
       sorter: true,
-      width: 180,
+      width: 200,
       render: (val: string) => (
         <span className="text-sm text-slate-600">{new Date(val).toLocaleString('zh-CN')}</span>
       ),

@@ -1,67 +1,68 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
-import Link from 'next/link'
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 
 interface WordData {
-  id: string
-  word: string
-  meaning: string
-  meaningZh: string
-  videoId: string
-  videoTitle?: string
+  id: string;
+  word: string;
+  meaning: string;
+  meaningZh: string;
+  videoId: string;
+  videoTitle?: string;
 }
 
 interface WordPopupProps {
-  word: WordData | null
-  onClose: () => void
+  word: WordData | null;
+  onClose: () => void;
 }
 
 export function WordPopup({ word, onClose }: WordPopupProps) {
-  const { data: session } = useSession()
-  const [isInBag, setIsInBag] = useState(false)
-  const [adding, setAdding] = useState(false)
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+  const { data: session } = useSession();
+  const [isInBag, setIsInBag] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
     if (!word || !session) {
-      setIsInBag(false)
-      return
+      setIsInBag(false);
+      return;
     }
 
-    fetch('/api/word-bag')
-      .then(res => res.json())
-      .then(data => {
-        const wordIds: string[] = data.words || []
-        setIsInBag(wordIds.includes(word.id))
+    fetch("/api/word-bag")
+      .then((res) => res.json())
+      .then((data) => {
+        const wordIds: string[] = data.words || [];
+        setIsInBag(wordIds.includes(word.id));
       })
-      .catch(() => setIsInBag(false))
-  }, [word, session])
+      .catch(() => setIsInBag(false));
+  }, [word, session]);
 
-  if (!word) return null
+  if (!word) return null;
 
   const handleAddToBag = async () => {
     if (!session) {
-      setShowLoginPrompt(true)
-      return
+      setShowLoginPrompt(true);
+      return;
     }
 
-    setAdding(true)
+    setAdding(true);
     try {
-      const res = await fetch('/api/word-bag', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/word-bag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ wordId: word.id }),
-      })
-      const data = await res.json()
-      setIsInBag(data.added)
+      });
+      const data = await res.json();
+      setIsInBag(data.added);
     } catch (error) {
-      console.error('Failed to add to word bag:', error)
+      console.error("Failed to add to word bag:", error);
     } finally {
-      setAdding(false)
+      setAdding(false);
     }
-  }
+  };
 
   return (
     <>
@@ -70,60 +71,49 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
         onClick={onClose}
       >
         <div
-          className="bg-white rounded-lg p-6 w-full max-w-md mx-4"
-          onClick={e => e.stopPropagation()}
+          className="bg-white rounded-2xl p-6 w-full max-w-lg mx-4 shadow-2xl max-h-[80vh] flex flex-col"
+          onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">{word.word}</h2>
-              {word.videoTitle && (
-                <Link
-                  href={`/video/${word.videoId}`}
-                  className="text-sm text-blue-600 hover:underline"
-                  onClick={onClose}
-                >
-                  来自：{word.videoTitle}
-                </Link>
-              )}
+          <div className="flex items-start justify-between mb-5">
+            <div>
+              <div className="flex items-baseline gap-3 mb-1">
+                <h2 className="text-3xl font-bold text-gray-900">
+                  {word.word}
+                </h2>
+                <span className="text-lg text-gray-600 font-medium">
+                  {word.meaningZh}
+                </span>
+              </div>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+              className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg p-1.5 transition-colors"
             >
-              ×
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
 
-          <div className="space-y-3 mb-6">
-            <div>
-              <div className="text-sm text-gray-500 mb-1">韩语释义</div>
-              <div className="text-base text-gray-800">{word.meaning}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">中文翻译</div>
-              <div className="text-base text-gray-800">{word.meaningZh}</div>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            {!isInBag ? (
-              <button
-                onClick={handleAddToBag}
-                disabled={adding}
-                className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium text-sm"
-              >
-                {adding ? '加入中...' : '加入词卡'}
-              </button>
-            ) : (
-              <div className="flex-1 bg-gray-100 text-gray-500 py-2.5 rounded-lg text-center text-sm">
-                已在词卡中
+          {word.meaning && (
+            <div className="overflow-y-auto flex-1 -mx-2 px-2">
+              <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
+                <ReactMarkdown>{word.meaning}</ReactMarkdown>
               </div>
-            )}
+            </div>
+          )}
+
+          <div className="mt-5 pt-4 border-t border-gray-100">
             <button
-              onClick={onClose}
-              className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg hover:bg-gray-200 text-sm"
+              onClick={handleAddToBag}
+              disabled={adding}
+              className={`w-full py-2.5 rounded-xl text-sm font-medium transition-all ${
+                isInBag
+                  ? "bg-gray-100 text-gray-500 cursor-default"
+                  : "bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98]"
+              }`}
             >
-              关闭
+              {adding ? "加入中..." : isInBag ? "已在词卡中 ✓" : "加入词卡"}
             </button>
           </div>
         </div>
@@ -136,7 +126,7 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
         >
           <div
             className="bg-white rounded-lg p-8 max-w-md text-center"
-            onClick={e => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="text-4xl mb-4">🔑</div>
             <h3 className="text-xl font-bold mb-3">需要登录</h3>
@@ -159,5 +149,5 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
         </div>
       )}
     </>
-  )
+  );
 }
