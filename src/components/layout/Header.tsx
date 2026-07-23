@@ -187,6 +187,12 @@ export function Header() {
               收藏
             </Link>
             <Link
+              href="/word-bag"
+              className="text-gray-600 hover:text-gray-900"
+            >
+              词卡
+            </Link>
+            <Link
               href="/learning-method"
               className="text-gray-600 hover:text-gray-900"
             >

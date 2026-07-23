@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 
 interface SubtitleEntry {
   id: string
@@ -11,6 +11,14 @@ interface SubtitleEntry {
   zh: string
 }
 
+interface VideoWord {
+  id: string
+  word: string
+  meaning: string
+  meaningZh: string
+  videoId: string
+}
+
 interface SubtitlePanelProps {
   subtitles: SubtitleEntry[]
   currentTime: number
@@ -19,9 +27,97 @@ interface SubtitlePanelProps {
   onModeChange?: (mode: '双语' | '韩文' | '中文' | '盲听') => void
   isFavorited?: boolean
   onFavoriteToggle?: () => void
+  words?: VideoWord[]
+  onWordClick?: (word: VideoWord) => void
+  showWordCards?: boolean
+  onToggleWordCards?: () => void
 }
 
 const subtitleModes = ['双语', '韩文', '中文', '盲听'] as const
+
+function HighlightedText({ text, words, onWordClick, isActive }: {
+  text: string
+  words: VideoWord[]
+  onWordClick?: (word: VideoWord) => void
+  isActive: boolean
+}) {
+  if (!words || words.length === 0 || !text) {
+    return <>{text}</>
+  }
+
+  const sortedWords = [...words].sort((a, b) => b.word.length - a.word.length)
+  const parts: { text: string; word?: VideoWord }[] = []
+  let remaining = text
+  const usedRanges: { start: number; end: number }[] = []
+
+  for (const w of sortedWords) {
+    let searchFrom = 0
+    while (true) {
+      const idx = remaining.indexOf(w.word, searchFrom)
+      if (idx === -1) break
+
+      const overlaps = usedRanges.some(r =>
+        (idx >= r.start && idx < r.end) || (idx + w.word.length > r.start && idx + w.word.length <= r.end)
+      )
+      if (!overlaps) {
+        parts.push({ text: w.word, word: w })
+        usedRanges.push({ start: idx, end: idx + w.word.length })
+      }
+      searchFrom = idx + w.word.length
+    }
+  }
+
+  if (parts.length === 0) {
+    return <>{text}</>
+  }
+
+  const allParts: { text: string; word?: VideoWord }[] = []
+  let lastEnd = 0
+  const sortedParts = [...parts].sort((a, b) => {
+    const aIdx = text.indexOf(a.text)
+    const bIdx = text.indexOf(b.text)
+    return aIdx - bIdx
+  })
+
+  for (const part of sortedParts) {
+    const idx = text.indexOf(part.text, lastEnd)
+    if (idx === -1) continue
+    if (idx > lastEnd) {
+      allParts.push({ text: text.slice(lastEnd, idx) })
+    }
+    allParts.push(part)
+    lastEnd = idx + part.text.length
+  }
+  if (lastEnd < text.length) {
+    allParts.push({ text: text.slice(lastEnd) })
+  }
+
+  return (
+    <>
+      {allParts.map((part, i) => {
+        if (part.word) {
+          return (
+            <span
+              key={i}
+              onClick={(e) => {
+                e.stopPropagation()
+                onWordClick?.(part.word!)
+              }}
+              className={`cursor-pointer border-b-2 border-dashed transition-colors ${
+                isActive
+                  ? 'border-blue-400 text-blue-700 hover:text-blue-900'
+                  : 'border-blue-300 text-blue-600 hover:text-blue-800'
+              }`}
+            >
+              {part.text}
+            </span>
+          )
+        }
+        return <span key={i}>{part.text}</span>
+      })}
+    </>
+  )
+}
 
 export function SubtitlePanel({
   subtitles,
@@ -31,6 +127,10 @@ export function SubtitlePanel({
   onModeChange,
   isFavorited,
   onFavoriteToggle,
+  words = [],
+  onWordClick,
+  showWordCards = false,
+  onToggleWordCards,
 }: SubtitlePanelProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef<HTMLDivElement>(null)
@@ -72,10 +172,8 @@ export function SubtitlePanel({
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col h-full overflow-hidden">
-      {/* 顶部栏：圆角模式切换 + 收藏爱心 */}
       <div className="shrink-0 px-3 py-2.5 bg-gray-50 border-b border-gray-100">
         <div className="flex items-center gap-2">
-          {/* 圆角分段控件 */}
           <div className="flex flex-1 bg-gray-200/80 rounded-lg p-0.5 gap-0.5">
             {subtitleModes.map(m => (
               <button
@@ -92,7 +190,17 @@ export function SubtitlePanel({
             ))}
           </div>
 
-          {/* 收藏爱心按钮 */}
+          <button
+            onClick={onToggleWordCards}
+            className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              showWordCards
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            词卡
+          </button>
+
           {onFavoriteToggle && (
             <button
               onClick={onFavoriteToggle}
@@ -110,100 +218,121 @@ export function SubtitlePanel({
         </div>
       </div>
 
-      {/* 字幕列表 */}
-      <div
-        ref={containerRef}
-        className="overflow-y-auto flex-1 p-3 space-y-2"
-      >
-        {!subtitles || subtitles.length === 0 ? (
-          <p className="text-gray-400 text-center py-8 text-sm">暂无字幕</p>
-        ) : (
-          (subtitles ?? []).map((entry, idx) => {
-            const isActive = idx === activeIndex
-            return (
+      {showWordCards ? (
+        <div
+          ref={containerRef}
+          className="overflow-y-auto flex-1 p-3 space-y-2"
+        >
+          {!words || words.length === 0 ? (
+            <p className="text-gray-400 text-center py-8 text-sm">该视频暂无词卡</p>
+          ) : (
+            words.map(w => (
               <div
-                key={entry.id}
-                ref={isActive ? activeRef : null}
-                onClick={() => {
-                  if (mode === '盲听') { toggleBlind(entry.id); return }
-                  handleEntryClick(entry)
-                }}
-                className={`px-3 py-3 rounded-lg cursor-pointer transition-all relative ${
-                  isActive
-                    ? 'bg-gradient-to-b from-blue-50/90 via-blue-50/60 to-blue-50/90 border border-blue-300/60 shadow-sm'
-                    : 'bg-gray-50 hover:bg-gray-100 border border-transparent'
-                }`}
+                key={w.id}
+                onClick={() => onWordClick?.(w)}
+                className="px-4 py-4 rounded-lg cursor-pointer bg-gray-50 hover:bg-blue-50 border border-transparent hover:border-blue-200 transition-all"
               >
-                {/* 顶部行：动态声波icon + 正在播放 */}
-                {isActive ? (
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <svg className="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-                      <rect x="2" y="10" width="3" height="4" rx="1">
-                        <animate attributeName="height" values="4;12;4" dur="0.8s" repeatCount="indefinite" />
-                        <animate attributeName="y" values="10;6;10" dur="0.8s" repeatCount="indefinite" />
-                      </rect>
-                      <rect x="7.5" y="7" width="3" height="10" rx="1">
-                        <animate attributeName="height" values="10;16;10" dur="0.6s" repeatCount="indefinite" />
-                        <animate attributeName="y" values="7;4;7" dur="0.6s" repeatCount="indefinite" />
-                      </rect>
-                      <rect x="13" y="9" width="3" height="6" rx="1">
-                        <animate attributeName="height" values="6;14;6" dur="0.7s" repeatCount="indefinite" />
-                        <animate attributeName="y" values="9;5;9" dur="0.7s" repeatCount="indefinite" />
-                      </rect>
-                      <rect x="18" y="8" width="3" height="8" rx="1">
-                        <animate attributeName="height" values="8;12;8" dur="0.5s" repeatCount="indefinite" />
-                        <animate attributeName="y" values="8;6;8" dur="0.5s" repeatCount="indefinite" />
-                      </rect>
-                    </svg>
-                    <span className="text-[11px] text-blue-500 font-medium">正在播放</span>
-                  </div>
-                ) : (
-                  <div className="text-[11px] text-gray-400 font-mono mb-1.5">{formatTime(entry.startTime)}</div>
-                )}
-
-                {/* 字幕内容 */}
-                {mode === '盲听' ? (
-                  <>
-                    {blindRevealed.has(entry.id) ? (
-                      <>
-                        <div className={`text-base font-extrabold leading-relaxed tracking-wider mb-1 ${isActive ? 'text-gray-900' : 'text-gray-800'}`} style={{ wordSpacing: '0.15em' }}>
-                          {entry.ko}
-                        </div>
-                        <div className={`text-sm leading-relaxed ${isActive ? 'text-gray-700' : 'text-gray-600'}`}>
-                          {entry.zh}
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="h-5 bg-gray-200 rounded w-full mb-1.5" />
-                        <div className="h-4 bg-gray-200 rounded w-3/4" />
-                      </>
-                    )}
-                  </>
-                ) : mode === '中文' ? (
-                  <div className={`text-sm leading-relaxed ${isActive ? 'text-gray-700' : 'text-gray-600'}`}>
-                    {entry.zh}
-                  </div>
-                ) : mode === '韩文' ? (
-                  <div className={`text-lg font-bold leading-relaxed tracking-wider ${isActive ? 'text-gray-900' : 'text-gray-800'}`} style={{ wordSpacing: '0.15em' }}>
-                    {entry.ko}
-                  </div>
-                ) : (
-                  // 双语模式：韩语加粗 + 中文字号缩小一号
-                  <>
-                    <div className={`text-lg font-extrabold leading-relaxed tracking-wider mb-0.5 ${isActive ? 'text-gray-900' : 'text-gray-800'}`} style={{ wordSpacing: '0.15em' }}>
-                      {entry.ko}
+                <div className="flex items-baseline gap-2 mb-1.5">
+                  <span className="text-xl font-bold text-gray-900">{w.word}</span>
+                </div>
+                <div className="text-sm text-gray-600 mb-0.5">{w.meaning}</div>
+                <div className="text-sm text-gray-500">{w.meaningZh}</div>
+              </div>
+            ))
+          )}
+        </div>
+      ) : (
+        <div
+          ref={containerRef}
+          className="overflow-y-auto flex-1 p-3 space-y-2"
+        >
+          {!subtitles || subtitles.length === 0 ? (
+            <p className="text-gray-400 text-center py-8 text-sm">暂无字幕</p>
+          ) : (
+            (subtitles ?? []).map((entry, idx) => {
+              const isActive = idx === activeIndex
+              return (
+                <div
+                  key={entry.id}
+                  ref={isActive ? activeRef : null}
+                  onClick={() => {
+                    if (mode === '盲听') { toggleBlind(entry.id); return }
+                    handleEntryClick(entry)
+                  }}
+                  className={`px-3 py-3 rounded-lg cursor-pointer transition-all relative ${
+                    isActive
+                      ? 'bg-gradient-to-b from-blue-50/90 via-blue-50/60 to-blue-50/90 border border-blue-300/60 shadow-sm'
+                      : 'bg-gray-50 hover:bg-gray-100 border border-transparent'
+                  }`}
+                >
+                  {isActive ? (
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <svg className="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="2" y="10" width="3" height="4" rx="1">
+                          <animate attributeName="height" values="4;12;4" dur="0.8s" repeatCount="indefinite" />
+                          <animate attributeName="y" values="10;6;10" dur="0.8s" repeatCount="indefinite" />
+                        </rect>
+                        <rect x="7.5" y="7" width="3" height="10" rx="1">
+                          <animate attributeName="height" values="10;16;10" dur="0.6s" repeatCount="indefinite" />
+                          <animate attributeName="y" values="7;4;7" dur="0.6s" repeatCount="indefinite" />
+                        </rect>
+                        <rect x="13" y="9" width="3" height="6" rx="1">
+                          <animate attributeName="height" values="6;14;6" dur="0.7s" repeatCount="indefinite" />
+                          <animate attributeName="y" values="9;5;9" dur="0.7s" repeatCount="indefinite" />
+                        </rect>
+                        <rect x="18" y="8" width="3" height="8" rx="1">
+                          <animate attributeName="height" values="8;12;8" dur="0.5s" repeatCount="indefinite" />
+                          <animate attributeName="y" values="8;6;8" dur="0.5s" repeatCount="indefinite" />
+                        </rect>
+                      </svg>
+                      <span className="text-[11px] text-blue-500 font-medium">正在播放</span>
                     </div>
+                  ) : (
+                    <div className="text-[11px] text-gray-400 font-mono mb-1.5">{formatTime(entry.startTime)}</div>
+                  )}
+
+                  {mode === '盲听' ? (
+                    <>
+                      {blindRevealed.has(entry.id) ? (
+                        <>
+                          <div className={`text-base font-extrabold leading-relaxed tracking-wider mb-1 ${isActive ? 'text-gray-900' : 'text-gray-800'}`} style={{ wordSpacing: '0.15em' }}>
+                            <HighlightedText text={entry.ko} words={words} onWordClick={onWordClick} isActive={isActive} />
+                          </div>
+                          <div className={`text-sm leading-relaxed ${isActive ? 'text-gray-700' : 'text-gray-600'}`}>
+                            {entry.zh}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="h-5 bg-gray-200 rounded w-full mb-1.5" />
+                          <div className="h-4 bg-gray-200 rounded w-3/4" />
+                        </>
+                      )}
+                    </>
+                  ) : mode === '中文' ? (
                     <div className={`text-sm leading-relaxed ${isActive ? 'text-gray-700' : 'text-gray-600'}`}>
                       {entry.zh}
                     </div>
-                  </>
-                )}
-              </div>
-            )
-          })
-        )}
-      </div>
+                  ) : mode === '韩文' ? (
+                    <div className={`text-lg font-bold leading-relaxed tracking-wider ${isActive ? 'text-gray-900' : 'text-gray-800'}`} style={{ wordSpacing: '0.15em' }}>
+                      <HighlightedText text={entry.ko} words={words} onWordClick={onWordClick} isActive={isActive} />
+                    </div>
+                  ) : (
+                    <>
+                      <div className={`text-lg font-extrabold leading-relaxed tracking-wider mb-0.5 ${isActive ? 'text-gray-900' : 'text-gray-800'}`} style={{ wordSpacing: '0.15em' }}>
+                        <HighlightedText text={entry.ko} words={words} onWordClick={onWordClick} isActive={isActive} />
+                      </div>
+                      <div className={`text-sm leading-relaxed ${isActive ? 'text-gray-700' : 'text-gray-600'}`}>
+                        {entry.zh}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )
+            })
+          )}
+        </div>
+      )}
     </div>
   )
 }

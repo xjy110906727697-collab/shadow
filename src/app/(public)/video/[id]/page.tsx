@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { VideoPlayer } from "@/components/public/VideoPlayer";
 import { SubtitlePanel } from "@/components/public/SubtitlePanel";
+import { WordPopup } from "@/components/public/WordPopup";
 
 interface SubtitleEntry {
   id: string;
@@ -13,6 +14,14 @@ interface SubtitleEntry {
   endTime: number;
   ko: string;
   zh: string;
+}
+
+interface VideoWord {
+  id: string;
+  word: string;
+  meaning: string;
+  meaningZh: string;
+  videoId: string;
 }
 
 interface VideoDetail {
@@ -43,6 +52,9 @@ export default function VideoDetailPage() {
     const ids: string[] = stored ? JSON.parse(stored) : [];
     return ids.includes(params.id as string);
   });
+  const [words, setWords] = useState<VideoWord[]>([]);
+  const [showWordCards, setShowWordCards] = useState(false);
+  const [selectedWord, setSelectedWord] = useState<VideoWord | null>(null);
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -64,8 +76,19 @@ export default function VideoDetailPage() {
       }
     };
 
+    const fetchWords = async () => {
+      try {
+        const res = await fetch(`/api/videos/${params.id}/words`);
+        const data = await res.json();
+        setWords(data.words || []);
+      } catch (error) {
+        console.error("Failed to fetch words:", error);
+      }
+    };
+
     if (params.id) {
       fetchVideo();
+      fetchWords();
     }
   }, [params.id]);
 
@@ -174,6 +197,10 @@ export default function VideoDetailPage() {
                 }
                 localStorage.setItem("favorites", JSON.stringify(ids));
               }}
+              words={words}
+              onWordClick={setSelectedWord}
+              showWordCards={showWordCards}
+              onToggleWordCards={() => setShowWordCards(!showWordCards)}
             />
           </div>
         </div>
@@ -185,6 +212,13 @@ export default function VideoDetailPage() {
           </div>
         )}
       </div>
+
+      {selectedWord && (
+        <WordPopup
+          word={{ ...selectedWord, videoId: video.id, videoTitle: video.titleZh || video.title }}
+          onClose={() => setSelectedWord(null)}
+        />
+      )}
 
       {/* Mobile bottom action bar */}
       <div className="fixed bottom-14 left-0 right-0 z-30 bg-white border-t border-gray-200 md:hidden">

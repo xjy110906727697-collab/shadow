@@ -14,6 +14,15 @@ interface SubtitleEntry {
   zh: string
 }
 
+interface VideoWord {
+  id: string
+  word: string
+  meaning: string
+  meaningZh: string
+  entryId: string | null
+  startTime: number | null
+}
+
 export default function SubtitleEditorPage() {
   const params = useParams()
   const router = useRouter()
@@ -24,9 +33,14 @@ export default function SubtitleEditorPage() {
   const [addingAfterId, setAddingAfterId] = useState<string | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [words, setWords] = useState<VideoWord[]>([])
+  const [showWordForm, setShowWordForm] = useState(false)
+  const [editingWordId, setEditingWordId] = useState<string | null>(null)
+  const [wordForm, setWordForm] = useState({ word: '', meaning: '', meaningZh: '', entryId: '', startTime: '' })
 
   useEffect(() => {
     fetchVideo()
+    fetchWords()
   }, [params.id])
 
   const fetchVideo = async () => {
@@ -39,6 +53,91 @@ export default function SubtitleEditorPage() {
       console.error('Failed to fetch video:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchWords = async () => {
+    try {
+      const res = await fetch(`/api/videos/${params.id}/words`)
+      const data = await res.json()
+      setWords(data.words || [])
+    } catch (error) {
+      console.error('Failed to fetch words:', error)
+    }
+  }
+
+  const handleAddWord = () => {
+    setWordForm({ word: '', meaning: '', meaningZh: '', entryId: '', startTime: '' })
+    setEditingWordId(null)
+    setShowWordForm(true)
+  }
+
+  const handleEditWord = (word: VideoWord) => {
+    setWordForm({
+      word: word.word,
+      meaning: word.meaning,
+      meaningZh: word.meaningZh,
+      entryId: word.entryId || '',
+      startTime: word.startTime?.toString() || '',
+    })
+    setEditingWordId(word.id)
+    setShowWordForm(true)
+  }
+
+  const handleSaveWord = async () => {
+    if (!wordForm.word || !wordForm.meaning || !wordForm.meaningZh) {
+      alert('请填写完整单词信息')
+      return
+    }
+
+    try {
+      if (editingWordId) {
+        const res = await fetch(`/api/videos/${params.id}/words/${editingWordId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            word: wordForm.word,
+            meaning: wordForm.meaning,
+            meaningZh: wordForm.meaningZh,
+            entryId: wordForm.entryId || null,
+            startTime: wordForm.startTime ? parseFloat(wordForm.startTime) : null,
+          }),
+        })
+        if (!res.ok) throw new Error('Failed to update word')
+      } else {
+        const res = await fetch(`/api/videos/${params.id}/words`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            word: wordForm.word,
+            meaning: wordForm.meaning,
+            meaningZh: wordForm.meaningZh,
+            entryId: wordForm.entryId || null,
+            startTime: wordForm.startTime ? parseFloat(wordForm.startTime) : null,
+          }),
+        })
+        if (!res.ok) throw new Error('Failed to create word')
+      }
+      setShowWordForm(false)
+      fetchWords()
+    } catch (error) {
+      console.error('Failed to save word:', error)
+      alert('保存失败')
+    }
+  }
+
+  const handleDeleteWord = async (wordId: string) => {
+    if (!confirm('确定删除这个单词吗？')) return
+
+    try {
+      const res = await fetch(`/api/videos/${params.id}/words/${wordId}`, {
+        method: 'DELETE',
+      })
+      if (!res.ok) throw new Error('Failed to delete word')
+      fetchWords()
+    } catch (error) {
+      console.error('Failed to delete word:', error)
+      alert('删除失败')
     }
   }
 
@@ -251,6 +350,127 @@ export default function SubtitleEditorPage() {
           onDelete={handleDeleteEntry}
           onAdd={handleAddAfterEntry}
         />
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">词卡管理 ({words.length})</h2>
+          <button
+            onClick={handleAddWord}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            + 添加词卡
+          </button>
+        </div>
+
+        {showWordForm && (
+          <div className="border border-gray-200 rounded-lg p-4 mb-4 bg-blue-50">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">单词</label>
+                <input
+                  type="text"
+                  value={wordForm.word}
+                  onChange={e => setWordForm(prev => ({ ...prev, word: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="韩语单词"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">韩语释义</label>
+                <input
+                  type="text"
+                  value={wordForm.meaning}
+                  onChange={e => setWordForm(prev => ({ ...prev, meaning: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="韩语解释"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">中文翻译</label>
+                <input
+                  type="text"
+                  value={wordForm.meaningZh}
+                  onChange={e => setWordForm(prev => ({ ...prev, meaningZh: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="中文意思"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">关联字幕条目</label>
+                <select
+                  value={wordForm.entryId}
+                  onChange={e => setWordForm(prev => ({ ...prev, entryId: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">不关联</option>
+                  {entries.map(entry => (
+                    <option key={entry.id} value={entry.id}>
+                      #{entry.index + 1} - {entry.ko.slice(0, 30)}...
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">时间点（秒）</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={wordForm.startTime}
+                  onChange={e => setWordForm(prev => ({ ...prev, startTime: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="可选"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleSaveWord}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
+              >
+                {editingWordId ? '更新' : '保存'}
+              </button>
+              <button
+                onClick={() => { setShowWordForm(false); setEditingWordId(null) }}
+                className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 text-sm"
+              >
+                取消
+              </button>
+            </div>
+          </div>
+        )}
+
+        {words.length === 0 ? (
+          <p className="text-gray-400 text-center py-8 text-sm">暂无词卡，点击上方按钮添加</p>
+        ) : (
+          <div className="space-y-2">
+            {words.map(w => (
+              <div key={w.id} className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg">
+                <div className="flex-1 min-w-0">
+                  <span className="text-lg font-bold text-gray-900 mr-3">{w.word}</span>
+                  <span className="text-sm text-gray-600 mr-3">{w.meaning}</span>
+                  <span className="text-sm text-gray-500">({w.meaningZh})</span>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <button
+                    onClick={() => handleEditWord(w)}
+                    className="text-blue-600 hover:text-blue-800 text-sm"
+                  >
+                    编辑
+                  </button>
+                  <button
+                    onClick={() => handleDeleteWord(w.id)}
+                    className="text-red-500 hover:text-red-700 text-sm"
+                  >
+                    删除
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

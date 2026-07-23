@@ -16,6 +16,7 @@ model User {
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
   progress     UserVideoProgress[]
+  wordBag      UserWordBag[]
 }
 
 enum Role {
@@ -59,6 +60,7 @@ model Video {
   categories        VideoCategory[]
   subtitleTracks    SubtitleTrack[]
   progress          UserVideoProgress[]
+  words             VideoWord[]
 }
 
 model VideoCategory {
@@ -130,4 +132,31 @@ model Favorite {
   createdAt DateTime @default(now())
 
   @@unique([userId, videoId])
+}
+
+model VideoWord {
+  id        String        @id @default(cuid())
+  videoId   String
+  word      String
+  meaning   String
+  meaningZh String
+  entryId   String?
+  startTime Float?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  video     Video         @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  userBags  UserWordBag[]
+
+  @@unique([videoId, word])
+}
+
+model UserWordBag {
+  id        String    @id @default(cuid())
+  userId    String
+  wordId    String
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word      VideoWord @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wordId])
 }
