@@ -70,7 +70,7 @@ export default function WordBagPage() {
           <p className="text-gray-500 text-lg mb-2">还没有收藏的单词</p>
           <p className="text-gray-400 mb-6">在视频学习时点击单词，即可加入词卡</p>
           <Link
-            href="/browse"
+            href="/"
             className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
           >
             去浏览视频

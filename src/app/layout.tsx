@@ -13,8 +13,11 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Shadow Video - Fluent Korean",
-  description: "Learn Korean with video lessons and interactive subtitles",
+  title: "Shadow Korean",
+  description: "通过真实语料学习韩语",
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({

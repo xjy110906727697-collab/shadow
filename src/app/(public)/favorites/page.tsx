@@ -71,7 +71,7 @@ export default function FavoritesPage() {
           <p className="text-gray-500 text-lg mb-2">还没有收藏的视频</p>
           <p className="text-gray-400 mb-6">在视频页面点击爱心图标即可收藏</p>
           <Link
-            href="/browse"
+            href="/"
             className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
           >
             去浏览视频

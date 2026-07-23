@@ -110,7 +110,7 @@ export function Header() {
 
   // Normal page header
   if (!isVideoPage) {
-    const isBrowsePage = pathname === "/browse";
+    const isBrowsePage = pathname === "/";
     const isFavoritesView = searchQuery === "show=favorites";
 
     return (
@@ -139,7 +139,7 @@ export function Header() {
                   />
                 </svg>
               </button>
-              <Link href="/browse" className="text-lg font-bold text-blue-600">
+              <Link href="/" className="text-lg font-bold text-blue-600">
                 Shadow Video
               </Link>
               <button
@@ -165,7 +165,7 @@ export function Header() {
             </>
           ) : (
             <div className="flex-1 text-center">
-              <Link href="/browse" className="text-lg font-bold text-blue-600">
+              <Link href="/" className="text-lg font-bold text-blue-600">
                 Shadow Video
               </Link>
             </div>
@@ -173,15 +173,15 @@ export function Header() {
         </div>
         {/* Desktop header */}
         <div className="hidden md:flex w-full px-4 md:px-6 h-12 items-center justify-between">
-          <Link href="/browse" className="text-lg font-bold text-blue-600">
+          <Link href="/" className="text-lg font-bold text-blue-600">
             Shadow Video
           </Link>
           <nav className="hidden md:flex items-center gap-4 text-sm">
-            <Link href="/browse" className="text-gray-600 hover:text-gray-900">
+            <Link href="/" className="text-gray-600 hover:text-gray-900">
               首页
             </Link>
             <Link
-              href="/browse?show=favorites"
+              href="/?show=favorites"
               className="text-gray-600 hover:text-gray-900"
             >
               收藏
@@ -359,7 +359,7 @@ export function Header() {
         {/* Left: back + logo + title */}
         <div className="flex items-center gap-2 min-w-0">
           <Link
-            href="/browse"
+            href="/"
             className="flex items-center text-gray-500 hover:text-gray-800 transition-colors shrink-0"
           >
             <svg
@@ -377,7 +377,7 @@ export function Header() {
             </svg>
           </Link>
           <Link
-            href="/browse"
+            href="/"
             className="text-lg font-bold text-blue-600 whitespace-nowrap shrink-0 hidden md:inline"
           >
             Shadow Video
