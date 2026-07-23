@@ -1,6 +1,6 @@
 module.exports = {
   apps: [{
-    name: 'ShadowVideo',
+    name: 'ShadowKorean',
     script: 'node_modules/.bin/next',
     args: 'start -p 3000',
     cwd: '/var/www/shadow',

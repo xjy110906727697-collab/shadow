@@ -68,10 +68,10 @@ export default function AccountPage() {
   }
 
   const menuItems = [
-    { label: '我的收藏', href: 'javascript:;', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>), onClick: () => { if (!isLoggedIn) { setLoginModalMsg('登录后即可查看我的收藏'); return }; window.location.href = '/?show=favorites' } },
+    { label: '我的收藏', href: '/favorites', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>) },
     { label: '学习方法', href: '/learning-method', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>) },
-    { label: '联系客服', href: 'javascript:;', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>), onClick: () => alert('客服邮箱：support@ShadowVideo.com') },
-    { label: '反馈', href: 'javascript:;', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>), onClick: () => { if (!isLoggedIn) { setLoginModalMsg('登录后即可提交反馈'); return }; alert('感谢您的反馈！请将意见发送至 support@ShadowVideo.com') } },
+    { label: '联系客服', href: 'javascript:;', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>), onClick: () => alert('客服邮箱：support@ShadowKorean.com') },
+    { label: '反馈', href: 'javascript:;', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>), onClick: () => { if (!isLoggedIn) { setLoginModalMsg('登录后即可提交反馈'); return }; alert('感谢您的反馈！请将意见发送至 support@ShadowKorean.com') } },
     { label: '修改密码', href: 'javascript:;', icon: (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>), onClick: () => { if (!isLoggedIn) { setLoginModalMsg('登录后即可修改密码'); return }; setShowPasswordForm(!showPasswordForm) } },
   ]
 
@@ -88,9 +88,9 @@ export default function AccountPage() {
           {isLoggedIn ? (
             <img src={avatarUrl} alt="avatar" className="w-16 h-16 rounded-full bg-gray-100" />
           ) : (
-            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
           )}
@@ -101,28 +101,98 @@ export default function AccountPage() {
                 <p className="text-xs text-gray-400 mt-0.5">继续加油学习！</p>
               </>
             ) : (
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <span className="text-sm font-medium text-gray-600">登录后解锁全部功能</span>
+              <div>
+                <p className="text-sm font-semibold text-gray-800 mb-1.5">欢迎来到 ShadowKorean</p>
+                <Link href="/login" className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium">
+                  立即登录
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
               </div>
             )}
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-gray-100">
-          {[
-            { label: '学习天数', value: isLoggedIn ? progressStats.learnedVideos : '--', icon: (<svg className="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>) },
-            { label: '已完成', value: isLoggedIn ? progressStats.learnedVideos : '--', icon: (<svg className="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>) },
-            { label: '未完成', value: isLoggedIn ? progressStats.unlearnedVideos : '--', icon: (<svg className="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>) },
-          ].map(item => (
-            <div key={item.label} className="text-center">
-              {item.icon}
-              <div className="text-lg font-bold text-gray-800">{item.value}</div>
-              <div className="text-[11px] text-gray-400 mt-0.5">{item.label}</div>
+        <div className="mt-5 pt-4 border-t border-gray-100">
+          {!isLoggedIn ? (
+            <div className="relative">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-4 text-center border border-blue-100/30">
+                  <div className="w-9 h-9 mx-auto mb-2 bg-blue-100/60 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="text-2xl font-bold text-blue-300">--</div>
+                  <div className="text-xs text-blue-400/70 mt-0.5">学习天数</div>
+                </div>
+                <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-xl p-4 text-center border border-emerald-100/30">
+                  <div className="w-9 h-9 mx-auto mb-2 bg-emerald-100/60 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="text-2xl font-bold text-emerald-300">--</div>
+                  <div className="text-xs text-emerald-400/70 mt-0.5">已完成</div>
+                </div>
+                <div className="bg-gradient-to-br from-amber-50 to-orange-100/50 rounded-xl p-4 text-center border border-amber-100/30">
+                  <div className="w-9 h-9 mx-auto mb-2 bg-amber-100/60 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="text-2xl font-bold text-amber-300">--</div>
+                  <div className="text-xs text-amber-400/70 mt-0.5">未完成</div>
+                </div>
+              </div>
+              <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px] rounded-xl flex items-center justify-center">
+                <div className="text-center">
+                  <p className="text-base font-semibold text-gray-800 drop-shadow-sm">解锁学习进度</p>
+                  <p className="text-sm text-gray-500 mt-0.5 drop-shadow-sm">登录即可查看学习统计</p>
+                </div>
+              </div>
             </div>
-          ))}
+          ) : (
+            <div className="grid grid-cols-3 gap-3">
+              <div className="relative bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-center overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent)]"></div>
+                <div className="relative">
+                  <div className="w-9 h-9 mx-auto mb-2 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="text-2xl font-bold text-white">{progressStats.learnedVideos}</div>
+                  <div className="text-xs text-blue-100 mt-0.5">学习天数</div>
+                </div>
+              </div>
+              <div className="relative bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-4 text-center overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent)]"></div>
+                <div className="relative">
+                  <div className="w-9 h-9 mx-auto mb-2 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="text-2xl font-bold text-white">{progressStats.learnedVideos}</div>
+                  <div className="text-xs text-emerald-100 mt-0.5">已完成</div>
+                </div>
+              </div>
+              <div className="relative bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl p-4 text-center overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent)]"></div>
+                <div className="relative">
+                  <div className="w-9 h-9 mx-auto mb-2 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="text-2xl font-bold text-white">{progressStats.unlearnedVideos}</div>
+                  <div className="text-xs text-amber-100 mt-0.5">未完成</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

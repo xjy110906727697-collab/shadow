@@ -4,7 +4,7 @@ set -e
 APP_DIR="/var/www/shadow"
 BRANCH="${1:-main}"
 
-echo "=== Deploying ShadowVideo (branch: $BRANCH) ==="
+echo "=== Deploying ShadowKorean (branch: $BRANCH) ==="
 
 cd "$APP_DIR"
 
@@ -25,7 +25,7 @@ echo "Building application..."
 npm run build
 
 echo "Restarting PM2..."
-pm2 restart ShadowVideo
+pm2 restart ShadowKorean
 
 echo "=== Deploy complete ==="
 pm2 status

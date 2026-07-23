@@ -51,7 +51,6 @@ function BrowsePageContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const searchQuery = searchParams.get('search') || ''
-  const showFavorites = searchParams.get('show') === 'favorites'
   const { data: session } = useSession()
   const [categories, setCategories] = useState<Category[]>([])
   const [videos, setVideos] = useState<Video[]>([])
@@ -129,17 +128,7 @@ function BrowsePageContent() {
         params.set('page', '1')
         const res = await fetch(`/api/videos?${params.toString()}`)
         const data = await res.json()
-        let fetchedVideos = data.videos
-
-        // Filter by favorites if in favorites mode
-        if (showFavorites) {
-          try {
-            const favRes = await fetch('/api/favorites')
-            const favData = await favRes.json()
-            const favIds: string[] = favData.favorites || []
-            fetchedVideos = fetchedVideos.filter((v: Video) => favIds.includes(v.id))
-          } catch { /* ignore */ }
-        }
+        const fetchedVideos = data.videos
 
         setVideos(fetchedVideos)
 
@@ -158,7 +147,7 @@ function BrowsePageContent() {
     }
 
     fetchVideos()
-  }, [searchQuery, appliedTopic, appliedDuration, appliedDifficulty, appliedInstructor, activeStat, showFavorites])
+  }, [searchQuery, appliedTopic, appliedDuration, appliedDifficulty, appliedInstructor, activeStat])
 
   const loadMore = async () => {
     if (loadingMore || page >= totalPages) return
@@ -468,7 +457,7 @@ function BrowsePageContent() {
             </div>
           ) : videos.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-sm">{showFavorites ? '暂无收藏的视频' : '暂无视频'}</p>
+              <p className="text-gray-500 text-sm">暂无视频</p>
             </div>
           ) : (
             <>

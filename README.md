@@ -1,4 +1,4 @@
-# ShadowVideo
+# ShadowKorean
 
 一个韩语学习平台，使用 Next.js 构建，提供视频课程和同步的韩中字幕，以及基于波形的交互式字幕编辑器。
 
@@ -228,7 +228,7 @@ cp .env.example .env
 
 ```env
 # PostgreSQL 连接字符串
-DATABASE_URL="postgresql://user:password@localhost:5432/ShadowVideo"
+DATABASE_URL="postgresql://user:password@localhost:5432/ShadowKorean"
 
 # NextAuth
 NEXTAUTH_URL="http://localhost:3000"

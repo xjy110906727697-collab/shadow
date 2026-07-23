@@ -115,7 +115,7 @@ export function Header() {
 
     return (
       <header className="border-b border-gray-200 bg-white">
-        {/* Mobile: centered ShadowVideo + optional filter/search */}
+        {/* Mobile: centered ShadowKorean + optional filter/search */}
         <div className="md:hidden w-full px-4 h-12 flex items-center justify-between">
           {isBrowsePage && !isFavoritesView ? (
             <>
@@ -140,7 +140,7 @@ export function Header() {
                 </svg>
               </button>
               <Link href="/" className="text-lg font-bold text-blue-600">
-                Shadow Video
+                Shadow Korean
               </Link>
               <button
                 onClick={() =>
@@ -166,7 +166,7 @@ export function Header() {
           ) : (
             <div className="flex-1 text-center">
               <Link href="/" className="text-lg font-bold text-blue-600">
-                Shadow Video
+                Shadow Korean
               </Link>
             </div>
           )}
@@ -174,7 +174,7 @@ export function Header() {
         {/* Desktop header */}
         <div className="hidden md:flex w-full px-4 md:px-6 h-12 items-center justify-between">
           <Link href="/" className="text-lg font-bold text-blue-600">
-            Shadow Video
+            Shadow Korean
           </Link>
           <nav className="hidden md:flex items-center gap-4 text-sm">
             <Link href="/" className="text-gray-600 hover:text-gray-900">
@@ -380,7 +380,7 @@ export function Header() {
             href="/"
             className="text-lg font-bold text-blue-600 whitespace-nowrap shrink-0 hidden md:inline"
           >
-            Shadow Video
+            Shadow Korean
           </Link>
           &nbsp;
           <div className="h-5 w-px bg-gray-300 shrink-0" />
@@ -391,7 +391,7 @@ export function Header() {
             </span>
           ) : (
             <span className="text-sm text-blue-800 font-bold md:hidden truncate">
-              Shadow Video
+              Shadow Korean
             </span>
           )}
         </div>

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "=== Setting up Ali ECS for ShadowVideo ==="
+echo "=== Setting up Ali ECS for ShadowKorean ==="
 
 sudo yum update -y
 
@@ -68,7 +68,7 @@ echo "Configuring PostgreSQL..."
 sudo systemctl start postgresql
 sudo systemctl enable postgresql
 sudo -u postgres psql -c "CREATE USER admin WITH PASSWORD 'CHANGE_ME';" || true
-sudo -u postgres psql -c "CREATE DATABASE ShadowVideo OWNER admin;" || true
+sudo -u postgres psql -c "CREATE DATABASE ShadowKorean OWNER admin;" || true
 
 sudo systemctl enable nginx
 sudo systemctl start nginx
