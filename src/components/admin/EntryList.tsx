@@ -136,10 +136,10 @@ export function EntryList({
     return (
       <tr
         key={rowId}
-        className={`${editing ? "bg-red-50" : "hover:bg-gray-50"}`}
+        className={`${editing ? "bg-red-50 dark:bg-red-900/20" : "hover:bg-gray-50 dark:hover:bg-slate-700/30"}`}
       >
         <td className="px-4 py-2 text-sm">
-          {isNew ? <span className="text-blue-500">新</span> : entry.index + 1}
+          {isNew ? <span className="text-blue-500 dark:text-blue-400">新</span> : entry.index + 1}
         </td>
         <td className="px-4 py-2 text-sm font-mono">
           {editing ? (
@@ -159,7 +159,7 @@ export function EntryList({
                     e.stopPropagation();
                     adjustTime("startTime", 1);
                   }}
-                  className="px-1.5 py-1 text-xs leading-none hover:bg-red-100"
+                  className="px-1.5 py-1 text-xs leading-none hover:bg-red-100 dark:hover:bg-red-900/20"
                 >
                   ▲
                 </button>
@@ -168,7 +168,7 @@ export function EntryList({
                     e.stopPropagation();
                     adjustTime("startTime", -1);
                   }}
-                  className="px-1.5 py-1 text-xs leading-none hover:bg-red-100"
+                  className="px-1.5 py-1 text-xs leading-none hover:bg-red-100 dark:hover:bg-red-900/20"
                 >
                   ▼
                 </button>
@@ -196,7 +196,7 @@ export function EntryList({
                     e.stopPropagation();
                     adjustTime("endTime", 1);
                   }}
-                  className="px-1.5 py-1 text-xs leading-none hover:bg-red-100"
+                  className="px-1.5 py-1 text-xs leading-none hover:bg-red-100 dark:hover:bg-red-900/20"
                 >
                   ▲
                 </button>
@@ -205,7 +205,7 @@ export function EntryList({
                     e.stopPropagation();
                     adjustTime("endTime", -1);
                   }}
-                  className="px-1.5 py-1 text-xs leading-none hover:bg-red-100"
+                  className="px-1.5 py-1 text-xs leading-none hover:bg-red-100 dark:hover:bg-red-900/20"
                 >
                   ▼
                 </button>
@@ -215,7 +215,7 @@ export function EntryList({
             formatTime(entry.endTime)
           )}
         </td>
-        <td className="px-4 py-2 text-sm text-right font-mono text-gray-500">
+        <td className="px-4 py-2 text-sm font-mono text-gray-500 dark:text-slate-400">
           {(form.endTime - form.startTime).toFixed(2)}
         </td>
         <td className="px-4 py-2 text-sm">
@@ -246,12 +246,12 @@ export function EntryList({
                   }
                   setCopiedId(entry.id);
                 }}
-                className="flex-shrink-0 text-gray-400 hover:text-blue-600 transition-colors"
+                className="flex-shrink-0 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 title="复制韩语"
               >
                 {copiedId === entry.id ? (
                   <svg
-                    className="w-4 h-4 text-green-500"
+                    className="w-4 h-4 text-green-500 dark:text-green-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -303,7 +303,7 @@ export function EntryList({
                   e.stopPropagation();
                   handleConfirm();
                 }}
-                className="text-green-600 hover:text-green-700 text-sm font-medium"
+                className="text-green-600 dark:text-green-500 hover:text-green-700 dark:hover:text-green-400 text-sm font-medium"
               >
                 确认
               </button>
@@ -312,7 +312,7 @@ export function EntryList({
                   e.stopPropagation();
                   handleCancel();
                 }}
-                className="text-gray-500 hover:text-gray-700 text-sm"
+                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm"
               >
                 取消
               </button>
@@ -324,7 +324,7 @@ export function EntryList({
                   e.stopPropagation();
                   onStartEdit(entry.id);
                 }}
-                className="text-gray-600 hover:text-gray-800 text-sm"
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-sm"
               >
                 编辑
               </button>
@@ -333,7 +333,7 @@ export function EntryList({
                   e.stopPropagation();
                   onAdd(entry.id);
                 }}
-                className="text-blue-600 hover:text-blue-700 text-sm"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm"
               >
                 添加
               </button>
@@ -350,7 +350,7 @@ export function EntryList({
               >
                 <button
                   onClick={(e) => e.stopPropagation()}
-                  className="text-red-600 hover:text-red-700 text-sm"
+                  className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-sm"
                 >
                   删除
                 </button>
@@ -365,32 +365,32 @@ export function EntryList({
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
-        <thead className="bg-gray-50">
+        <thead className="bg-gray-50 dark:bg-slate-700">
           <tr>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">
               #
             </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-slate-400">
               开始
             </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-slate-400">
               结束
             </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-slate-400">
               时长(秒)
             </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 break-words max-w-[200px]">
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-slate-400 break-words max-w-[200px]">
               韩语
             </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 break-words max-w-[200px]">
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-slate-400 break-words max-w-[200px]">
               中文
             </th>
-            <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 w-40">
+            <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-slate-400 w-40">
               操作
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
           {renderEntries.map((entry) => renderRow(entry))}
         </tbody>
       </table>

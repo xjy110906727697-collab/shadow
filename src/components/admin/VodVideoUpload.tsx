@@ -67,20 +67,20 @@ export function VodVideoUpload({ label, vodVideoId, onUploadComplete, onRemove, 
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
         {label} {required && '*'}
       </label>
       {vodVideoId ? (
-        <div className="border border-gray-200 rounded-lg p-3 bg-gray-50">
+        <div className="border border-gray-200 dark:border-slate-600 rounded-lg p-3 bg-gray-50 dark:bg-slate-700">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-sm text-gray-600 truncate flex-1">
+            <span className="text-sm text-gray-600 dark:text-slate-400 truncate flex-1">
               VOD: {vodVideoId}
             </span>
             <div className="flex gap-2 shrink-0">
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="text-xs text-blue-600 hover:text-blue-700"
+                className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
               >
                 更换
               </button>
@@ -94,7 +94,7 @@ export function VodVideoUpload({ label, vodVideoId, onUploadComplete, onRemove, 
               >
                 <button
                   type="button"
-                  className="text-xs text-red-500 hover:text-red-600"
+                  className="text-xs text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300"
                 >
                   删除
                 </button>
@@ -105,12 +105,12 @@ export function VodVideoUpload({ label, vodVideoId, onUploadComplete, onRemove, 
       ) : (
         <div
           onClick={() => inputRef.current?.click()}
-          className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition-colors"
+          className="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors"
         >
           {uploading ? (
             <div>
-              <p className="text-sm text-gray-500 mb-2">上传中... {uploadProgress}%</p>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <p className="text-sm text-gray-500 dark:text-slate-400 mb-2">上传中... {uploadProgress}%</p>
+              <div className="w-full bg-gray-200 dark:bg-slate-600 rounded-full h-2">
                 <div
                   className="bg-blue-600 h-2 rounded-full transition-all"
                   style={{ width: `${uploadProgress}%` }}
@@ -119,11 +119,11 @@ export function VodVideoUpload({ label, vodVideoId, onUploadComplete, onRemove, 
             </div>
           ) : (
             <>
-              <svg className="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 mx-auto text-gray-400 dark:text-slate-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
-              <p className="text-sm text-gray-500">点击选择视频文件</p>
-              <p className="text-xs text-gray-400 mt-1">支持 MP4、WebM 等格式，将上传到阿里云VOD</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">点击选择视频文件</p>
+              <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">支持 MP4、WebM 等格式，将上传到阿里云VOD</p>
             </>
           )}
         </div>

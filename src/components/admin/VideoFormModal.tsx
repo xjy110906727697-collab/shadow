@@ -151,8 +151,8 @@ export function VideoFormModal({ open, editId, onClose, onSuccess }: VideoFormMo
     }
   }
 
-  const inputClass = 'w-full px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
-  const labelClass = 'block text-sm font-medium text-gray-700 mb-1'
+  const inputClass = 'w-full px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm dark:bg-slate-800 dark:text-slate-200'
+  const labelClass = 'block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1'
 
   return (
     <Modal
@@ -164,12 +164,12 @@ export function VideoFormModal({ open, editId, onClose, onSuccess }: VideoFormMo
       okText={isEdit ? '更新' : '创建'}
       cancelText="取消"
       width={640}
-      destroyOnClose
+      destroyOnHidden
       className="rounded-xl overflow-hidden"
     >
       <div className="space-y-4 -mt-1">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
             {error}
           </div>
         )}

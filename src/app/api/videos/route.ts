@@ -129,11 +129,11 @@ export async function GET(request: Request) {
       prisma.video.count({ where })
     ])
 
-    const videosWithLevel = videos.map(video => {
-      const levelCategory = video.categories.find(c => c.category.type === 'LEVEL')
+    const videosWithLevel = videos.map((video: any) => {
+      const levelCategory = video.categories.find((c: any) => c.category.type === 'LEVEL')
       const topicCategories = video.categories
-        .filter(c => c.category.type === 'TOPIC')
-        .map(c => ({ id: c.category.id, name: c.category.nameZh, slug: c.category.slug }))
+        .filter((c: any) => c.category.type === 'TOPIC')
+        .map((c: any) => ({ id: c.category.id, name: c.category.nameZh, slug: c.category.slug }))
       return {
         id: video.id,
         title: video.title,

@@ -77,7 +77,7 @@ export default function AdminWordCardsPage() {
       dataIndex: "word",
       width: 150,
       render: (word: string) => (
-        <span className="font-semibold text-gray-900">{word}</span>
+        <span className="font-semibold text-gray-900 dark:text-slate-100">{word}</span>
       ),
     },
     {
@@ -94,7 +94,7 @@ export default function AdminWordCardsPage() {
         val ? (
           <button
             onClick={() => setPreviewMeaning(val)}
-            className="text-gray-400 hover:text-blue-600 transition-colors"
+            className="text-gray-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             title="查看详细解释"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +102,7 @@ export default function AdminWordCardsPage() {
             </svg>
           </button>
         ) : (
-          <span className="text-gray-300">-</span>
+          <span className="text-gray-300 dark:text-slate-600">-</span>
         ),
     },
     {
@@ -110,10 +110,10 @@ export default function AdminWordCardsPage() {
       key: "video",
       render: (_: unknown, record: WordCard) => (
         <div>
-          <div className="text-sm font-medium text-gray-900">
+          <div className="text-sm font-medium text-gray-900 dark:text-slate-100">
             {record.video.titleZh}
           </div>
-          <div className="text-xs text-gray-500 truncate max-w-[200px]">
+          <div className="text-xs text-gray-500 dark:text-slate-400 truncate max-w-[200px]">
             {record.video.title}
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function AdminWordCardsPage() {
       dataIndex: "createdAt",
       width: 120,
       render: (val: string) => (
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-gray-500 dark:text-slate-400">
           {new Date(val).toLocaleDateString("zh-CN")}
         </span>
       ),
@@ -135,24 +135,24 @@ export default function AdminWordCardsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
             词卡管理
           </h1>
-          <p className="text-slate-500 mt-1">管理所有视频的单词卡片</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">管理所有视频的单词卡片</p>
         </div>
         <Button
           onClick={() => router.push("/admin/videos")}
-          className="text-gray-600"
+          className="text-gray-600 dark:text-slate-400"
         >
           ← 返回视频列表
         </Button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-5">
         <Space wrap size="middle">
           <Input
             placeholder="搜索单词/释义..."
-            prefix={<SearchOutlined className="text-slate-400" />}
+            prefix={<SearchOutlined className="text-slate-400 dark:text-slate-500" />}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onPressEnter={handleSearch}
@@ -169,7 +169,7 @@ export default function AdminWordCardsPage() {
           {videoIdFilter && (
             <Button
               onClick={() => router.push("/admin/word-cards")}
-              className="text-gray-600"
+              className="text-gray-600 dark:text-slate-400"
             >
               清除视频筛选
             </Button>
@@ -177,7 +177,7 @@ export default function AdminWordCardsPage() {
         </Space>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
         <Table<WordCard>
           columns={columns}
           dataSource={words}

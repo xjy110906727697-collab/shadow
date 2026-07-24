@@ -15,9 +15,9 @@ interface Feedback {
 }
 
 const typeConfig: Record<string, { color: string; bg: string }> = {
-  '问题反馈': { color: 'text-red-700', bg: 'bg-gradient-to-r from-red-100 to-orange-100' },
-  '功能建议': { color: 'text-blue-700', bg: 'bg-gradient-to-r from-blue-100 to-indigo-100' },
-  '其他': { color: 'text-slate-700', bg: 'bg-slate-100' },
+  '问题反馈': { color: 'text-red-700 dark:text-red-300', bg: 'bg-gradient-to-r from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30' },
+  '功能建议': { color: 'text-blue-700 dark:text-blue-300', bg: 'bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30' },
+  '其他': { color: 'text-slate-700 dark:text-slate-300', bg: 'bg-slate-100 dark:bg-slate-700' },
 }
 
 export default function AdminFeedbackPage() {
@@ -96,7 +96,7 @@ export default function AdminFeedbackPage() {
       width: 280,
       ellipsis: true,
       render: (content: string) => (
-        <span className="text-slate-700 text-sm">{content}</span>
+        <span className="text-slate-700 dark:text-slate-300 text-sm">{content}</span>
       ),
     },
     {
@@ -104,7 +104,7 @@ export default function AdminFeedbackPage() {
       dataIndex: 'contact',
       width: 200,
       render: (contact: string) => (
-        <span className="text-sm text-slate-600">{contact || <span className="text-slate-300">未提供</span>}</span>
+        <span className="text-sm text-slate-600 dark:text-slate-400">{contact || <span className="text-slate-300 dark:text-slate-500">未提供</span>}</span>
       ),
     },
     {
@@ -113,7 +113,7 @@ export default function AdminFeedbackPage() {
       sorter: true,
       width: 200,
       render: (val: string) => (
-        <span className="text-sm text-slate-600">{new Date(val).toLocaleString('zh-CN')}</span>
+        <span className="text-sm text-slate-600 dark:text-slate-400">{new Date(val).toLocaleString('zh-CN')}</span>
       ),
     },
   ]
@@ -121,15 +121,15 @@ export default function AdminFeedbackPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">意见反馈</h1>
-        <p className="text-slate-500 mt-1">查看用户反馈与建议</p>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">意见反馈</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">查看用户反馈与建议</p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-5">
         <Space wrap size="middle">
           <Input
             placeholder="搜索反馈内容..."
-            prefix={<SearchOutlined className="text-slate-400" />}
+            prefix={<SearchOutlined className="text-slate-400 dark:text-slate-500" />}
             value={search}
             onChange={e => setSearch(e.target.value)}
             onPressEnter={handleSearch}
@@ -153,7 +153,7 @@ export default function AdminFeedbackPage() {
         </Space>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
         <Table<Feedback>
           columns={columns}
           dataSource={feedbacks}

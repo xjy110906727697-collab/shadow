@@ -171,7 +171,7 @@ export default function AdminUsersPage() {
           <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium shadow-sm">
             {email.charAt(0).toUpperCase()}
           </div>
-          <span className="font-medium text-slate-900">{email}</span>
+          <span className="font-medium text-slate-900 dark:text-slate-100">{email}</span>
         </div>
       ),
     },
@@ -183,8 +183,8 @@ export default function AdminUsersPage() {
         <Tag 
           className={`px-2.5 py-1 rounded-full text-xs font-medium border-0 ${
             role === 'ADMIN' 
-              ? 'bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700' 
-              : 'bg-slate-100 text-slate-700'
+              ? 'bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/40 dark:to-indigo-900/40 text-purple-700 dark:text-purple-300' 
+              : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
           }`}
         >
           {role === 'ADMIN' ? '管理员' : '用户'}
@@ -197,11 +197,11 @@ export default function AdminUsersPage() {
       sorter: true,
       render: (expireAt: string | null) => {
         if (!expireAt) {
-          return <span className="text-slate-400 text-sm">无期限</span>
+          return <span className="text-slate-400 dark:text-slate-500 text-sm">无期限</span>
         }
         const isExpired = new Date(expireAt) < new Date()
         return (
-          <span className={`text-sm ${isExpired ? 'text-red-600 font-medium' : 'text-slate-600'}`}>
+          <span className={`text-sm ${isExpired ? 'text-red-600 dark:text-red-400 font-medium' : 'text-slate-600 dark:text-slate-400'}`}>
             {new Date(expireAt).toLocaleDateString('zh-CN')}
             {isExpired && <span className="ml-1.5 text-xs">(已过期)</span>}
           </span>
@@ -213,7 +213,7 @@ export default function AdminUsersPage() {
       dataIndex: 'createdAt',
       sorter: true,
       render: (val: string) => (
-        <span className="text-sm text-slate-600">{new Date(val).toLocaleDateString('zh-CN')}</span>
+        <span className="text-sm text-slate-600 dark:text-slate-400">{new Date(val).toLocaleDateString('zh-CN')}</span>
       ),
     },
     {
@@ -224,7 +224,7 @@ export default function AdminUsersPage() {
           type="text"
           size="small"
           onClick={() => openEditModal(record)}
-          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
+          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -238,7 +238,7 @@ export default function AdminUsersPage() {
   const formFields = (
     <div className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">邮箱 *</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">邮箱 *</label>
         <Input
           value={formData.email}
           onChange={e => setFormData({ ...formData, email: e.target.value })}
@@ -248,7 +248,7 @@ export default function AdminUsersPage() {
       </div>
       {addModalOpen && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">密码 *</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">密码 *</label>
           <Input.Password
             value={formData.password}
             onChange={e => setFormData({ ...formData, password: e.target.value })}
@@ -258,7 +258,7 @@ export default function AdminUsersPage() {
         </div>
       )}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">角色</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">角色</label>
         <Select
           value={formData.role}
           onChange={val => setFormData({ ...formData, role: val })}
@@ -270,7 +270,7 @@ export default function AdminUsersPage() {
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">到期时间</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">到期时间</label>
         <Input
           type="date"
           value={formData.expireAt}
@@ -285,8 +285,8 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">用户管理</h1>
-          <p className="text-slate-500 mt-1">管理系统用户与权限</p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">用户管理</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">管理系统用户与权限</p>
         </div>
         <Button
           type="primary"
@@ -298,11 +298,11 @@ export default function AdminUsersPage() {
         </Button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-5">
         <Space wrap size="middle">
           <Input
             placeholder="搜索邮箱..."
-            prefix={<SearchOutlined className="text-slate-400" />}
+            prefix={<SearchOutlined className="text-slate-400 dark:text-slate-500" />}
             value={search}
             onChange={e => setSearch(e.target.value)}
             onPressEnter={handleSearch}
@@ -315,7 +315,7 @@ export default function AdminUsersPage() {
         </Space>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
         <Table<User>
           columns={columns}
           dataSource={users}
@@ -344,7 +344,7 @@ export default function AdminUsersPage() {
         confirmLoading={submitting}
         okText="创建"
         cancelText="取消"
-        destroyOnClose
+        destroyOnHidden
       >
         {formFields}
       </Modal>
@@ -358,7 +358,7 @@ export default function AdminUsersPage() {
         confirmLoading={submitting}
         okText="保存"
         cancelText="取消"
-        destroyOnClose
+        destroyOnHidden
       >
         {formFields}
       </Modal>

@@ -14,7 +14,7 @@ export async function GET() {
     select: { videoId: true },
   })
 
-  return NextResponse.json({ favorites: favorites.map(f => f.videoId) })
+  return NextResponse.json({ favorites: favorites.map((f: { videoId: string }) => f.videoId) })
 }
 
 export async function POST(request: Request) {

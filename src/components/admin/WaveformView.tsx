@@ -114,11 +114,11 @@ export function WaveformView({
         >
           Play/Pause
         </button>
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-gray-600 dark:text-slate-400">
           Current time: {currentTime.toFixed(2)}s
         </div>
       </div>
-      <div ref={containerRef} className="border border-gray-200 rounded" />
+      <div ref={containerRef} className="border border-gray-200 dark:border-slate-600 rounded" />
     </div>
   )
 }

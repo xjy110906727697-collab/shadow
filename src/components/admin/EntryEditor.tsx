@@ -31,36 +31,36 @@ export function EntryEditor({ entry, onUpdate, onClose }: EntryEditorProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">编辑条目 #{entry.index + 1}</h2>
+      <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">编辑条目 #{entry.index + 1}</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
             韩语文本
           </label>
           <textarea
             value={formData.ko}
             onChange={e => handleChange('ko', e.target.value)}
             rows={3}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:text-slate-200"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
             中文文本
           </label>
           <textarea
             value={formData.zh}
             onChange={e => handleChange('zh', e.target.value)}
             rows={3}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:text-slate-200"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
             开始时间（秒）
           </label>
           <input
@@ -68,11 +68,11 @@ export function EntryEditor({ entry, onUpdate, onClose }: EntryEditorProps) {
             step="0.01"
             value={formData.startTime}
             onChange={e => handleChange('startTime', parseFloat(e.target.value))}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:text-slate-200"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
             结束时间（秒）
           </label>
           <input
@@ -80,7 +80,7 @@ export function EntryEditor({ entry, onUpdate, onClose }: EntryEditorProps) {
             step="0.01"
             value={formData.endTime}
             onChange={e => handleChange('endTime', parseFloat(e.target.value))}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:text-slate-200"
           />
         </div>
       </div>
@@ -94,7 +94,7 @@ export function EntryEditor({ entry, onUpdate, onClose }: EntryEditorProps) {
         </button>
         <button
           onClick={onClose}
-          className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200"
+          className="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 px-6 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600"
         >
           取消
         </button>

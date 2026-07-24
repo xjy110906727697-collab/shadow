@@ -24,10 +24,10 @@ export async function GET(
       return NextResponse.json({ error: 'Video not found' }, { status: 404 })
     }
 
-    const koTrack = video.subtitleTracks.find(t => t.lang === 'KO')
-    const zhTrack = video.subtitleTracks.find(t => t.lang === 'ZH')
+    const koTrack = video.subtitleTracks.find((t: { lang: string }) => t.lang === 'KO')
+    const zhTrack = video.subtitleTracks.find((t: { lang: string }) => t.lang === 'ZH')
 
-    const subtitles = koTrack?.entries.map((entry, idx) => ({
+    const subtitles = koTrack?.entries.map((entry: { id: string; index: number; startTime: number; endTime: number; text: string }, idx: number) => ({
       id: entry.id,
       index: entry.index,
       startTime: entry.startTime,

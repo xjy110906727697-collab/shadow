@@ -329,11 +329,11 @@ export default function SubtitleEditorPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (loading) {
-    return <p className="text-gray-500">加载中...</p>;
+    return <p className="text-gray-500 dark:text-slate-400">加载中...</p>;
   }
 
   if (!video) {
-    return <p className="text-gray-500">视频未找到</p>;
+    return <p className="text-gray-500 dark:text-slate-400">视频未找到</p>;
   }
 
   return (
@@ -341,19 +341,19 @@ export default function SubtitleEditorPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">字幕编辑器</h1>
-            <p className="text-gray-600 mt-2">{video.titleZh}</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">字幕编辑器</h1>
+            <p className="text-gray-600 dark:text-slate-400 mt-2">{video.titleZh}</p>
           </div>
           <button
             onClick={() => router.push("/admin/videos")}
-            className="text-gray-600 hover:text-gray-900"
+            className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100"
           >
             ← 返回视频列表
           </button>
         </div>
 
         {video.audioUrl && (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
             <WaveformView
               audioUrl={video.audioUrl}
               entries={entries}
@@ -367,9 +367,9 @@ export default function SubtitleEditorPage() {
 
         <div className="flex gap-6">
           {/* 左侧 80% — 字幕条目 */}
-          <div className="w-[80%] bg-white rounded-lg shadow p-6">
+          <div className="w-[80%] bg-white dark:bg-slate-800 rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
                 字幕条目 ({entries.length})
               </h2>
               <div className="flex gap-2">
@@ -384,7 +384,7 @@ export default function SubtitleEditorPage() {
                 />
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200"
+                  className="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600"
                 >
                   导入 SRT 字幕
                 </button>
@@ -407,9 +407,9 @@ export default function SubtitleEditorPage() {
           </div>
 
           {/* 右侧 20% — 词卡管理 */}
-          <div className="w-[20%] bg-white rounded-lg shadow p-6">
+          <div className="w-[20%] bg-white dark:bg-slate-800 rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
                 词卡管理 ({words.length})
               </h2>
               <button
@@ -421,7 +421,7 @@ export default function SubtitleEditorPage() {
             </div>
 
             {words.length === 0 ? (
-              <p className="text-gray-400 text-center py-8 text-sm">
+              <p className="text-gray-400 dark:text-slate-500 text-center py-8 text-sm">
                 暂无词卡，点击上方按钮添加
               </p>
             ) : (
@@ -429,31 +429,23 @@ export default function SubtitleEditorPage() {
                 {words.map((w) => (
                   <div
                     key={w.id}
-                    className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg"
+                    className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-slate-700 rounded-lg"
                   >
                     <div className="flex-1 min-w-0">
-                      <span className="text-lg font-bold text-gray-900 mr-3">
+                      <span className="text-lg font-bold text-gray-900 dark:text-slate-100 mr-3">
                         {w.word}
                       </span>
-                      <span className="text-sm text-gray-600 mr-3">
+                      <span className="text-sm text-gray-600 dark:text-slate-400 mr-3">
                         {w.meaningZh}
                       </span>
                     </div>
                     <div className="flex gap-2 shrink-0">
-                      <Popconfirm
-                        title="确定删除这个词卡吗？"
-                        description="删除后将无法恢复"
-                        onConfirm={() => handleDeleteWord(w.id)}
-                        okText="确定"
-                        cancelText="取消"
-                        okButtonProps={{ danger: true }}
+                      <button
+                        onClick={() => handleEditWord(w)}
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm"
                       >
-                        <button
-                          className="text-red-500 hover:text-red-700 text-sm"
-                        >
-                          删除
-                        </button>
-                      </Popconfirm>
+                        编辑
+                      </button>
                       <Popconfirm
                         title="确定删除这个词卡吗？"
                         description="删除后将无法恢复"
@@ -488,11 +480,11 @@ export default function SubtitleEditorPage() {
         }}
         okText={editingWordId ? "更新" : "保存"}
         cancelText="取消"
-        destroyOnClose
+        destroyOnHidden
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               单词
             </label>
             <input
@@ -501,12 +493,12 @@ export default function SubtitleEditorPage() {
               onChange={(e) =>
                 setWordForm((prev) => ({ ...prev, word: e.target.value }))
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:text-slate-200"
               placeholder="韩语单词"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               中文翻译
             </label>
             <input
@@ -515,12 +507,12 @@ export default function SubtitleEditorPage() {
               onChange={(e) =>
                 setWordForm((prev) => ({ ...prev, meaningZh: e.target.value }))
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:text-slate-200"
               placeholder="中文翻译"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               详细解释
             </label>
             <textarea
@@ -529,12 +521,12 @@ export default function SubtitleEditorPage() {
               onChange={(e) =>
                 setWordForm((prev) => ({ ...prev, meaning: e.target.value }))
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none dark:bg-slate-800 dark:text-slate-200"
               placeholder="详细解释"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               关联字幕条目
             </label>
             <select
@@ -542,7 +534,7 @@ export default function SubtitleEditorPage() {
               onChange={(e) =>
                 setWordForm((prev) => ({ ...prev, entryId: e.target.value }))
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:text-slate-200"
             >
               <option value="">不关联</option>
               {entries.map((entry) => (

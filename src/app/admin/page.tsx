@@ -91,27 +91,27 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">仪表盘</h1>
-        <p className="text-slate-500 mt-1">系统概览与数据统计</p>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">仪表盘</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">系统概览与数据统计</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, idx) => (
-          <div key={idx} className={`relative overflow-hidden bg-gradient-to-br ${stat.bgGradient} rounded-2xl p-6 border border-white/60 shadow-sm hover:shadow-md transition-shadow`}>
+          <div key={idx} className={`relative overflow-hidden bg-gradient-to-br ${stat.bgGradient} dark:from-slate-800 dark:to-slate-700 rounded-2xl p-6 border border-white/60 dark:border-slate-700/60 shadow-sm hover:shadow-md transition-shadow`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br opacity-10 rounded-full -mr-16 -mt-16" />
             <div className="relative">
               <div className={`w-14 h-14 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center text-white shadow-lg mb-4`}>
                 {stat.icon}
               </div>
-              <div className="text-sm text-slate-600 mb-1">{stat.title}</div>
-              <div className={`text-4xl font-bold ${stat.textColor}`}>{stat.value}</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">{stat.title}</div>
+              <div className={`text-4xl font-bold ${stat.textColor} dark:text-opacity-90`}>{stat.value}</div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
-        <div className="px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
+        <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-700 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -120,55 +120,55 @@ export default async function AdminDashboardPage() {
                 </svg>
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">最近用户</h2>
-                <p className="text-sm text-slate-500">最新注册的用户列表</p>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">最近用户</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">最新注册的用户列表</p>
               </div>
             </div>
           </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-50/50 border-b border-slate-100">
+            <thead className="bg-slate-50/50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
               <tr>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">邮箱</th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">角色</th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">到期时间</th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">创建时间</th>
+                <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">邮箱</th>
+                <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">角色</th>
+                <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">到期时间</th>
+                <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">创建时间</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
-              {recentUsers.map(user => {
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+              {recentUsers.map((user: { id: string; email: string; role: string; expireAt: Date | null; createdAt: Date }) => {
                 const isExpired = user.expireAt && new Date(user.expireAt) < new Date()
                 return (
-                  <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={user.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-medium shadow-sm">
                           {user.email.charAt(0).toUpperCase()}
                         </div>
-                        <span className="text-sm font-medium text-slate-900">{user.email}</span>
+                        <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{user.email}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
                         user.role === 'ADMIN' 
-                          ? 'bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 border border-purple-200/60' 
-                          : 'bg-slate-100 text-slate-700 border border-slate-200/60'
+                          ? 'bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/40 dark:to-indigo-900/40 text-purple-700 dark:text-purple-300 border border-purple-200/60 dark:border-purple-700/60' 
+                          : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60'
                       }`}>
                         {user.role === 'ADMIN' ? '管理员' : '用户'}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       {user.expireAt ? (
-                        <span className={`text-sm ${isExpired ? 'text-red-600 font-medium' : 'text-slate-600'}`}>
+                        <span className={`text-sm ${isExpired ? 'text-red-600 dark:text-red-400 font-medium' : 'text-slate-600 dark:text-slate-400'}`}>
                           {new Date(user.expireAt).toLocaleDateString('zh-CN')}
                           {isExpired && <span className="ml-1.5 text-xs">(已过期)</span>}
                         </span>
                       ) : (
-                        <span className="text-sm text-slate-400">无期限</span>
+                        <span className="text-sm text-slate-400 dark:text-slate-500">无期限</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
+                    <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
                       {new Date(user.createdAt).toLocaleDateString('zh-CN')}
                     </td>
                   </tr>

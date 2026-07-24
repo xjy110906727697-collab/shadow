@@ -27,7 +27,7 @@ export async function GET() {
     orderBy: { createdAt: 'desc' },
   })
 
-  const words = wordBag.map(wb => ({
+  const words = wordBag.map((wb: any) => ({
     id: wb.word.id,
     word: wb.word.word,
     meaning: wb.word.meaning,
