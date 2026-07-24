@@ -120,7 +120,7 @@ export default function VideoDetailPage() {
   if (isLocked) {
     return (
       <div className="w-full px-4 md:px-8 py-8">
-        <div className="max-w-md mx-auto bg-white dark:bg-slate-800 rounded-lg shadow p-8 text-center">
+        <div className="max-w-md mx-auto bg-[#faf8f6] dark:bg-[#0a0a0e] rounded-lg shadow p-8 text-center">
           <svg
             className="w-16 h-16 text-gray-400 dark:text-slate-500 mx-auto mb-4"
             fill="none"
@@ -149,7 +149,7 @@ export default function VideoDetailPage() {
             </Link>
             <Link
               href="/pricing"
-              className="flex-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600"
+              className="flex-1 bg-gray-100 dark:bg-[#121216] text-gray-700 dark:text-slate-300 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600"
             >
               查看订阅
             </Link>
@@ -221,7 +221,7 @@ export default function VideoDetailPage() {
       )}
 
       {/* Mobile bottom action bar */}
-      <div className="fixed bottom-14 left-0 right-0 z-30 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 md:hidden">
+      <div className="fixed bottom-14 left-0 right-0 z-30 bg-[#faf8f6] dark:bg-[#0a0a0e] border-t border-gray-200 dark:border-slate-700 md:hidden">
         <div className="pb-[env(safe-area-inset-bottom)]" />
       </div>
     </div>

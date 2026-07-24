@@ -115,7 +115,7 @@ export function Header() {
     const isFavoritesView = searchQuery === "show=favorites";
 
     return (
-      <header className="border-b border-gray-200 dark:border-slate-700 bg-[#faf8f6] dark:bg-slate-900">
+      <header className="border-b border-gray-200/50 dark:border-white/5 bg-[#faf8f6] dark:bg-[#121216]">
         {/* Mobile: centered ShadowKorean + optional filter/search */}
         <div className="md:hidden w-full px-4 h-12 flex items-center justify-between">
           {isBrowsePage && !isFavoritesView ? (
@@ -259,7 +259,7 @@ export function Header() {
             }}
           >
             <div
-              className="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-xl mx-4"
+              className="bg-[#faf8f6] dark:bg-slate-800 rounded-lg p-6 w-full max-w-xl mx-4"
               onClick={(e) => e.stopPropagation()}
             >
               {feedbackDone ? (
@@ -299,7 +299,7 @@ export function Header() {
                         <button
                           key={t}
                           onClick={() => setFeedbackType(t)}
-                          className={`px-4 py-1.5 rounded-full text-sm border transition-colors ${feedbackType === t ? "bg-blue-600 text-white border-blue-600" : "bg-white dark:bg-slate-700 text-gray-600 dark:text-slate-300 border-gray-300 dark:border-slate-600 hover:border-blue-400"}`}
+                          className={`px-4 py-1.5 rounded-full text-sm border transition-colors ${feedbackType === t ? "bg-blue-600 text-white border-blue-600" : "bg-[#faf8f6] dark:bg-slate-700 text-gray-600 dark:text-slate-300 border-gray-300 dark:border-slate-600 hover:border-blue-400"}`}
                         >
                           {t}
                         </button>
@@ -316,7 +316,7 @@ export function Header() {
                       onChange={(e) => setFeedbackContent(e.target.value)}
                       placeholder="请详细描述您的问题或建议..."
                       rows={4}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-[#faf8f6] dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                     />
                   </div>
 
@@ -331,7 +331,7 @@ export function Header() {
                       value={feedbackContact}
                       onChange={(e) => setFeedbackContact(e.target.value)}
                       placeholder="邮箱或手机号，方便我们与您联系"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#faf8f6] dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                     />
                   </div>
 
@@ -355,7 +355,7 @@ export function Header() {
             onClick={() => setShowLoginPrompt(false)}
           >
             <div
-              className="bg-white dark:bg-slate-800 rounded-lg p-8 max-w-md w-full text-center"
+              className="bg-[#faf8f6] dark:bg-slate-800 rounded-lg p-8 max-w-md w-full text-center"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-4xl mb-4">🔑</div>
@@ -385,7 +385,7 @@ export function Header() {
   }
 
   return (
-    <header className="border-b border-gray-200 dark:border-slate-700 bg-[#faf8f6] dark:bg-slate-900">
+    <header className="border-b border-gray-200/50 dark:border-white/5 bg-[#faf8f6] dark:bg-[#121216]">
       <div className="w-full px-3.5 md:px-4 h-14 flex items-center justify-between max-w-[1400px] mx-auto gap-2">
         {/* Left: back + logo + title */}
         <div className="flex items-center gap-2 min-w-0">

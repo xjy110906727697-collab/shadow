@@ -119,7 +119,7 @@ export function VideoPlayer({ videoUrl, onTimeUpdate }: VideoPlayerProps) {
       </div>
 
       {/* Controls below video */}
-      <div className="bg-[#faf8f6] dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-b-lg px-4 py-3 space-y-3">
+      <div className="bg-[#faf8f6] dark:bg-[#0a0a0e] border border-gray-200 dark:border-slate-700 rounded-b-lg px-4 py-3 space-y-3">
         {/* Progress bar — filled left, empty right */}
         <div
           className="relative h-2 bg-gray-200 dark:bg-slate-600 rounded-full cursor-pointer"

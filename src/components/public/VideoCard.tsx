@@ -102,7 +102,7 @@ export function VideoCard({
 
   return (
     <Link href={`/video/${id}`} className="group block" onClick={handleClick}>
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm overflow-hidden hover:shadow transition-shadow relative border border-gray-100 dark:border-slate-700">
+      <div className="bg-[#faf8f6] dark:bg-[#0a0a0e] rounded-lg shadow-sm overflow-hidden hover:shadow transition-shadow relative border border-gray-100 dark:border-slate-900">
         <div className="relative aspect-video bg-gray-200 dark:bg-slate-700">
           <Image
             src={coverUrl}
@@ -113,7 +113,7 @@ export function VideoCard({
           />
           <button
             onClick={handleFavorite}
-            className="absolute top-2 right-2 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-white/80 dark:bg-slate-700/80 hover:bg-white dark:hover:bg-slate-600 transition-colors shadow-sm"
+            className="absolute top-2 right-2 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-[#faf8f6]/80 dark:bg-[#0a0a0e]/80 hover:bg-[#faf8f6] dark:hover:bg-[#0a0a0e] transition-colors shadow-sm"
           >
             <svg
               className={`w-4 h-4 ${isFavorited ? "text-red-500 fill-red-500" : "text-gray-500"}`}
@@ -153,23 +153,22 @@ export function VideoCard({
 
           {/* 第二行：作者  时间 */}
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400">
-            <span>{instructor || ''}</span>
-            {createdAt && (
-              <span>{formatDate(createdAt)}</span>
-            )}
+            <span>{instructor || ""}</span>
+            {createdAt && <span>{formatDate(createdAt)}</span>}
           </div>
 
           {/* 第三行：话题  难度 */}
           <div className="flex items-center justify-between">
             <div className="flex flex-wrap gap-1">
-              {topics && topics.slice(0, 2).map((t) => (
-                <span
-                  key={t.id}
-                  className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400 px-1.5 py-0.5 rounded"
-                >
-                  {t.name}
-                </span>
-              ))}
+              {topics &&
+                topics.slice(0, 2).map((t) => (
+                  <span
+                    key={t.id}
+                    className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400 px-1.5 py-0.5 rounded"
+                  >
+                    {t.name}
+                  </span>
+                ))}
               {topics && topics.length > 2 && (
                 <span className="text-xs text-gray-400 dark:text-slate-500">
                   +{topics.length - 2}
@@ -179,7 +178,8 @@ export function VideoCard({
             <div className="flex items-center gap-1 shrink-0">
               {difficulty ? (
                 <span className="text-sm text-yellow-500">
-                  {"★".repeat(difficulty)}{"☆".repeat(5 - difficulty)}
+                  {"★".repeat(difficulty)}
+                  {"☆".repeat(5 - difficulty)}
                 </span>
               ) : (
                 <span className="text-sm text-gray-300">☆☆☆☆☆</span>

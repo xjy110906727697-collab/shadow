@@ -77,7 +77,9 @@ export default function AdminWordCardsPage() {
       dataIndex: "word",
       width: 150,
       render: (word: string) => (
-        <span className="font-semibold text-gray-900 dark:text-slate-100">{word}</span>
+        <span className="font-semibold text-gray-900 dark:text-slate-100">
+          {word}
+        </span>
       ),
     },
     {
@@ -97,8 +99,18 @@ export default function AdminWordCardsPage() {
             className="text-gray-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             title="查看详细解释"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
           </button>
         ) : (
@@ -138,7 +150,9 @@ export default function AdminWordCardsPage() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
             词卡管理
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">管理所有视频的单词卡片</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
+            管理所有视频的单词卡片
+          </p>
         </div>
         <Button
           onClick={() => router.push("/admin/videos")}
@@ -148,11 +162,13 @@ export default function AdminWordCardsPage() {
         </Button>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-5">
+      <div className="bg-[#faf8f6] dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-5">
         <Space wrap size="middle">
           <Input
             placeholder="搜索单词/释义..."
-            prefix={<SearchOutlined className="text-slate-400 dark:text-slate-500" />}
+            prefix={
+              <SearchOutlined className="text-slate-400 dark:text-slate-500" />
+            }
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onPressEnter={handleSearch}
@@ -177,7 +193,7 @@ export default function AdminWordCardsPage() {
         </Space>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
+      <div className="bg-[#faf8f6] dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
         <Table<WordCard>
           columns={columns}
           dataSource={words}

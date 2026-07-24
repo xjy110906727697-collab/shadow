@@ -63,11 +63,20 @@ export async function GET(
       zh: zhTrack?.entries[idx]?.text || ''
     })) || []
 
+    const topicCategories = video.categories
+      ?.filter((c: any) => c.category.type === 'TOPIC')
+      .map((c: any) => ({
+        id: c.category.id,
+        name: c.category.nameZh,
+        slug: c.category.slug,
+      })) || []
+
     return NextResponse.json({
       ...video,
       videoUrl: video.videoUrl,
       coverUrl: video.coverUrl,
       subtitles,
+      topics: topicCategories,
       categories: undefined,
       subtitleTracks: undefined
     })

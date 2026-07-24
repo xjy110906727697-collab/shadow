@@ -71,7 +71,7 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
         onClick={onClose}
       >
         <div
-          className="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-lg mx-4 shadow-2xl max-h-[80vh] flex flex-col"
+          className="bg-[#faf8f6] dark:bg-slate-800 rounded-2xl p-6 w-full max-w-lg mx-4 shadow-2xl max-h-[80vh] flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-start justify-between mb-5">
@@ -121,7 +121,7 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
           onClick={() => setShowLoginPrompt(false)}
         >
           <div
-            className="bg-white dark:bg-slate-800 rounded-lg p-8 max-w-md text-center"
+            className="bg-[#faf8f6] dark:bg-slate-800 rounded-lg p-8 max-w-md text-center"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="text-4xl mb-4">🔑</div>

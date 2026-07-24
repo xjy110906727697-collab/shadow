@@ -60,9 +60,9 @@ export default function WordBagPage() {
       setLoading(false);
       return;
     }
-    fetch('/api/word-bag')
-      .then(res => res.json())
-      .then(data => {
+    fetch("/api/word-bag")
+      .then((res) => res.json())
+      .then((data) => {
         setWords(data.words || []);
       })
       .catch(console.error)
@@ -72,7 +72,7 @@ export default function WordBagPage() {
   const dateGroups = useMemo<DateGroup[]>(() => {
     const map = new Map<string, WordBagItem[]>();
     const sorted = [...words].sort(
-      (a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime()
+      (a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime(),
     );
     for (const item of sorted) {
       const key = getDateKey(item.addedAt);
@@ -115,7 +115,7 @@ export default function WordBagPage() {
         setRemovingWordId(null);
       }
     },
-    [removingWordId, selectedWord]
+    [removingWordId, selectedWord],
   );
 
   useEffect(() => {
@@ -133,26 +133,60 @@ export default function WordBagPage() {
       ) : !session ? (
         <div className="text-center py-16">
           <div className="text-gray-400 dark:text-slate-500 mb-4">
-            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            <svg
+              className="w-16 h-16 mx-auto"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
             </svg>
           </div>
-          <p className="text-gray-500 dark:text-slate-400 text-lg mb-2">需要登录查看词卡</p>
-          <p className="text-gray-400 dark:text-slate-500 mb-6">登录后即可管理和复习您的词卡</p>
-          <Link href="/login" className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+          <p className="text-gray-500 dark:text-slate-400 text-lg mb-2">
+            需要登录查看词卡
+          </p>
+          <p className="text-gray-400 dark:text-slate-500 mb-6">
+            登录后即可管理和复习您的词卡
+          </p>
+          <Link
+            href="/login"
+            className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+          >
             去登录
           </Link>
         </div>
       ) : words.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-gray-400 dark:text-slate-500 mb-4">
-            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            <svg
+              className="w-16 h-16 mx-auto"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
             </svg>
           </div>
-          <p className="text-gray-500 dark:text-slate-400 text-lg mb-2">还没有收藏的单词</p>
-          <p className="text-gray-400 dark:text-slate-500 mb-6">在视频学习时点击单词，即可加入单词本</p>
-          <Link href="/" className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+          <p className="text-gray-500 dark:text-slate-400 text-lg mb-2">
+            还没有收藏的单词
+          </p>
+          <p className="text-gray-400 dark:text-slate-500 mb-6">
+            在视频学习时点击单词，即可加入单词本
+          </p>
+          <Link
+            href="/"
+            className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+          >
             去浏览视频
           </Link>
         </div>
@@ -166,7 +200,7 @@ export default function WordBagPage() {
                   <button
                     key={group.date}
                     onClick={() => setActiveDateKey(group.date)}
-                    className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all whitespace-nowrap md:whitespace-normal md:w-full ${
+                    className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all whitespace-nowrap md:whitespace-normal md:w-full md:text-sm text-xs ${
                       isActive
                         ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium"
                         : "text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-slate-200"
@@ -174,13 +208,17 @@ export default function WordBagPage() {
                   >
                     <span
                       className={`w-2 h-2 rounded-full shrink-0 ${
-                        isActive ? "bg-blue-500 dark:bg-blue-400" : "bg-gray-300 dark:bg-slate-600"
+                        isActive
+                          ? "bg-blue-500 dark:bg-blue-400"
+                          : "bg-gray-300 dark:bg-slate-600"
                       }`}
                     />
-                    <span className="text-sm">{group.label}</span>
+                    <span className="text-xs md:text-sm">{group.label}</span>
                     <span
                       className={`text-xs ml-auto tabular-nums ${
-                        isActive ? "text-blue-400 dark:text-blue-500" : "text-gray-400 dark:text-slate-500"
+                        isActive
+                          ? "text-blue-400 dark:text-blue-500"
+                          : "text-gray-400 dark:text-slate-500"
                       }`}
                     >
                       {group.items.length}
@@ -193,71 +231,51 @@ export default function WordBagPage() {
 
           <main className="flex-1 min-w-0">
             {activeGroup && (
-              <div className="relative">
-                <div className="absolute left-[7px] top-3 bottom-3 w-px bg-gray-200 dark:bg-slate-700 hidden md:block" />
-
+              <div>
                 <div className="mb-4 flex items-baseline gap-2">
-                  <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">{activeGroup.label}</h2>
-                  <span className="text-sm text-gray-400 dark:text-slate-500">
-                    {activeGroup.date}
-                  </span>
+                  <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">
+                    {activeGroup.label}
+                  </h2>
                   <span className="text-sm text-gray-400 dark:text-slate-500">
                     {activeGroup.items.length} 个单词
                   </span>
                 </div>
 
-                <div className="space-y-3">
+                <div className="flex flex-wrap gap-2">
                   {activeGroup.items.map((item) => (
-                    <div key={item.id} className="relative md:pl-6">
-                      <div className="absolute left-0 top-5 w-[15px] h-px bg-gray-200 dark:bg-slate-700 hidden md:block" />
-                      <div className="absolute -left-[1px] top-[18px] w-[9px] h-[9px] rounded-full border-2 border-blue-400 dark:border-blue-500 bg-white dark:bg-slate-800 hidden md:block" />
-
-                      <div
+                    <div
+                      key={item.id}
+                      className="group relative"
+                    >
+                      <button
                         onClick={() => setSelectedWord(item)}
-                        className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4 hover:shadow-md hover:border-blue-200 dark:hover:border-blue-700 transition-all cursor-pointer group"
+                        className="flex items-center gap-1.5 px-3 py-2 bg-[#faf8f6] dark:bg-[#0a0a0e] border border-gray-200 dark:border-slate-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-sm transition-all text-left"
                       >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <h3 className="text-xl font-bold text-gray-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                {item.word}
-                              </h3>
-                              <span className="text-xs text-gray-400 dark:text-slate-500">
-                                {new Date(item.addedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}
-                              </span>
-                            </div>
-                            <div className="prose prose-sm max-w-none text-sm text-gray-600 dark:text-slate-400 mt-1">
-                              <ReactMarkdown>{item.meaning}</ReactMarkdown>
-                            </div>
-                            {item.meaningZh && (
-                              <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">{item.meaningZh}</p>
-                            )}
-                            <Link
-                              href={`/video/${item.videoId}`}
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block"
-                            >
-                              来自：{item.videoTitle}
-                            </Link>
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemoveWord(item);
-                            }}
-                            className={`shrink-0 p-1.5 rounded-md transition-colors ${
-                              removingWordId === item.id
-                                ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
-                                : "text-gray-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-                            }`}
-                            title={removingWordId === item.id ? "再次点击确认移除" : "移出单词本"}
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-slate-100 whitespace-nowrap">
+                          {item.word}
+                        </span>
+                        {item.meaningZh && (
+                          <span className="text-xs text-gray-400 dark:text-slate-500 whitespace-nowrap">
+                            {item.meaningZh}
+                          </span>
+                        )}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveWord(item);
+                        }}
+                        className={`absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity ${
+                          removingWordId === item.id
+                            ? "bg-red-500 text-white opacity-100"
+                            : "bg-gray-300 dark:bg-slate-600 text-white hover:bg-red-500 dark:hover:bg-red-500"
+                        }`}
+                        title={removingWordId === item.id ? "再次点击移除" : "移出"}
+                      >
+                        <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
                     </div>
                   ))}
                 </div>

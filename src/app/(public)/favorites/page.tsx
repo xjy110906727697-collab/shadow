@@ -13,8 +13,13 @@ interface Video {
   descriptionZh?: string | null
   coverUrl: string
   duration: number
+  episodeNumber?: number | null
+  difficulty?: number | null
+  instructor?: string | null
   level?: string | null
+  topics?: { id: string; name: string; slug: string }[]
   visitorAccessible?: boolean
+  createdAt?: string
 }
 
 export default function FavoritesPage() {
@@ -95,7 +100,7 @@ export default function FavoritesPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
           {favorites.map(video => (
             <VideoCard
               key={video.id}

@@ -341,8 +341,12 @@ export default function SubtitleEditorPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">字幕编辑器</h1>
-            <p className="text-gray-600 dark:text-slate-400 mt-2">{video.titleZh}</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+              字幕编辑器
+            </h1>
+            <p className="text-gray-600 dark:text-slate-400 mt-2">
+              {video.titleZh}
+            </p>
           </div>
           <button
             onClick={() => router.push("/admin/videos")}
@@ -353,7 +357,7 @@ export default function SubtitleEditorPage() {
         </div>
 
         {video.audioUrl && (
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+          <div className="bg-[#faf8f6] dark:bg-slate-800 rounded-lg shadow p-6">
             <WaveformView
               audioUrl={video.audioUrl}
               entries={entries}
@@ -367,7 +371,7 @@ export default function SubtitleEditorPage() {
 
         <div className="flex gap-6">
           {/* 左侧 80% — 字幕条目 */}
-          <div className="w-[80%] bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+          <div className="w-[80%] bg-[#faf8f6] dark:bg-slate-800 rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
                 字幕条目 ({entries.length})
@@ -407,7 +411,7 @@ export default function SubtitleEditorPage() {
           </div>
 
           {/* 右侧 20% — 词卡管理 */}
-          <div className="w-[20%] bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+          <div className="w-[20%] bg-[#faf8f6] dark:bg-slate-800 rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
                 词卡管理 ({words.length})
@@ -454,9 +458,7 @@ export default function SubtitleEditorPage() {
                         cancelText="取消"
                         okButtonProps={{ danger: true }}
                       >
-                        <button
-                          className="text-red-500 hover:text-red-700 text-sm"
-                        >
+                        <button className="text-red-500 hover:text-red-700 text-sm">
                           删除
                         </button>
                       </Popconfirm>

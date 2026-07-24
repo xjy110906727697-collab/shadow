@@ -150,7 +150,9 @@ export default function AdminVideosPage() {
             {record.episodeNumber || "?"}
           </div>
           <div>
-            <div className="font-semibold text-slate-900 dark:text-slate-100">{record.titleZh}</div>
+            <div className="font-semibold text-slate-900 dark:text-slate-100">
+              {record.titleZh}
+            </div>
             <div className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[200px]">
               {record.title}
             </div>
@@ -322,7 +324,10 @@ export default function AdminVideosPage() {
             字幕
           </Link>
           <Button
-            onClick={() => { setVideoEditId(record.id); setVideoModalOpen(true) }}
+            onClick={() => {
+              setVideoEditId(record.id);
+              setVideoModalOpen(true);
+            }}
             type="text"
             size="small"
             className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
@@ -384,23 +389,30 @@ export default function AdminVideosPage() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
             视频管理
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">管理所有视频内容</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
+            管理所有视频内容
+          </p>
         </div>
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => { setVideoEditId(null); setVideoModalOpen(true) }}
+          onClick={() => {
+            setVideoEditId(null);
+            setVideoModalOpen(true);
+          }}
           className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 border-0 shadow-lg shadow-blue-500/20"
         >
           添加视频
         </Button>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-5">
+      <div className="bg-[#faf8f6] dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-5">
         <Space wrap size="middle">
           <Input
             placeholder="搜索标题..."
-            prefix={<SearchOutlined className="text-slate-400 dark:text-slate-500" />}
+            prefix={
+              <SearchOutlined className="text-slate-400 dark:text-slate-500" />
+            }
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onPressEnter={handleSearch}
@@ -443,7 +455,7 @@ export default function AdminVideosPage() {
         </Space>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
+      <div className="bg-[#faf8f6] dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 overflow-hidden">
         <Table<Video>
           columns={columns}
           dataSource={videos}
@@ -488,7 +500,10 @@ export default function AdminVideosPage() {
       <VideoFormModal
         open={videoModalOpen}
         editId={videoEditId}
-        onClose={() => { setVideoModalOpen(false); setVideoEditId(null) }}
+        onClose={() => {
+          setVideoModalOpen(false);
+          setVideoEditId(null);
+        }}
         onSuccess={fetchVideos}
       />
     </div>

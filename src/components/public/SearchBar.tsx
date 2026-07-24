@@ -1,26 +1,26 @@
-'use client'
+"use client";
 
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 export function SearchBar() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [search, setSearch] = useState(searchParams.get('search') || '')
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get("search") || "");
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    const params = new URLSearchParams(searchParams)
-    
+    e.preventDefault();
+    const params = new URLSearchParams(searchParams);
+
     if (search) {
-      params.set('search', search)
+      params.set("search", search);
     } else {
-      params.delete('search')
+      params.delete("search");
     }
-    
-    params.set('page', '1')
-    router.push(`?${params.toString()}`)
-  }
+
+    params.set("page", "1");
+    router.push(`?${params.toString()}`);
+  };
 
   return (
     <form onSubmit={handleSearch}>
@@ -30,7 +30,7 @@ export function SearchBar() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="搜索视频..."
-          className="w-full px-3 py-2 pl-8 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
+          className="outline-none focus:outline-none w-full px-3 py-2 pl-8 text-sm border border-gray-300 dark:border-slate-800 rounded-lg bg-[#faf8f6] dark:bg-[#0a0a0e] text-gray-900 dark:text-slate-100"
         />
         <svg
           className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500"
@@ -47,5 +47,5 @@ export function SearchBar() {
         </svg>
       </div>
     </form>
-  )
+  );
 }

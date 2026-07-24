@@ -40,7 +40,7 @@ export default function LearningMethodPage() {
                     className={`w-full text-left rounded-lg border p-3.5 transition-all ${
                       isActive
                         ? "border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/30 shadow-sm"
-                        : "border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-gray-300 dark:hover:border-slate-600 hover:shadow-sm"
+                        : "border-gray-200 dark:border-slate-900 bg-[#faf8f6] dark:bg-[#0a0a0e] hover:border-gray-300 dark:hover:border-slate-600 hover:shadow-sm"
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1.5">
@@ -126,7 +126,7 @@ export default function LearningMethodPage() {
           </aside>
 
           <main className="flex-1 min-w-0">
-            <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-4 md:p-8">
+            <div className="bg-[#faf8f6] dark:bg-[#0a0a0e] border border-gray-200 dark:border-slate-900 rounded-lg p-4 md:p-8">
               <div className="flex items-center gap-3 mb-5">
                 <h2 className="text-xl font-semibold dark:text-slate-100">
                   {current.title}

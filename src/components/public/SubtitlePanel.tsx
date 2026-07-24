@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
+import { useSession } from "next-auth/react";
 
 interface SubtitleEntry {
   id: string;
@@ -140,6 +141,9 @@ export function SubtitlePanel({
   const activeRef = useRef<HTMLDivElement>(null);
   const [blindRevealed, setBlindRevealed] = useState<Set<string>>(new Set());
   const [selectedWordId, setSelectedWordId] = useState<string | null>(null);
+  const [wordBagIds, setWordBagIds] = useState<Set<string>>(new Set());
+  const [addingBagId, setAddingBagId] = useState<string | null>(null);
+  const { data: session } = useSession();
   const isWordCards = mode === "词卡";
 
   const toggleBlind = (id: string) => {
@@ -155,6 +159,44 @@ export function SubtitlePanel({
   useEffect(() => {
     if (!isWordCards) setSelectedWordId(null);
   }, [isWordCards]);
+
+  // 获取已加入词袋的单词 ID
+  useEffect(() => {
+    if (!session?.user) return;
+    fetch("/api/word-bag")
+      .then((res) => res.json())
+      .then((data) => {
+        const ids: string[] = data.words || [];
+        setWordBagIds(new Set(ids.map((w: any) => (typeof w === "string" ? w : w.id))));
+      })
+      .catch(() => {});
+  }, [session]);
+
+  const handleToggleBag = async (wordId: string) => {
+    if (!session) return;
+    setAddingBagId(wordId);
+    try {
+      const res = await fetch("/api/word-bag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wordId }),
+      });
+      const data = await res.json();
+      if (data.added) {
+        setWordBagIds((prev) => new Set(prev).add(wordId));
+      } else {
+        setWordBagIds((prev) => {
+          const next = new Set(prev);
+          next.delete(wordId);
+          return next;
+        });
+      }
+    } catch (error) {
+      console.error("Failed to toggle word bag:", error);
+    } finally {
+      setAddingBagId(null);
+    }
+  };
 
   const activeIndex = (subtitles ?? []).findIndex(
     (entry) => currentTime >= entry.startTime && currentTime <= entry.endTime,
@@ -187,17 +229,17 @@ export function SubtitlePanel({
   };
 
   return (
-    <div className="bg-[#faf8f6] dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex flex-col h-full overflow-hidden">
-      <div className="shrink-0 px-3 pt-2.5 pb-0 bg-[#faf8f6] dark:bg-slate-700/50 border-b border-gray-100 dark:border-slate-700">
+    <div className="bg-[#faf8f6] dark:bg-[#0a0a0e] rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex flex-col h-full overflow-hidden">
+      <div className="shrink-0 px-3 pt-2.5 pb-0 bg-[#faf8f6] dark:bg-[#0a0a0e] border-b border-gray-100 dark:border-slate-700">
         <div className="flex items-center gap-2">
-          <div className="flex flex-1 bg-gray-200/80 dark:bg-slate-600/80 rounded-lg p-0.5 gap-0.5">
+          <div className="flex flex-1 bg-gray-200/80 dark:bg-[#121216]/80 rounded-lg p-0.5 gap-0.5">
             {subtitleModes.map((m) => (
               <button
                 key={m}
                 onClick={() => onModeChange?.(m)}
                 className={`flex-1 text-xs py-1.5 rounded-md transition-all text-center font-medium ${
                   mode === m
-                    ? "bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm"
+                    ? "bg-[#faf8f6] dark:bg-[#0a0a0e] text-blue-600 dark:text-blue-400 shadow-sm"
                     : "text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200"
                 }`}
               >
@@ -212,7 +254,7 @@ export function SubtitlePanel({
               className={`flex-shrink-0 w-9 h-9 flex items-center justify-center transition-all ${
                 isFavorited
                   ? "text-red-500"
-                  : "bg-gray-50 dark:bg-slate-700 text-gray-400 dark:text-slate-500 hover:text-red-400"
+                  : "bg-gray-50 dark:bg-[#121216] text-gray-400 dark:text-slate-500 hover:text-red-400"
               }`}
             >
               <svg
@@ -249,7 +291,7 @@ export function SubtitlePanel({
                   className={`w-full text-left px-3.5 py-3 rounded-xl transition-all ${
                     selectedWordId === w.id
                       ? "bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 shadow-sm"
-                      : "bg-[#faf8f6] dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 border border-transparent"
+                      : "bg-[#faf8f6] dark:bg-[#0a0a0e] hover:bg-gray-100 dark:hover:bg-[#121216] border border-transparent"
                   }`}
                 >
                   <div className="font-bold text-gray-900 dark:text-slate-100 text-sm mb-0.5">
@@ -276,6 +318,43 @@ export function SubtitlePanel({
               }
               return (
                 <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-xl font-bold text-gray-900 dark:text-slate-100">
+                        {selected.word}
+                      </div>
+                      <div className="text-sm text-gray-500 dark:text-slate-400">
+                        {selected.meaningZh}
+                      </div>
+                    </div>
+                    {session && (
+                      <button
+                        onClick={() => handleToggleBag(selected.id)}
+                        disabled={addingBagId === selected.id}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all shrink-0 ${
+                          wordBagIds.has(selected.id)
+                            ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400"
+                            : "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800/60"
+                        }`}
+                        title={wordBagIds.has(selected.id) ? "已在单词本" : "加入单词本"}
+                      >
+                        {addingBagId === selected.id ? (
+                          <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                        ) : wordBagIds.has(selected.id) ? (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                        )}
+                      </button>
+                    )}
+                  </div>
                   {selected.meaning && (
                     <div className="prose prose-sm max-w-none text-gray-700 dark:text-slate-300 leading-relaxed">
                       <ReactMarkdown>{selected.meaning}</ReactMarkdown>
@@ -309,7 +388,7 @@ export function SubtitlePanel({
                   className={`px-3 py-3 rounded-lg cursor-pointer transition-all relative ${
                     isActive
                       ? "bg-gradient-to-b from-blue-50/90 via-blue-50/60 to-blue-50/90 dark:from-blue-900/40 dark:via-blue-900/30 dark:to-blue-900/40 border border-blue-300/60 dark:border-blue-700/60 shadow-sm"
-                      : "bg-[#faf8f6] dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 border border-transparent"
+                      : "bg-[#faf8f6] dark:bg-[#0a0a0e] hover:bg-gray-100 dark:hover:bg-[#121216] border border-transparent"
                   }`}
                 >
                   {isActive ? (
@@ -409,8 +488,8 @@ export function SubtitlePanel({
                         </>
                       ) : (
                         <>
-                          <div className="h-5 bg-gray-200 dark:bg-slate-600 rounded w-full mb-1" />
-                          <div className="h-4 bg-gray-200 dark:bg-slate-600 rounded w-3/4" />
+                          <div className="h-5 bg-gray-200 dark:bg-[#121216] rounded w-full mb-1" />
+                          <div className="h-4 bg-gray-200 dark:bg-[#121216] rounded w-3/4" />
                         </>
                       )}
                     </>

@@ -1,65 +1,67 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useRouter, useParams } from 'next/navigation'
-import Link from 'next/link'
-import { FileUpload } from '@/components/admin/FileUpload'
-import { VodVideoUpload } from '@/components/admin/VodVideoUpload'
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
+import { FileUpload } from "@/components/admin/FileUpload";
+import { VodVideoUpload } from "@/components/admin/VodVideoUpload";
 
 interface Category {
-  id: string
-  name: string
-  nameZh: string
-  slug: string
-  type: 'LEVEL' | 'TOPIC'
+  id: string;
+  name: string;
+  nameZh: string;
+  slug: string;
+  type: "LEVEL" | "TOPIC";
 }
 
 interface VideoFormData {
-  title: string
-  titleZh: string
-  coverUrl: string
-  videoUrl: string
-  duration: number
-  episodeNumber: number
-  difficulty: number
-  instructor: string
-  published: boolean
-  visitorAccessible: boolean
-  topicIds: string[]
+  title: string;
+  titleZh: string;
+  coverUrl: string;
+  videoUrl: string;
+  duration: number;
+  episodeNumber: number;
+  difficulty: number;
+  instructor: string;
+  published: boolean;
+  visitorAccessible: boolean;
+  topicIds: string[];
 }
 
 export default function VideoEditPage() {
-  const router = useRouter()
-  const params = useParams()
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [vodVideoId, setVodVideoId] = useState('')
-  const [dbId, setDbId] = useState<string | null>(null)
+  const router = useRouter();
+  const params = useParams();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [vodVideoId, setVodVideoId] = useState("");
+  const [dbId, setDbId] = useState<string | null>(null);
   const [formData, setFormData] = useState<VideoFormData>({
-    title: '',
-    titleZh: '',
-    coverUrl: '',
-    videoUrl: '',
+    title: "",
+    titleZh: "",
+    coverUrl: "",
+    videoUrl: "",
     duration: 0,
     episodeNumber: 0,
     difficulty: 0,
-    instructor: '',
+    instructor: "",
     published: false,
     visitorAccessible: false,
-    topicIds: []
-  })
+    topicIds: [],
+  });
 
   useEffect(() => {
-    fetch('/api/categories')
-      .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(console.error)
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((data) => setCategories(data))
+      .catch(console.error);
 
     fetch(`/api/admin/videos/${params.id}`)
-      .then(res => res.json())
-      .then(data => {
-        const topicCategories = data.categories?.filter((c: any) => c.category.type === 'TOPIC')
+      .then((res) => res.json())
+      .then((data) => {
+        const topicCategories = data.categories?.filter(
+          (c: any) => c.category.type === "TOPIC",
+        );
 
         setFormData({
           title: data.title,
@@ -69,70 +71,77 @@ export default function VideoEditPage() {
           duration: data.duration,
           episodeNumber: data.episodeNumber || 0,
           difficulty: data.difficulty || 0,
-          instructor: data.instructor || '',
+          instructor: data.instructor || "",
           published: data.published,
           visitorAccessible: data.visitorAccessible || false,
-          topicIds: topicCategories?.map((c: any) => c.category.id) || []
-        })
-        setVodVideoId(data.vodVideoId || '')
-        setDbId(data.id || null)
+          topicIds: topicCategories?.map((c: any) => c.category.id) || [],
+        });
+        setVodVideoId(data.vodVideoId || "");
+        setDbId(data.id || null);
       })
-      .catch(console.error)
-  }, [params.id])
+      .catch(console.error);
+  }, [params.id]);
 
-  const levels = categories.filter(c => c.type === 'LEVEL')
-  const topics = categories.filter(c => c.type === 'TOPIC')
+  const levels = categories.filter((c) => c.type === "LEVEL");
+  const topics = categories.filter((c) => c.type === "TOPIC");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
       const res = await fetch(`/api/admin/videos/${params.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
           episodeNumber: formData.episodeNumber || null,
           difficulty: formData.difficulty || null,
           instructor: formData.instructor || null,
-          categoryIds: formData.topicIds
-        })
-      })
+          categoryIds: formData.topicIds,
+        }),
+      });
 
       if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || '更新视频失败')
+        const data = await res.json();
+        throw new Error(data.error || "更新视频失败");
       }
 
-      router.push('/admin/videos')
+      router.push("/admin/videos");
     } catch (err) {
-      setError(err instanceof Error ? err.message : '发生错误')
+      setError(err instanceof Error ? err.message : "发生错误");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const toggleTopic = (topicId: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       topicIds: prev.topicIds.includes(topicId)
-        ? prev.topicIds.filter(id => id !== topicId)
-        : [...prev.topicIds, topicId]
-    }))
-  }
+        ? prev.topicIds.filter((id) => id !== topicId)
+        : [...prev.topicIds, topicId],
+    }));
+  };
 
-  const inputClass = "w-full px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm dark:bg-slate-800 dark:text-slate-200"
-  const labelClass = "block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"
+  const inputClass =
+    "w-full px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm dark:bg-slate-800 dark:text-slate-200";
+  const labelClass =
+    "block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1";
 
   return (
     <div className="min-h-screen bg-black/20 dark:bg-black/40 flex items-start justify-center py-10">
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-3xl mx-4 overflow-hidden">
+      <div className="bg-[#faf8f6] dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-3xl mx-4 overflow-hidden">
         {/* 头部 */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-slate-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">编辑视频</h2>
-          <Link href="/admin/videos" className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 text-sm">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+            编辑视频
+          </h2>
+          <Link
+            href="/admin/videos"
+            className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 text-sm"
+          >
             ✕
           </Link>
         </div>
@@ -151,7 +160,9 @@ export default function VideoEditPage() {
                 <input
                   type="text"
                   value={formData.title}
-                  onChange={e => setFormData({ ...formData, title: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
                   required
                   className={inputClass}
                 />
@@ -161,7 +172,9 @@ export default function VideoEditPage() {
                 <input
                   type="text"
                   value={formData.titleZh}
-                  onChange={e => setFormData({ ...formData, titleZh: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, titleZh: e.target.value })
+                  }
                   required
                   className={inputClass}
                 />
@@ -174,7 +187,7 @@ export default function VideoEditPage() {
                 accept="image/*"
                 type="covers"
                 value={formData.coverUrl}
-                onChange={url => setFormData({ ...formData, coverUrl: url })}
+                onChange={(url) => setFormData({ ...formData, coverUrl: url })}
                 required
                 placeholder="支持 JPG、PNG 等格式"
               />
@@ -182,12 +195,12 @@ export default function VideoEditPage() {
                 label="视频文件 (阿里云VOD)"
                 vodVideoId={vodVideoId}
                 onUploadComplete={(newVodId, newDbId) => {
-                  setVodVideoId(newVodId)
-                  setDbId(newDbId)
+                  setVodVideoId(newVodId);
+                  setDbId(newDbId);
                 }}
                 onRemove={() => {
-                  setVodVideoId('')
-                  setDbId(null)
+                  setVodVideoId("");
+                  setDbId(null);
                 }}
                 required
               />
@@ -199,7 +212,12 @@ export default function VideoEditPage() {
                 <input
                   type="number"
                   value={formData.duration}
-                  onChange={e => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      duration: parseInt(e.target.value) || 0,
+                    })
+                  }
                   required
                   min={0}
                   className={inputClass}
@@ -210,7 +228,12 @@ export default function VideoEditPage() {
                 <input
                   type="number"
                   value={formData.episodeNumber}
-                  onChange={e => setFormData({ ...formData, episodeNumber: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      episodeNumber: parseInt(e.target.value) || 0,
+                    })
+                  }
                   min={0}
                   placeholder="如 11"
                   className={inputClass}
@@ -221,7 +244,12 @@ export default function VideoEditPage() {
                 <input
                   type="number"
                   value={formData.difficulty}
-                  onChange={e => setFormData({ ...formData, difficulty: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      difficulty: parseInt(e.target.value) || 0,
+                    })
+                  }
                   min={0}
                   max={5}
                   placeholder="1-5"
@@ -235,7 +263,9 @@ export default function VideoEditPage() {
               <input
                 type="text"
                 value={formData.instructor}
-                onChange={e => setFormData({ ...formData, instructor: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, instructor: e.target.value })
+                }
                 placeholder="频道"
                 className={inputClass}
               />
@@ -244,15 +274,15 @@ export default function VideoEditPage() {
             <div>
               <label className={labelClass}>主题</label>
               <div className="flex flex-wrap gap-2">
-                {topics.map(topic => (
+                {topics.map((topic) => (
                   <button
                     key={topic.id}
                     type="button"
                     onClick={() => toggleTopic(topic.id)}
                     className={`px-3 py-1.5 rounded-lg text-sm ${
                       formData.topicIds.includes(topic.id)
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600"
                     }`}
                   >
                     {topic.nameZh}
@@ -265,8 +295,13 @@ export default function VideoEditPage() {
               <div>
                 <label className={labelClass}>发布状态</label>
                 <select
-                  value={formData.published ? 'true' : 'false'}
-                  onChange={e => setFormData({ ...formData, published: e.target.value === 'true' })}
+                  value={formData.published ? "true" : "false"}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      published: e.target.value === "true",
+                    })
+                  }
                   className={inputClass}
                 >
                   <option value="false">草稿</option>
@@ -276,8 +311,13 @@ export default function VideoEditPage() {
               <div>
                 <label className={labelClass}>允许访客观看</label>
                 <select
-                  value={formData.visitorAccessible ? 'true' : 'false'}
-                  onChange={e => setFormData({ ...formData, visitorAccessible: e.target.value === 'true' })}
+                  value={formData.visitorAccessible ? "true" : "false"}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      visitorAccessible: e.target.value === "true",
+                    })
+                  }
                   className={inputClass}
                 >
                   <option value="false">否</option>
@@ -292,7 +332,7 @@ export default function VideoEditPage() {
                 disabled={loading}
                 className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
               >
-                {loading ? '更新中...' : '更新视频'}
+                {loading ? "更新中..." : "更新视频"}
               </button>
               <Link
                 href="/admin/videos"
@@ -305,5 +345,5 @@ export default function VideoEditPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
