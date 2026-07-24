@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { Popconfirm } from 'antd'
 
 interface FileUploadProps {
   label: string
@@ -63,13 +64,21 @@ export function FileUpload({ label, accept, type, value, onChange, required, pla
               >
                 更换
               </button>
-              <button
-                type="button"
-                onClick={() => onChange('')}
-                className="text-xs text-red-500 hover:text-red-600"
+              <Popconfirm
+                title="确定删除这个文件吗？"
+                description="删除后将清除已上传的文件"
+                onConfirm={() => onChange('')}
+                okText="确定"
+                cancelText="取消"
+                okButtonProps={{ danger: true }}
               >
-                删除
-              </button>
+                <button
+                  type="button"
+                  className="text-xs text-red-500 hover:text-red-600"
+                >
+                  删除
+                </button>
+              </Popconfirm>
             </div>
           </div>
         </div>

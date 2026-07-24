@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Modal, Select } from "antd";
+import { Modal, Select, Popconfirm } from "antd";
 import ReactMarkdown from "react-markdown";
 import { WaveformView } from "@/components/admin/WaveformView";
 import { EntryList } from "@/components/admin/EntryList";
@@ -157,8 +157,6 @@ export default function SubtitleEditorPage() {
   };
 
   const handleDeleteWord = async (wordId: string) => {
-    if (!confirm("确定删除这个单词吗？")) return;
-
     try {
       const res = await fetch(`/api/videos/${params.id}/words/${wordId}`, {
         method: "DELETE",
@@ -442,18 +440,34 @@ export default function SubtitleEditorPage() {
                       </span>
                     </div>
                     <div className="flex gap-2 shrink-0">
-                      <button
-                        onClick={() => handleEditWord(w)}
-                        className="text-blue-600 hover:text-blue-800 text-sm"
+                      <Popconfirm
+                        title="确定删除这个词卡吗？"
+                        description="删除后将无法恢复"
+                        onConfirm={() => handleDeleteWord(w.id)}
+                        okText="确定"
+                        cancelText="取消"
+                        okButtonProps={{ danger: true }}
                       >
-                        编辑
-                      </button>
-                      <button
-                        onClick={() => handleDeleteWord(w.id)}
-                        className="text-red-500 hover:text-red-700 text-sm"
+                        <button
+                          className="text-red-500 hover:text-red-700 text-sm"
+                        >
+                          删除
+                        </button>
+                      </Popconfirm>
+                      <Popconfirm
+                        title="确定删除这个词卡吗？"
+                        description="删除后将无法恢复"
+                        onConfirm={() => handleDeleteWord(w.id)}
+                        okText="确定"
+                        cancelText="取消"
+                        okButtonProps={{ danger: true }}
                       >
-                        删除
-                      </button>
+                        <button
+                          className="text-red-500 hover:text-red-700 text-sm"
+                        >
+                          删除
+                        </button>
+                      </Popconfirm>
                     </div>
                   </div>
                 ))}

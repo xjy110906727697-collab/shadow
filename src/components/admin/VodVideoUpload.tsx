@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { Popconfirm } from 'antd'
 
 interface VodVideoUploadProps {
   label: string
@@ -83,13 +84,21 @@ export function VodVideoUpload({ label, vodVideoId, onUploadComplete, onRemove, 
               >
                 更换
               </button>
-              <button
-                type="button"
-                onClick={onRemove}
-                className="text-xs text-red-500 hover:text-red-600"
+              <Popconfirm
+                title="确定删除这个视频吗？"
+                description="删除后将无法恢复"
+                onConfirm={onRemove}
+                okText="确定"
+                cancelText="取消"
+                okButtonProps={{ danger: true }}
               >
-                删除
-              </button>
+                <button
+                  type="button"
+                  className="text-xs text-red-500 hover:text-red-600"
+                >
+                  删除
+                </button>
+              </Popconfirm>
             </div>
           </div>
         </div>

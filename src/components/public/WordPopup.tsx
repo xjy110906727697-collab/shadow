@@ -113,7 +113,7 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
                   : "bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98]"
               }`}
             >
-              {adding ? "加入中..." : isInBag ? "已在词卡中 ✓" : "加入词卡"}
+              {adding ? "加入中..." : isInBag ? "已在单词本中 ✓" : "加入单词本"}
             </button>
           </div>
         </div>
