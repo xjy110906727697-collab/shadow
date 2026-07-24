@@ -115,7 +115,7 @@ export function Header() {
     const isFavoritesView = searchQuery === "show=favorites";
 
     return (
-      <header className="border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+      <header className="border-b border-gray-200 dark:border-slate-700 bg-[#faf8f6] dark:bg-slate-900">
         {/* Mobile: centered ShadowKorean + optional filter/search */}
         <div className="md:hidden w-full px-4 h-12 flex items-center justify-between">
           {isBrowsePage && !isFavoritesView ? (
@@ -140,13 +140,18 @@ export function Header() {
                   />
                 </svg>
               </button>
-              <Link href="/" className="text-lg font-bold text-blue-600 dark:text-blue-400">
+              <Link
+                href="/"
+                className="text-lg font-bold text-blue-600 dark:text-blue-400"
+              >
                 Shadow Korean
               </Link>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() =>
-                    window.dispatchEvent(new CustomEvent("toggle-mobile-search"))
+                    window.dispatchEvent(
+                      new CustomEvent("toggle-mobile-search"),
+                    )
                   }
                   className="p-2 text-gray-600 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200"
                 >
@@ -170,7 +175,10 @@ export function Header() {
           ) : (
             <>
               <div className="flex-1 text-center">
-                <Link href="/" className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                <Link
+                  href="/"
+                  className="text-lg font-bold text-blue-600 dark:text-blue-400"
+                >
                   Shadow Korean
                 </Link>
               </div>
@@ -180,11 +188,17 @@ export function Header() {
         </div>
         {/* Desktop header */}
         <div className="hidden md:flex w-full px-4 md:px-6 h-12 items-center justify-between">
-          <Link href="/" className="text-lg font-bold text-blue-600 dark:text-blue-400">
+          <Link
+            href="/"
+            className="text-lg font-bold text-blue-600 dark:text-blue-400"
+          >
             Shadow Korean
           </Link>
           <nav className="hidden md:flex items-center gap-4 text-sm">
-            <Link href="/" className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100">
+            <Link
+              href="/"
+              className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100"
+            >
               首页
             </Link>
             <Link
@@ -217,7 +231,10 @@ export function Header() {
             >
               反馈
             </button>
-            <Link href="/account" className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100">
+            <Link
+              href="/account"
+              className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100"
+            >
               个人中心
             </Link>
             {session?.user?.role === "ADMIN" && (
@@ -248,7 +265,9 @@ export function Header() {
               {feedbackDone ? (
                 <div className="text-center py-6">
                   <div className="text-4xl mb-3">✅</div>
-                  <h3 className="text-lg font-semibold mb-2 dark:text-slate-100">感谢您的反馈！</h3>
+                  <h3 className="text-lg font-semibold mb-2 dark:text-slate-100">
+                    感谢您的反馈！
+                  </h3>
                   <p className="text-gray-500 dark:text-slate-400 text-sm mb-4">
                     我们会认真阅读每一条意见
                   </p>
@@ -264,7 +283,9 @@ export function Header() {
                 </div>
               ) : (
                 <>
-                  <h2 className="text-xl font-bold mb-2 dark:text-slate-100">意见反馈</h2>
+                  <h2 className="text-xl font-bold mb-2 dark:text-slate-100">
+                    意见反馈
+                  </h2>
                   <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">
                     您的反馈对我们非常重要，帮助我们不断改进
                   </p>
@@ -338,7 +359,9 @@ export function Header() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-4xl mb-4">🔑</div>
-              <h3 className="text-xl font-bold mb-3 dark:text-slate-100">需要登录</h3>
+              <h3 className="text-xl font-bold mb-3 dark:text-slate-100">
+                需要登录
+              </h3>
               <p className="text-gray-600 dark:text-slate-400 mb-6 leading-relaxed">
                 登录后即可提交反馈
               </p>
@@ -362,8 +385,8 @@ export function Header() {
   }
 
   return (
-    <header className="border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900">
-      <div className="w-full px-2 md:px-4 h-14 flex items-center justify-between max-w-[1400px] mx-auto gap-2">
+    <header className="border-b border-gray-200 dark:border-slate-700 bg-[#faf8f6] dark:bg-slate-900">
+      <div className="w-full px-3.5 md:px-4 h-14 flex items-center justify-between max-w-[1400px] mx-auto gap-2">
         {/* Left: back + logo + title */}
         <div className="flex items-center gap-2 min-w-0">
           <Link
@@ -394,7 +417,7 @@ export function Header() {
           <div className="h-5 w-px bg-gray-300 dark:bg-slate-600 shrink-0" />
           &nbsp;
           {title ? (
-            <span className="text-sm text-gray-800 dark:text-slate-200 truncate font-bold">
+            <span className="text-m text-gray-800 dark:text-slate-200 truncate font-bold">
               {title}
             </span>
           ) : (

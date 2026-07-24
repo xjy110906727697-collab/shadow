@@ -110,7 +110,9 @@ export default function VideoDetailPage() {
   if (loading) {
     return (
       <div className="w-full px-4 md:px-8 py-8">
-        <p className="text-center text-gray-500 dark:text-slate-400">加载视频中...</p>
+        <p className="text-center text-gray-500 dark:text-slate-400">
+          加载视频中...
+        </p>
       </div>
     );
   }
@@ -132,7 +134,9 @@ export default function VideoDetailPage() {
               d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
             />
           </svg>
-          <h2 className="text-2xl font-bold mb-2 dark:text-slate-100">需要订阅</h2>
+          <h2 className="text-2xl font-bold mb-2 dark:text-slate-100">
+            需要订阅
+          </h2>
           <p className="text-gray-600 dark:text-slate-400 mb-6">
             此视频需要订阅后才能观看，请登录或注册以获取完整访问权限。
           </p>
@@ -158,16 +162,18 @@ export default function VideoDetailPage() {
   if (!video) {
     return (
       <div className="w-full px-4 md:px-8 py-8">
-        <p className="text-center text-gray-500 dark:text-slate-400">视频未找到</p>
+        <p className="text-center text-gray-500 dark:text-slate-400">
+          视频未找到
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="w-full px-2 md:px-4 py-4 pb-32 md:pb-4 min-[1000px]:pt-8">
+    <div className="w-full px-2 md:px-4 py-4 md:pb-4 min-[1000px]:pt-8">
       {/* Player + Subtitles */}
       <div className="max-w-[1400px] mx-auto">
-        <div className="flex flex-col min-[1000px]:flex-row gap-4">
+        <div className="flex flex-col min-[1000px]:flex-row gap-1">
           <div className="min-[1000px]:w-[68%]">
             <VideoPlayer
               videoUrl={video.videoUrl}
@@ -201,13 +207,6 @@ export default function VideoDetailPage() {
             />
           </div>
         </div>
-
-        {/* Description below */}
-        {(video.descriptionZh || video.description) && (
-          <div className="mt-4 text-sm text-gray-600 dark:text-slate-400 leading-relaxed">
-            <p>{video.descriptionZh || video.description}</p>
-          </div>
-        )}
       </div>
 
       {selectedWord && (

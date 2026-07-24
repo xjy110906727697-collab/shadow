@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Table, Button, message, Tag, Space, Select } from 'antd'
+import { Table, Button, App, Tag, Space, Select } from 'antd'
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 
@@ -17,6 +17,7 @@ interface InviteCode {
 }
 
 export default function AdminInviteCodesPage() {
+  const { message } = App.useApp()
   const [codes, setCodes] = useState<InviteCode[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'available' | 'used'>('all')
