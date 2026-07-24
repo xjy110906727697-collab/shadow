@@ -28,6 +28,11 @@ export async function GET(request: Request) {
       orderBy: { [field]: order },
       skip,
       take: pageSize,
+      include: {
+        inviteCode: {
+          select: { code: true }
+        }
+      }
     }),
     prisma.user.count({ where })
   ])

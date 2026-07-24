@@ -64,6 +64,12 @@ export default async function AdminLayout({
               </svg>
               <span className="text-sm font-medium">用户管理</span>
             </Link>
+            <Link href="/admin/invite-codes" className="group flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-800 dark:hover:to-slate-800 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7h2a2 2 0 012 2v2a2 2 0 01-2 2h-2m-4-6h2a2 2 0 012 2v2a2 2 0 01-2 2h-2M9 7h6m-6 4h6m-3-6v10" />
+              </svg>
+              <span className="text-sm font-medium">邀请码管理</span>
+            </Link>
             <Link href="/admin/feedback" className="group flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-800 dark:hover:to-slate-800 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />

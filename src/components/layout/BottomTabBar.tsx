@@ -25,7 +25,7 @@ export function BottomTabBar() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white border-t border-gray-200">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700">
       <div className="flex items-center justify-around h-14">
         {tabs.map(tab => {
           const active = isActive(tab.href)
@@ -34,7 +34,7 @@ export function BottomTabBar() {
               key={tab.href}
               href={tab.href}
               className={`flex flex-col items-center justify-center flex-1 h-full min-h-[44px] ${
-                active ? 'text-blue-600' : 'text-gray-500'
+                active ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-slate-400'
               }`}
             >
               {tab.icon}

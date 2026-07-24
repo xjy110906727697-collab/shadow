@@ -16,13 +16,13 @@ interface ArticleCardProps {
 export default function ArticleCard({ id, title, tag, summary, readingTime, readCount, date }: ArticleCardProps) {
   return (
     <Link href={`/learning-method/${id}`} className="group block">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow transition-shadow p-4">
-        <span className={`inline-block text-[11px] font-medium px-2 py-0.5 rounded-full ${tagColors[tag] || 'bg-gray-100 text-gray-600'}`}>
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow transition-shadow p-4">
+        <span className={`inline-block text-[11px] font-medium px-2 py-0.5 rounded-full ${tagColors[tag] || 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400'}`}>
           {tag}
         </span>
-        <h3 className="text-base font-semibold mt-2 group-hover:text-blue-600 transition-colors">{title}</h3>
-        <p className="text-sm text-gray-500 mt-1 leading-relaxed line-clamp-2">{summary}</p>
-        <div className="flex items-center gap-3 text-[11px] text-gray-400 mt-3">
+        <h3 className="text-base font-semibold mt-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 dark:text-slate-200">{title}</h3>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 leading-relaxed line-clamp-2">{summary}</p>
+        <div className="flex items-center gap-3 text-[11px] text-gray-400 dark:text-slate-500 mt-3">
           {date && (
             <span className="flex items-center gap-0.5">
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

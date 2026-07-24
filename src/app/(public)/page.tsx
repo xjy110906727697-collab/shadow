@@ -245,7 +245,7 @@ function BrowsePageContent() {
       <SearchBar />
 
       {/* Combined Stats Card - clickable rows */}
-      <div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
+      <div className="border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 overflow-hidden">
         {statsCards.map((card, idx) => {
           const isActive = activeStat === card.key
           return (
@@ -253,26 +253,26 @@ function BrowsePageContent() {
               key={card.key}
               onClick={() => handleStatClick(card.key)}
               className={`w-full flex items-center justify-between px-4 py-3.5 transition-all duration-200 cursor-pointer border-l-[3px] ${
-                idx < statsCards.length - 1 ? 'border-b border-gray-100' : ''
+                idx < statsCards.length - 1 ? 'border-b border-gray-100 dark:border-slate-700' : ''
               } ${
                 isActive
                   ? `${card.activeBg} ${card.activeBorder} ${card.activeText}`
-                  : 'border-l-transparent text-gray-500 hover:bg-gray-50/70 hover:text-gray-700'
+                  : 'border-l-transparent text-gray-500 dark:text-slate-400 hover:bg-gray-50/70 dark:hover:bg-slate-700/50 hover:text-gray-700 dark:hover:text-slate-200'
               }`}
             >
               <div className="flex items-center gap-3">
                 {card.key === 'all' && (
-                  <svg className={`w-[18px] h-[18px] ${isActive ? 'text-blue-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`w-[18px] h-[18px] ${isActive ? 'text-blue-500' : 'text-gray-400 dark:text-slate-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
                 )}
                 {card.key === 'learned' && (
-                  <svg className={`w-[18px] h-[18px] ${isActive ? 'text-emerald-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`w-[18px] h-[18px] ${isActive ? 'text-emerald-500' : 'text-gray-400 dark:text-slate-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 )}
                 {card.key === 'unlearned' && (
-                  <svg className={`w-[18px] h-[18px] ${isActive ? 'text-amber-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`w-[18px] h-[18px] ${isActive ? 'text-amber-500' : 'text-gray-400 dark:text-slate-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 )}
@@ -280,7 +280,7 @@ function BrowsePageContent() {
                   {card.label}
                 </span>
               </div>
-              <span className={`text-xl font-semibold tabular-nums ${isActive ? card.valueColor : 'text-gray-400'}`}>
+              <span className={`text-xl font-semibold tabular-nums ${isActive ? card.valueColor : 'text-gray-400 dark:text-slate-500'}`}>
                 {card.value}
               </span>
             </button>
@@ -289,17 +289,17 @@ function BrowsePageContent() {
       </div>
 
       {/* Combined Filters Card - bigger */}
-      <div className="border border-gray-200 rounded-lg bg-white p-4 space-y-4">
-        <h3 className="text-sm font-semibold text-gray-700 border-b border-gray-100 pb-2">筛选条件</h3>
+      <div className="border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 p-4 space-y-4">
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-100 dark:border-slate-700 pb-2">筛选条件</h3>
 
         {/* 时长 + 频道 on one row — aligned */}
         <div className="flex gap-3 items-start">
           <div className="flex-1">
-            <h4 className="text-xs font-medium text-gray-500 mb-1.5">时长</h4>
+            <h4 className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5">时长</h4>
             <select
               value={durationDraft}
               onChange={e => setDurationDraft(e.target.value as DurationFilter)}
-              className="w-full text-sm border border-gray-200 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full text-sm border border-gray-200 dark:border-slate-600 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
             >
               <option value="">全部</option>
               <option value="lt3">&lt; 3分钟</option>
@@ -308,11 +308,11 @@ function BrowsePageContent() {
             </select>
           </div>
           <div className="flex-1">
-            <h4 className="text-xs font-medium text-gray-500 mb-1.5">频道</h4>
+            <h4 className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5">频道</h4>
             <select
               value={instructorDraft}
               onChange={e => setInstructorDraft(e.target.value)}
-              className="w-full text-sm border border-gray-200 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full text-sm border border-gray-200 dark:border-slate-600 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
             >
               <option value="">全部</option>
               {instructors.map(name => (
@@ -324,14 +324,14 @@ function BrowsePageContent() {
 
         {/* 难度单独一行 */}
         <div>
-          <h4 className="text-xs font-medium text-gray-500 mb-1.5">难度</h4>
+          <h4 className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5">难度</h4>
           <div className="flex items-center gap-0.5">
             {[1, 2, 3, 4, 5].map(star => (
               <button
                 key={star}
                 onClick={() => setDifficultyDraft(difficultyDraft === star ? 0 : star)}
                 className={`text-lg px-0.5 leading-none transition-colors cursor-pointer ${
-                  star <= difficultyDraft ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-300'
+                  star <= difficultyDraft ? 'text-yellow-400' : 'text-gray-300 dark:text-slate-600 hover:text-yellow-300'
                 }`}
                 title={`${star}星`}
               >
@@ -343,7 +343,7 @@ function BrowsePageContent() {
 
         {/* 主题标签 as toggle chips */}
         <div>
-          <h4 className="text-xs font-medium text-gray-500 mb-1.5">主题标签</h4>
+          <h4 className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5">主题标签</h4>
           <div className="grid grid-cols-3 gap-1.5">
             {topics.map(topic => (
               <button
@@ -352,7 +352,7 @@ function BrowsePageContent() {
                 className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer ${
                   topicDraft === topic.slug
                     ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
+                    : 'bg-gray-50 dark:bg-slate-700 text-gray-600 dark:text-slate-400 border-gray-200 dark:border-slate-600 hover:border-blue-300 dark:hover:border-blue-600 hover:text-blue-600 dark:hover:text-blue-400'
                 }`}
               >
                 {topic.nameZh}
@@ -379,10 +379,10 @@ function BrowsePageContent() {
     <div className="w-full px-4 md:px-6 py-3 pb-20 md:pb-3">
       {showLoginPrompt && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowLoginPrompt(false)}>
-          <div className="bg-white rounded-lg p-8 max-w-md text-center" onClick={e => e.stopPropagation()}>
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-8 max-w-md text-center" onClick={e => e.stopPropagation()}>
             <div className="text-4xl mb-4">🔑</div>
-            <h3 className="text-xl font-bold mb-3">需要登录</h3>
-            <p className="text-gray-600 mb-6 leading-relaxed">
+            <h3 className="text-xl font-bold mb-3 dark:text-slate-100">需要登录</h3>
+            <p className="text-gray-600 dark:text-slate-400 mb-6 leading-relaxed">
               登录后即可查看学习进度和筛选内容
             </p>
             <Link
@@ -393,7 +393,7 @@ function BrowsePageContent() {
             </Link>
             <Link
               href="/register"
-              className="block w-full text-gray-500 text-sm text-center py-2 rounded-lg hover:text-gray-700 hover:bg-gray-50"
+              className="block w-full text-gray-500 dark:text-slate-400 text-sm text-center py-2 rounded-lg hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700"
             >
               注册账号
             </Link>
@@ -402,10 +402,10 @@ function BrowsePageContent() {
       )}
       {showSubscribeModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowSubscribeModal(false)}>
-          <div className="bg-white rounded-lg p-8 max-w-md text-center" onClick={e => e.stopPropagation()}>
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-8 max-w-md text-center" onClick={e => e.stopPropagation()}>
             <div className="text-4xl mb-4">🔒</div>
-            <h3 className="text-xl font-bold mb-3">此内容需要登录</h3>
-            <p className="text-gray-600 mb-6 leading-relaxed">
+            <h3 className="text-xl font-bold mb-3 dark:text-slate-100">此内容需要登录</h3>
+            <p className="text-gray-600 dark:text-slate-400 mb-6 leading-relaxed">
               游客模式仅可观看第1、2、3期视频<br />
               注册账号后即可解锁全部内容
             </p>
@@ -417,7 +417,7 @@ function BrowsePageContent() {
             </Link>
             <Link
               href="/login"
-              className="block w-full text-gray-500 text-sm text-center py-2 rounded-lg hover:text-gray-700 hover:bg-gray-50"
+              className="block w-full text-gray-500 dark:text-slate-400 text-sm text-center py-2 rounded-lg hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700"
             >
               已有账号？去登录
             </Link>
@@ -428,12 +428,12 @@ function BrowsePageContent() {
       {/* Mobile search input */}
       {showMobileSearch && (
         <div className="md:hidden mb-3">
-          <input
+            <input
             type="text"
             value={mobileSearchText}
             onChange={e => setMobileSearchText(e.target.value)}
             placeholder="搜索视频..."
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
             autoFocus
           />
         </div>
@@ -453,15 +453,15 @@ function BrowsePageContent() {
         <main className="flex-1 min-w-0">
           {loading ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-sm">加载视频中...</p>
+              <p className="text-gray-500 dark:text-slate-400 text-sm">加载视频中...</p>
             </div>
           ) : videos.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-sm">暂无视频</p>
+              <p className="text-gray-500 dark:text-slate-400 text-sm">暂无视频</p>
             </div>
           ) : (
             <>
-              <div className="grid gap-3 md:gap-5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
                 {videos.map(video => (
                   <VideoCard
                     key={video.id}
@@ -473,10 +473,10 @@ function BrowsePageContent() {
               
               <div ref={observerRef} className="py-6 text-center">
                 {loadingMore && (
-                  <p className="text-gray-500 text-sm">加载更多...</p>
+                  <p className="text-gray-500 dark:text-slate-400 text-sm">加载更多...</p>
                 )}
                 {!loadingMore && page < totalPages && (
-                  <p className="text-gray-400 text-xs">向下滚动加载更多</p>
+                  <p className="text-gray-400 dark:text-slate-500 text-xs">向下滚动加载更多</p>
                 )}
               </div>
             </>
@@ -489,7 +489,7 @@ function BrowsePageContent() {
 
 export default function BrowsePageWrapper() {
   return (
-    <Suspense fallback={<div className="w-full px-4 md:px-6 py-3"><p className="text-gray-500 text-sm">加载中...</p></div>}>
+    <Suspense fallback={<div className="w-full px-4 md:px-6 py-3"><p className="text-gray-500 dark:text-slate-400 text-sm">加载中...</p></div>}>
       <BrowsePageContent />
     </Suspense>
   )

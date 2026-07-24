@@ -110,7 +110,7 @@ export default function VideoDetailPage() {
   if (loading) {
     return (
       <div className="w-full px-4 md:px-8 py-8">
-        <p className="text-center text-gray-500">加载视频中...</p>
+        <p className="text-center text-gray-500 dark:text-slate-400">加载视频中...</p>
       </div>
     );
   }
@@ -118,9 +118,9 @@ export default function VideoDetailPage() {
   if (isLocked) {
     return (
       <div className="w-full px-4 md:px-8 py-8">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow p-8 text-center">
+        <div className="max-w-md mx-auto bg-white dark:bg-slate-800 rounded-lg shadow p-8 text-center">
           <svg
-            className="w-16 h-16 text-gray-400 mx-auto mb-4"
+            className="w-16 h-16 text-gray-400 dark:text-slate-500 mx-auto mb-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -132,8 +132,8 @@ export default function VideoDetailPage() {
               d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
             />
           </svg>
-          <h2 className="text-2xl font-bold mb-2">需要订阅</h2>
-          <p className="text-gray-600 mb-6">
+          <h2 className="text-2xl font-bold mb-2 dark:text-slate-100">需要订阅</h2>
+          <p className="text-gray-600 dark:text-slate-400 mb-6">
             此视频需要订阅后才能观看，请登录或注册以获取完整访问权限。
           </p>
           <div className="flex gap-3">
@@ -145,7 +145,7 @@ export default function VideoDetailPage() {
             </Link>
             <Link
               href="/pricing"
-              className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200"
+              className="flex-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600"
             >
               查看订阅
             </Link>
@@ -158,7 +158,7 @@ export default function VideoDetailPage() {
   if (!video) {
     return (
       <div className="w-full px-4 md:px-8 py-8">
-        <p className="text-center text-gray-500">视频未找到</p>
+        <p className="text-center text-gray-500 dark:text-slate-400">视频未找到</p>
       </div>
     );
   }
@@ -204,7 +204,7 @@ export default function VideoDetailPage() {
 
         {/* Description below */}
         {(video.descriptionZh || video.description) && (
-          <div className="mt-4 text-sm text-gray-600 leading-relaxed">
+          <div className="mt-4 text-sm text-gray-600 dark:text-slate-400 leading-relaxed">
             <p>{video.descriptionZh || video.description}</p>
           </div>
         )}
@@ -222,7 +222,7 @@ export default function VideoDetailPage() {
       )}
 
       {/* Mobile bottom action bar */}
-      <div className="fixed bottom-14 left-0 right-0 z-30 bg-white border-t border-gray-200 md:hidden">
+      <div className="fixed bottom-14 left-0 right-0 z-30 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 md:hidden">
         <div className="pb-[env(safe-area-inset-bottom)]" />
       </div>
     </div>

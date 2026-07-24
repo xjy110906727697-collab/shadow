@@ -8,15 +8,25 @@ datasource db {
 }
 
 model User {
-  id           String             @id @default(cuid())
-  email        String             @unique
-  passwordHash String
-  role         Role               @default(USER)
-  expireAt     DateTime?
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  progress     UserVideoProgress[]
-  wordBag      UserWordBag[]
+  id            String             @id @default(cuid())
+  email         String             @unique
+  passwordHash  String
+  role          Role               @default(USER)
+  expireAt      DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  progress      UserVideoProgress[]
+  wordBag       UserWordBag[]
+  inviteCode    InviteCode?        @relation(fields: [inviteCodeId], references: [id])
+  inviteCodeId  String?            @unique
+}
+
+model InviteCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User?
 }
 
 enum Role {

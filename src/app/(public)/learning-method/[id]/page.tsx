@@ -14,8 +14,8 @@ export default function ArticleDetailPage() {
       <div className="w-full px-4 md:px-6 py-4 pb-20 md:pb-4">
         <div className="max-w-3xl mx-auto text-center py-16">
           <div className="text-4xl mb-4">📄</div>
-          <h1 className="text-2xl font-bold mb-3">文章不存在</h1>
-          <p className="text-gray-600 mb-6">找不到该文章，请返回文章列表</p>
+          <h1 className="text-2xl font-bold mb-3 dark:text-slate-100">文章不存在</h1>
+          <p className="text-gray-600 dark:text-slate-400 mb-6">找不到该文章，请返回文章列表</p>
           <Link
             href="/learning-method"
             className="inline-block bg-blue-600 text-white px-8 py-2.5 rounded-lg hover:bg-blue-700 font-medium"
@@ -32,7 +32,7 @@ export default function ArticleDetailPage() {
       <div className="max-w-3xl mx-auto">
         <Link
           href="/learning-method"
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 mb-6 transition-colors"
+          className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 mb-6 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -40,19 +40,19 @@ export default function ArticleDetailPage() {
           返回
         </Link>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-8">
+        <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-4 md:p-8">
           <div className="flex items-center gap-2 mb-3">
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${tagColors[article.tag] || 'bg-gray-100 text-gray-600'}`}>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${tagColors[article.tag] || 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400'}`}>
               {article.tag}
             </span>
             {article.date && (
-              <span className="text-xs text-gray-400">{article.date}</span>
+              <span className="text-xs text-gray-400 dark:text-slate-500">{article.date}</span>
             )}
           </div>
 
-          <h1 className="text-2xl font-bold mb-4">{article.title}</h1>
+          <h1 className="text-2xl font-bold mb-4 dark:text-slate-100">{article.title}</h1>
 
-          <div className="flex items-center gap-4 text-sm text-gray-500 mb-6 pb-6 border-b border-gray-100">
+          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-slate-400 mb-6 pb-6 border-b border-gray-100 dark:border-slate-700">
             <span className="flex items-center gap-1">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -68,7 +68,7 @@ export default function ArticleDetailPage() {
             </span>
           </div>
 
-          <div className="text-gray-700 text-base leading-7 whitespace-pre-line">
+          <div className="text-gray-700 dark:text-slate-300 text-base leading-7 whitespace-pre-line">
             {article.content}
           </div>
         </div>

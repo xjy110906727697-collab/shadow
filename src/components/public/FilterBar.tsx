@@ -50,7 +50,7 @@ export function FilterBar() {
   return (
     <div className="space-y-4 mb-6">
       <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-2">等级</h3>
+        <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">等级</h3>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => {
@@ -60,7 +60,7 @@ export function FilterBar() {
             className={`px-4 py-2 rounded-lg text-sm ${
               !selectedLevel
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
             }`}
           >
             全部
@@ -75,7 +75,7 @@ export function FilterBar() {
               className={`px-4 py-2 rounded-lg text-sm ${
                 selectedLevel === level.slug
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               {level.nameZh}
@@ -85,7 +85,7 @@ export function FilterBar() {
       </div>
 
       <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-2">主题</h3>
+        <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">主题</h3>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => {
@@ -95,7 +95,7 @@ export function FilterBar() {
             className={`px-4 py-2 rounded-lg text-sm ${
               !selectedTopic
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
             }`}
           >
             全部
@@ -110,7 +110,7 @@ export function FilterBar() {
               className={`px-4 py-2 rounded-lg text-sm ${
                 selectedTopic === topic.slug
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               {topic.nameZh}

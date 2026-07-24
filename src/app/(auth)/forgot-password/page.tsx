@@ -116,7 +116,7 @@ export default function ForgotPasswordPage() {
       </div>
 
       {/* Right Side - Forgot Password Form */}
-      <div className="w-full lg:w-[55%] bg-gray-50 flex items-center justify-center px-6 py-12">
+      <div className="w-full lg:w-[55%] bg-gray-50 dark:bg-slate-900 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-[400px]">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
@@ -126,35 +126,35 @@ export default function ForgotPasswordPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
               </div>
-              <span className="text-2xl font-bold text-gray-900">Shadow Korean</span>
+              <span className="text-2xl font-bold text-gray-900 dark:text-slate-100">Shadow Korean</span>
             </div>
           </div>
 
           {/* Header */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1.5">找回密码</h2>
-            <p className="text-gray-500 text-sm">请输入您注册时使用的邀请码和账号来验证身份</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-1.5">找回密码</h2>
+            <p className="text-gray-500 dark:text-slate-400 text-sm">请输入您注册时使用的邀请码和账号来验证身份</p>
           </div>
 
           {/* Form Card */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-7">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-7">
             {success ? (
               <div className="text-center py-8">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">密码重置成功</h3>
-                <p className="text-sm text-gray-500 mb-6">正在跳转到登录页面...</p>
-                <Link href="/login" className="text-sm text-blue-600 hover:text-blue-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">密码重置成功</h3>
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">正在跳转到登录页面...</p>
+                <Link href="/login" className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
                   立即登录
                 </Link>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
                     <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -163,12 +163,12 @@ export default function ForgotPasswordPage() {
                 )}
 
                 <div>
-                  <label htmlFor="inviteCode" className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label htmlFor="inviteCode" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
                     邀请码
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <svg className="w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-[18px] h-[18px] text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                       </svg>
                     </div>
@@ -179,18 +179,18 @@ export default function ForgotPasswordPage() {
                       onChange={(e) => setInviteCode(e.target.value)}
                       required
                       placeholder="请输入您注册时使用的邀请码"
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-gray-400"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="account" className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label htmlFor="account" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
                     账号
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <svg className="w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-[18px] h-[18px] text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
@@ -201,19 +201,19 @@ export default function ForgotPasswordPage() {
                       onChange={(e) => setAccount(e.target.value)}
                       required
                       placeholder="请输入注册时使用的手机号或邮箱"
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-gray-400"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                     />
                   </div>
-                  <p className="mt-1.5 text-xs text-gray-400">您注册时使用的是邮箱还是手机号？请输入对应的邮箱或手机号</p>
+                  <p className="mt-1.5 text-xs text-gray-400 dark:text-slate-500">您注册时使用的是邮箱还是手机号？请输入对应的邮箱或手机号</p>
                 </div>
 
                 <div>
-                  <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
                     新密码
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <svg className="w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-[18px] h-[18px] text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
                     </div>
@@ -224,18 +224,18 @@ export default function ForgotPasswordPage() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                       placeholder="请输入新密码（至少6位）"
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-gray-400"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
                     确认新密码
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <svg className="w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-[18px] h-[18px] text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                       </svg>
                     </div>
@@ -246,7 +246,7 @@ export default function ForgotPasswordPage() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       placeholder="请再次输入新密码"
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-gray-400"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                     />
                   </div>
                 </div>
@@ -263,7 +263,7 @@ export default function ForgotPasswordPage() {
                   <Link href="/login" className="block">
                     <button
                       type="button"
-                      className="w-full bg-gray-50 text-gray-600 py-2.5 px-4 rounded-xl hover:bg-gray-100 font-medium transition-colors border border-gray-200 text-sm"
+                      className="w-full bg-gray-50 dark:bg-slate-700 text-gray-600 dark:text-slate-300 py-2.5 px-4 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-600 font-medium transition-colors border border-gray-200 dark:border-slate-600 text-sm"
                     >
                       返回登录
                     </button>

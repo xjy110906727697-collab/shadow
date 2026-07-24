@@ -101,21 +101,21 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="w-full lg:w-[55%] bg-gray-50 flex items-center justify-center px-6 py-12">
+      <div className="w-full lg:w-[55%] bg-gray-50 dark:bg-slate-900 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-[400px]">
           {/* Header */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1.5">Shadow Korean</h2>
-            <p className="text-gray-500 text-sm">欢迎回来，请登录您的账号</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-1.5">Shadow Korean</h2>
+            <p className="text-gray-500 dark:text-slate-400 text-sm">欢迎回来，请登录您的账号</p>
           </div>
 
           {/* Login Card */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-7">
-            <h3 className="text-lg font-semibold text-gray-900 mb-5">登录</h3>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-7">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-5">登录</h3>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
                   <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -124,12 +124,12 @@ export default function LoginPage() {
               )}
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
                   账号
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <svg className="w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-[18px] h-[18px] text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                   </div>
@@ -140,18 +140,18 @@ export default function LoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     placeholder="请输入手机号或邮箱"
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-gray-400"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
                   密码
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <svg className="w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-[18px] h-[18px] text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                   </div>
@@ -162,11 +162,11 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     placeholder="请输入密码"
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-gray-400"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                   />
                 </div>
                 <div className="mt-2 text-right">
-                  <Link href="/forgot-password" className="text-xs text-blue-600 hover:text-blue-700">
+                  <Link href="/forgot-password" className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
                     忘记密码?
                   </Link>
                 </div>
@@ -184,9 +184,18 @@ export default function LoginPage() {
                 <Link href="/register" className="block">
                   <button
                     type="button"
-                    className="w-full bg-gray-50 text-gray-600 py-2.5 px-4 rounded-xl hover:bg-gray-100 font-medium transition-colors border border-gray-200 text-sm"
+                    className="w-full bg-gray-50 dark:bg-slate-700 text-gray-600 dark:text-slate-300 py-2.5 px-4 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-600 font-medium transition-colors border border-gray-200 dark:border-slate-600 text-sm"
                   >
                     立即注册
+                  </button>
+                </Link>
+
+                <Link href="/" className="block">
+                  <button
+                    type="button"
+                    className="w-full bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 py-2.5 px-4 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 font-medium transition-colors border border-gray-300 dark:border-slate-600 text-sm"
+                  >
+                    游客模式
                   </button>
                 </Link>
               </div>
@@ -194,31 +203,31 @@ export default function LoginPage() {
           </div>
 
           {/* Contact Section */}
-          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-            <h4 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">联系我们</h4>
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-slate-700 text-center">
+            <h4 className="text-xs font-medium text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3">联系我们</h4>
             <div className="flex items-center justify-center gap-5 mb-4">
-              <button type="button" onClick={() => setQrModal({open: true, type: 'wechat'})} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
+              <button type="button" onClick={() => setQrModal({open: true, type: 'wechat'})} className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200 transition-colors">
                 <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 01.598.082l1.584.926a.272.272 0 00.14.045c.134 0 .24-.11.24-.245 0-.06-.024-.12-.04-.178l-.325-1.233a.492.492 0 01.177-.554C23.028 18.473 24 16.82 24 14.941c0-3.28-3.04-5.95-7.062-6.083zm-2.089 2.9c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.97-.982z"/>
                 </svg>
                 <span>微信</span>
               </button>
-              <button type="button" onClick={() => setQrModal({open: true, type: 'xiaohongshu'})} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
+              <button type="button" onClick={() => setQrModal({open: true, type: 'xiaohongshu'})} className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200 transition-colors">
                 <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.5 14.5h-9v-1h9v1zm0-3h-9v-1h9v1zm0-3h-9v-1h9v1zm0-3h-9v-1h9v1z"/>
                 </svg>
                 <span>小红书</span>
               </button>
-              <button type="button" onClick={() => setQrModal({open: true, type: 'douyin'})} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
+              <button type="button" onClick={() => setQrModal({open: true, type: 'douyin'})} className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200 transition-colors">
                 <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm3 15c-1.105 0-2-.672-2-1.5S13.895 14 15 14s2 .672 2 1.5-.895 1.5-2 1.5zm-6 0c-1.105 0-2-.672-2-1.5S7.895 14 9 14s2 .672 2 1.5S10.105 17 9 17zm3-5a3 3 0 110-6 3 3 0 010 6z"/>
                 </svg>
                 <span>抖音</span>
               </button>
             </div>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-400 dark:text-slate-500">
               继续使用即表示您同意我们的
-              <a href="#" className="text-gray-500 underline underline-offset-2 hover:text-gray-700">服务条款</a>
+              <a href="#" className="text-gray-500 dark:text-slate-400 underline underline-offset-2 hover:text-gray-700 dark:hover:text-slate-300">服务条款</a>
             </p>
           </div>
         </div>
@@ -227,25 +236,25 @@ export default function LoginPage() {
       {/* QR Code Modal */}
       {qrModal.open && qrModal.type && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setQrModal({open: false, type: null})}>
-          <div className="bg-white rounded-2xl p-8 max-w-sm w-full relative" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 max-w-sm w-full relative" onClick={(e) => e.stopPropagation()}>
             <button
               type="button"
               onClick={() => setQrModal({open: false, type: null})}
-              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
                 {qrModal.type === 'wechat' && '微信扫码'}
                 {qrModal.type === 'xiaohongshu' && '小红书扫码'}
                 {qrModal.type === 'douyin' && '抖音扫码'}
               </h3>
-              <p className="text-sm text-gray-500 mb-6">扫码添加客服，获取更多帮助</p>
-              <div className="bg-gray-50 rounded-xl p-8 mb-4">
-                <div className="w-48 h-48 mx-auto bg-white rounded-lg flex items-center justify-center">
+              <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">扫码添加客服，获取更多帮助</p>
+              <div className="bg-gray-50 dark:bg-slate-700 rounded-xl p-8 mb-4">
+                <div className="w-48 h-48 mx-auto bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center">
                   <Image
                     src={`/qr-${qrModal.type}.png`}
                     alt={`${qrModal.type} QR Code`}
@@ -255,7 +264,7 @@ export default function LoginPage() {
                   />
                 </div>
               </div>
-              <p className="text-xs text-gray-400">请使用{qrModal.type === 'wechat' ? '微信' : qrModal.type === 'xiaohongshu' ? '小红书' : '抖音'}扫描二维码</p>
+              <p className="text-xs text-gray-400 dark:text-slate-500">请使用{qrModal.type === 'wechat' ? '微信' : qrModal.type === 'xiaohongshu' ? '小红书' : '抖音'}扫描二维码</p>
             </div>
           </div>
         </div>

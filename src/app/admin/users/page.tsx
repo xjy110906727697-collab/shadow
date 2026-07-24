@@ -12,6 +12,7 @@ interface User {
   role: 'USER' | 'ADMIN'
   expireAt: string | null
   createdAt: string
+  inviteCode: { code: string } | null
 }
 
 interface UserFormData {
@@ -207,6 +208,19 @@ export default function AdminUsersPage() {
           </span>
         )
       },
+    },
+    {
+      title: '邀请码',
+      dataIndex: 'inviteCode',
+      render: (inviteCode: { code: string } | null) => (
+        inviteCode ? (
+          <span className="font-mono text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2 py-1 rounded">
+            {inviteCode.code}
+          </span>
+        ) : (
+          <span className="text-slate-400 dark:text-slate-500 text-sm">-</span>
+        )
+      ),
     },
     {
       title: '创建时间',
